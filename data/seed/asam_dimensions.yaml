@@ -1,0 +1,103 @@
+# ASAM 4th-edition (2023) dimensional admission criteria — seed catalog.
+#
+# Reference fixture, not code: a clinician can review or extend this without
+# touching Python. The ingestion pipeline (app/ingest/asam_evidence_index.py)
+# loads it and, for each dimension, anchors an evidence span wherever one of
+# the dimension's keywords appears in chart text.
+#
+# The six dimensions are per the ASAM Criteria 4th edition; see
+# documents/phase_1.md §B. Dimension 6 ("Person-Centered Considerations")
+# replaces the 3rd-edition "Readiness to Change" — readiness is now woven
+# across all dimensions, and Dimension 4 here carries the substance-use-risk
+# emphasis.
+
+dimensions:
+  - number: 1
+    name: "Intoxication, Withdrawal, and Addiction Medications"
+    keywords:
+      - withdrawal
+      - CIWA-Ar
+      - COWS
+      - intoxication
+      - intoxicated
+      - detox
+      - taper
+      - chlordiazepoxide
+      - librium
+      - gabapentin
+      - tremor
+      - last drink
+      - MOUD
+
+  - number: 2
+    name: "Biomedical Conditions and Complications"
+    keywords:
+      - hypertension
+      - HTN
+      - hepatic
+      - hepatitis
+      - LFT
+      - AST
+      - ALT
+      - GGT
+      - bilirubin
+      - vitals
+      - blood pressure
+      - lisinopril
+      - TBI
+
+  - number: 3
+    name: "Emotional, Behavioral, and Cognitive Conditions/Complications"
+    keywords:
+      - PHQ-9
+      - GAD-7
+      - C-SSRS
+      - depression
+      - depressive
+      - anxiety
+      - anxious
+      - suicidal
+      - ideation
+      - Major Depressive Disorder
+      - Generalized Anxiety Disorder
+      - Mental Status Exam
+
+  - number: 4
+    name: "Substance Use-Related Risks and Readiness to Change"
+    keywords:
+      - AUDIT-C
+      - DAST-10
+      - ambivalent
+      - ambivalence
+      - continued use
+      - DUI
+      - readiness
+      - relapse
+      - prior treatment
+      - polysubstance
+
+  - number: 5
+    name: "Recovery and Living Environment"
+    keywords:
+      - housing
+      - homeless
+      - sober support
+      - recovery environment
+      - unemployed
+      - job loss
+      - living with
+      - social isolation
+      - active substance user
+
+  - number: 6
+    name: "Person-Centered Considerations"
+    keywords:
+      - cultural
+      - spiritual
+      - religious
+      - Hispanic
+      - Catholic
+      - "I'm here because"
+      - strengths
+      - preferences
+      - person-centered

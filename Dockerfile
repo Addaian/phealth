@@ -10,10 +10,12 @@ WORKDIR /app
 COPY pyproject.toml ./
 RUN pip install --no-cache-dir --upgrade pip && pip install --no-cache-dir .
 
-# Copy the application source and migration tooling.
+# Copy the application source, migration tooling, and the seed catalogs the
+# ingestion pipeline loads at runtime (ASAM dimensions + TJC EP catalog).
 COPY app/ ./app/
 COPY alembic/ ./alembic/
 COPY alembic.ini ./
+COPY data/seed/ ./data/seed/
 
 # uvicorn serves the FastAPI app; --host 0.0.0.0 makes it reachable from the host.
 EXPOSE 8000

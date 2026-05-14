@@ -72,26 +72,46 @@ def field(label: str, body: str) -> str:
     return f"\n▶ {label}\n\n{body.strip()}\n"
 
 
-def flow(s: str) -> str:
+def flow(text: str) -> str:
     """Collapse YAML folded-block whitespace ('>' style) into clean prose.
 
     YAML folded blocks ('>') replace newlines with spaces but preserve
     indentation as multiple spaces — this normalizes to a single space.
     """
-    return " ".join(s.split())
+    return " ".join(text.split())
+
+
+def _render_substance(substance: dict[str, Any]) -> str:
+    """Render one substance-use entry as a bullet line for the §15 breakdown.
+
+    A substance the patient denies (e.g. opioids) renders as a short line; a
+    substance with a use history renders the full first/last-use, route, and
+    withdrawal detail.
+    """
+    if "DENIES" in str(substance.get("current_pattern", "")).upper():
+        line = f"  • {substance['substance']}: {substance['current_pattern']}. "
+        return (line + str(substance.get("notes", ""))).rstrip()
+    return flow(f"""
+        • {substance["substance"]}: first use age {substance.get("age_of_first_use", "?")};
+        pattern {substance.get("current_pattern", "?")};
+        last use {substance.get("last_use", "?")};
+        route {substance.get("route", "?")};
+        withdrawal history — {substance.get("withdrawal_history", "none")};
+        prior treatment — {substance.get("prior_treatment", "none")}.
+    """)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
 # BPS Intake renderer
 # ─────────────────────────────────────────────────────────────────────────────
-def render_bps_intake(p: dict[str, Any]) -> str:
+def render_bps_intake(persona: dict[str, Any]) -> str:
     """Render the [BPS] Intake Assessment as paste-into-SP plain text.
 
     Produces all 21 sections of the BPS template the user built in M1.
     See documents/phase_1_PRD.md §6.1 for the section contract.
     """
-    enc = p["encounter"]
-    demo = p["demographics"]
+    enc = persona["encounter"]
+    demo = persona["demographics"]
     out = banner(
         f"[BPS] Intake Assessment for {demo['given_name']} {demo['family_name']}\n"
         f"  Date: {enc['bps_intake_date']}\n"
@@ -103,7 +123,7 @@ def render_bps_intake(p: dict[str, Any]) -> str:
 
     # ── §1 Presenting Problem ────────────────────────────────────────────
     out += section(1, "Presenting Problem")
-    out += field("Presenting Problem", p["presenting_problem"]["chief_complaint"].strip())
+    out += field("Presenting Problem", persona["presenting_problem"]["chief_complaint"].strip())
 
     # ── §2 Signs and Symptoms ────────────────────────────────────────────
     # DSM-5-TR symptom checklist tied to the three working diagnoses in §20.
@@ -131,7 +151,7 @@ def render_bps_intake(p: dict[str, Any]) -> str:
 
     # ── §3 History of Presenting Problem ────────────────────────────────
     out += section(3, "History of Presenting Problem")
-    out += field("History of Presenting Problem", flow(p["presenting_problem"]["hpi"]))
+    out += field("History of Presenting Problem", flow(persona["presenting_problem"]["hpi"]))
     out += field(
         "Frequency/duration/severity/cycling of symptoms",
         flow("""
@@ -157,7 +177,7 @@ def render_bps_intake(p: dict[str, Any]) -> str:
     )
     out += field(
         "Family mental health history",
-        flow(p["family_social_history"]["family_psychiatric_history"]),
+        flow(persona["family_social_history"]["family_psychiatric_history"]),
     )
 
     # ── §4 Current Family and Significant Relationships ─────────────────
@@ -338,8 +358,8 @@ def render_bps_intake(p: dict[str, Any]) -> str:
 
     # ── §14 Physical Health ──────────────────────────────────────────────
     # Load-bearing for ASAM Dim 2 (Biomedical Conditions).
-    med = p["medical_history"]
-    v = med["vitals_on_admission"]
+    med = persona["medical_history"]
+    vitals = med["vitals_on_admission"]
     out += section(14, "Physical Health")
     out += field(
         "Summary of health",
@@ -362,9 +382,9 @@ def render_bps_intake(p: dict[str, Any]) -> str:
     )
     out += field(
         "Vitals (BP, HR, RR, temp, SpO2)",
-        f"BP {v['blood_pressure']}; HR {v['heart_rate']}; "
-        f"RR {v['respiratory_rate']}; T {v['temperature_f']}°F; "
-        f"SpO2 {v['oxygen_saturation']}%.",
+        f"BP {vitals['blood_pressure']}; HR {vitals['heart_rate']}; "
+        f"RR {vitals['respiratory_rate']}; T {vitals['temperature_f']}°F; "
+        f"SpO2 {vitals['oxygen_saturation']}%.",
     )
     out += field(
         "Current medications (name, dose, frequency, prescriber)",
@@ -410,25 +430,8 @@ def render_bps_intake(p: dict[str, Any]) -> str:
     """),
     )
 
-    # Per-substance breakdown — each substance gets one bullet paragraph.
-    subs_lines = []
-    for s in p["substance_use"]:
-        # Substances with no use (e.g. opioids — denied) render shorter.
-        if "DENIES" in str(s.get("current_pattern", "")).upper():
-            subs_lines.append(
-                f"  • {s['substance']}: {s['current_pattern']}. {s.get('notes', '')}".rstrip()
-            )
-        else:
-            subs_lines.append(
-                flow(f"""
-                • {s["substance"]}: first use age {s.get("age_of_first_use", "?")};
-                pattern {s.get("current_pattern", "?")};
-                last use {s.get("last_use", "?")};
-                route {s.get("route", "?")};
-                withdrawal history — {s.get("withdrawal_history", "none")};
-                prior treatment — {s.get("prior_treatment", "none")}.
-            """)
-            )
+    # Per-substance breakdown — one bullet line per substance (see _render_substance).
+    subs_lines = [_render_substance(substance) for substance in persona["substance_use"]]
     out += field(
         "Per-substance breakdown (alcohol, sedative-hypnotics, cannabis, "
         "opioids, stimulants, other) — for each: first/last use, route, "
@@ -436,10 +439,12 @@ def render_bps_intake(p: dict[str, Any]) -> str:
         "\n".join(subs_lines),
     )
     out += field(
-        "AUDIT-C (date, items, total, interpretation)", flow(p["scales"]["audit_c"]["verbatim"])
+        "AUDIT-C (date, items, total, interpretation)",
+        flow(persona["scales"]["audit_c"]["verbatim"]),
     )
     out += field(
-        "DAST-10 (date, items, total, interpretation)", flow(p["scales"]["dast10"]["verbatim"])
+        "DAST-10 (date, items, total, interpretation)",
+        flow(persona["scales"]["dast10"]["verbatim"]),
     )
 
     # ── §16 Counseling/Prior Treatment History ──────────────────────────
@@ -467,33 +472,36 @@ def render_bps_intake(p: dict[str, Any]) -> str:
     )
 
     # ── §17 Past Psychiatric History ─────────────────────────────────────
-    psy = p["psychiatric_history"]
+    psy = persona["psychiatric_history"]
     out += section(17, "Past Psychiatric History")
     out += field(
         "Prior psychiatric diagnoses (DSM-5-TR / ICD-10)",
         "\n".join(
-            f"  • {d['name']} (ICD-10 {d['icd10']}; "
-            f"DSM-5-TR {d['dsm5tr']}; onset {d['onset_year']})"
-            for d in psy["diagnoses"]
+            f"  • {diagnosis['name']} (ICD-10 {diagnosis['icd10']}; "
+            f"DSM-5-TR {diagnosis['dsm5tr']}; onset {diagnosis['onset_year']})"
+            for diagnosis in psy["diagnoses"]
         ),
     )
     out += field(
         "Psychiatric hospitalizations (year, facility, reason, duration)",
         "\n".join(
-            f"  • {h['year']} — {h['facility']} — {h['reason']}" for h in psy["hospitalizations"]
+            f"  • {hospitalization['year']} — {hospitalization['facility']} — "
+            f"{hospitalization['reason']}"
+            for hospitalization in psy["hospitalizations"]
         ),
     )
     out += field(
         "Prior psychiatric medications (drug, dose, dates, prescriber, response)",
         "\n".join(
-            f"  • {m['name']} — {m['years']} — {m['outcome']}" for m in psy["prior_medications"]
+            f"  • {medication['name']} — {medication['years']} — {medication['outcome']}"
+            for medication in psy["prior_medications"]
         ),
     )
     out += field("Self-harm history", flow(psy["self_harm_history"]))
     out += field("Prior suicide attempts (lifetime)", "None.")
 
     # ── §18 Mental Status Exam ───────────────────────────────────────────
-    mse = p["mental_status_exam"]
+    mse = persona["mental_status_exam"]
     out += section(18, "Mental Status Exam")
     for label, key in [
         ("Appearance", "appearance"),
@@ -510,10 +518,12 @@ def render_bps_intake(p: dict[str, Any]) -> str:
     ]:
         out += field(label, mse[key])
     out += field(
-        "Standardized screening — PHQ-9 (date, items, total)", flow(p["scales"]["phq9"]["verbatim"])
+        "Standardized screening — PHQ-9 (date, items, total)",
+        flow(persona["scales"]["phq9"]["verbatim"]),
     )
     out += field(
-        "Standardized screening — GAD-7 (date, items, total)", flow(p["scales"]["gad7"]["verbatim"])
+        "Standardized screening — GAD-7 (date, items, total)",
+        flow(persona["scales"]["gad7"]["verbatim"]),
     )
 
     # ── §19 Risk Assessment ──────────────────────────────────────────────
@@ -521,14 +531,16 @@ def render_bps_intake(p: dict[str, Any]) -> str:
     out += section(19, "Risk Assessment")
     out += field(
         "Suicide risk — C-SSRS (date, items, interpretation)",
-        flow(p["scales"]["c_ssrs"]["verbatim"]),
+        flow(persona["scales"]["c_ssrs"]["verbatim"]),
     )
     out += field("Homicidal ideation", "Denies. No ideation, plan, intent, or lifetime history.")
     out += field(
-        "Withdrawal risk — CIWA-Ar (date, items, total)", flow(p["scales"]["ciwa_ar"]["verbatim"])
+        "Withdrawal risk — CIWA-Ar (date, items, total)",
+        flow(persona["scales"]["ciwa_ar"]["verbatim"]),
     )
     out += field(
-        "Withdrawal risk — COWS (date, items, total, or N/A)", flow(p["scales"]["cows"]["verbatim"])
+        "Withdrawal risk — COWS (date, items, total, or N/A)",
+        flow(persona["scales"]["cows"]["verbatim"]),
     )
     out += field(
         "Violence / aggression risk",
@@ -582,20 +594,24 @@ def render_bps_intake(p: dict[str, Any]) -> str:
     # ── §21 Treatment Plan ───────────────────────────────────────────────
     # Golden-thread anchor: interventions listed here are what progress
     # notes must reference. G2 = peer-support is intentionally NOT listed.
-    tp = p["treatment_plan"]
+    treatment_plan = persona["treatment_plan"]
     out += section(21, "Treatment Plan")
-    for i, g in enumerate(tp["goals"], 1):
+    for goal_number, goal in enumerate(treatment_plan["goals"], 1):
         body = (
-            f"Domain: {g['domain']}. "
-            f"Goal: {g['goal']}. "
-            f"Target date: {g['target_date']}. "
-            f"Measure: {g['measure']}."
+            f"Domain: {goal['domain']}. "
+            f"Goal: {goal['goal']}. "
+            f"Target date: {goal['target_date']}. "
+            f"Measure: {goal['measure']}."
         )
-        out += field(f"Goal {i} (domain, goal, target date, measure)", body)
+        out += field(f"Goal {goal_number} (domain, goal, target date, measure)", body)
     out += field(
-        "Interventions (list with frequency)", "\n".join(f"  • {iv}" for iv in tp["interventions"])
+        "Interventions (list with frequency)",
+        "\n".join(f"  • {intervention}" for intervention in treatment_plan["interventions"]),
     )
-    out += field("Expected outcomes", "\n".join(f"  • {o}" for o in tp["expected_outcomes"]))
+    out += field(
+        "Expected outcomes",
+        "\n".join(f"  • {outcome}" for outcome in treatment_plan["expected_outcomes"]),
+    )
     out += field(
         "Discharge / step-down criteria",
         flow("""
@@ -612,7 +628,7 @@ def render_bps_intake(p: dict[str, Any]) -> str:
 # ─────────────────────────────────────────────────────────────────────────────
 # Progress-note renderer
 # ─────────────────────────────────────────────────────────────────────────────
-def render_progress_note(p: dict[str, Any], note_idx: int) -> str:
+def render_progress_note(persona: dict[str, Any], note_idx: int) -> str:
     """Render one progress note (SOAP, DAP, or DSAP) as paste-into-SP text.
 
     Sections render in canonical order for the note's format (playbook §F):
@@ -620,12 +636,12 @@ def render_progress_note(p: dict[str, Any], note_idx: int) -> str:
         DAP  → data, assessment, plan
         DSAP → data, subjective, assessment, plan
     """
-    note = p["progress_notes"][note_idx]
+    note = persona["progress_notes"][note_idx]
     fmt = note["format"]
 
     out = banner(
-        f"[{fmt}] Progress Note for {p['demographics']['given_name']} "
-        f"{p['demographics']['family_name']}\n"
+        f"[{fmt}] Progress Note for {persona['demographics']['given_name']} "
+        f"{persona['demographics']['family_name']}\n"
         f"  Date: {note['date']}\n"
         f"  Clinician: {note['author']['name']} ({note['author']['role']})\n"
         f"  Encounter type: {note['encounter_type']}\n"
@@ -646,7 +662,7 @@ def render_progress_note(p: dict[str, Any], note_idx: int) -> str:
     # DO NOT paste this into SimplePractice.
     gap = note.get("embeds_gap")
     if gap:
-        gap_detail = next(g for g in p["intentional_gaps"] if g["id"] == gap)
+        gap_detail = next(entry for entry in persona["intentional_gaps"] if entry["id"] == gap)
         out += (
             f"\n{HR}\n"
             f"AUTHOR NOTE — intentional gap embedded here: "
@@ -663,6 +679,7 @@ def render_progress_note(p: dict[str, Any], note_idx: int) -> str:
 # Main
 # ─────────────────────────────────────────────────────────────────────────────
 def main() -> None:
+    """Load the persona and write all four rendered chart-text files to OUTPUT_DIR."""
     with PERSONA_PATH.open() as f:
         persona = yaml.safe_load(f)
 

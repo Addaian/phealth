@@ -13,18 +13,40 @@ Database-backed tests assume the schema has been migrated
 (`alembic upgrade head`); see documents/phase_1_implementation_plan.md §M5.
 """
 
+from pathlib import Path
+
 import pytest
+import yaml
 from fastapi.testclient import TestClient
 from sqlalchemy import text
 from sqlmodel import Session
 
 from app.main import app
 
+# Repo root, derived from this file's location (tests/conftest.py).
+_REPO_ROOT = Path(__file__).resolve().parent.parent
+
 
 @pytest.fixture
 def client() -> TestClient:
     """A TestClient bound to the FastAPI app."""
     return TestClient(app)
+
+
+@pytest.fixture(scope="session")
+def persona() -> dict:
+    """The synthetic patient's single source of truth (app/synthetic/persona.yaml).
+
+    Loaded once per test session — it is read-only reference data.
+    """
+    with (_REPO_ROOT / "app" / "synthetic" / "persona.yaml").open() as f:
+        return yaml.safe_load(f)
+
+
+@pytest.fixture(scope="session")
+def export_root() -> Path:
+    """Path to the committed SimplePractice synthetic export directory."""
+    return _REPO_ROOT / "data" / "synthetic_export" / "Marcus Reyes"
 
 
 @pytest.fixture(scope="session")

@@ -13,10 +13,18 @@ application wiring is proven. Routes are implemented in M6 (ingest) and M8
 (read API).
 """
 
+import logging
+
 from fastapi import FastAPI
 
 from app.api import fhir as fhir_api
 from app.api import ingest, notes, patients
+
+# Surface application-level INFO logs (ingestion progress, audit events). uvicorn
+# configures only its own loggers and leaves the root logger without a handler,
+# so app-module INFO records would otherwise be dropped. basicConfig installs a
+# root StreamHandler at INFO; it is a no-op if a handler is already present.
+logging.basicConfig(level=logging.INFO)
 
 app = FastAPI(
     title="Perspectives Health — Clinical Ingestion Substrate",

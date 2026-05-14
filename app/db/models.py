@@ -35,7 +35,9 @@ from sqlalchemy import Column
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlmodel import Field, SQLModel
 
-# Embedding dimensionality for OpenAI text-embedding-3-small (PRD §7; set in M6).
+# Embedding dimensionality for OpenAI text-embedding-3-small (PRD §7; used in M6).
+# Must match the output dimension of whatever model the EMBEDDING_MODEL setting
+# (app/core/config.py) names — if that model is swapped, update this too.
 EMBEDDING_DIM = 1536
 
 

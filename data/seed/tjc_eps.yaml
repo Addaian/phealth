@@ -1,0 +1,82 @@
+# The Joint Commission — Element of Performance (EP) catalog — seed.
+#
+# Reference fixture, not code. Each EP here has a rule function in
+# app/ingest/tjc_coverage_matrix.py (keyed by `code`); the ingester evaluates
+# every EP against the patient's document set and emits a TjcCoverage row with
+# status satisfied | gap | ambiguous.
+#
+# `gap_id` links an EP to the intentional gap it is designed to catch in the
+# synthetic chart (see app/synthetic/persona.yaml §intentional_gaps); a null
+# `gap_id` marks an EP this chart is expected to *satisfy* — the contrast is
+# what makes the audit endpoint demonstrable (playbook §Step 8).
+#
+# EP wording is paraphrased from the Joint Commission Comprehensive
+# Accreditation Manual for Behavioral Health Care; see documents/phase_1.md §C
+# for sourcing and the CTS.02.02.01 paywall caveat.
+
+eps:
+  - code: "CTS.01.05.01"
+    title: "Comprehensive assessment completed at admission"
+    standard: "Care, Treatment, and Services — assessment"
+    description: >
+      A comprehensive biopsychosocial assessment is completed for the
+      individual served at admission.
+    gap_id: null
+
+  - code: "RC.01.01.01"
+    title: "The clinical record is complete"
+    standard: "Record of Care, Treatment, and Services"
+    description: >
+      The clinical record contains the information required to support the
+      diagnosis, justify care, and document the course and results of care.
+    gap_id: null
+
+  - code: "CTS.04.02.01"
+    title: "Treatment plan with measurable goals is documented"
+    standard: "Care, Treatment, and Services — planning"
+    description: >
+      The individual served has a documented treatment plan with measurable
+      goals, target dates, and interventions.
+    gap_id: null
+
+  - code: "CTS.03.01.03"
+    title: "Treatment plan reflects assessed needs (golden thread)"
+    standard: "Care, Treatment, and Services — planning"
+    description: >
+      The plan for care reflects the assessed needs, strengths, preferences,
+      and goals of the individual served; services delivered are reflected in
+      the plan.
+    gap_id: "G2"
+
+  - code: "CTS.03.01.09"
+    title: "Outcomes assessed with a standardized tool (measurement-based care)"
+    standard: "Care, Treatment, and Services — outcomes"
+    description: >
+      The organization assesses the outcomes of care using a standardized tool
+      or instrument, repeated over the episode of care.
+    gap_id: "G1"
+
+  - code: "NPSG.15.01.01"
+    title: "Suicide risk screening with a validated tool"
+    standard: "National Patient Safety Goal 15"
+    description: >
+      Individuals are screened for suicidal ideation using a validated tool at
+      admission and at clinically significant points in care (e.g. before a
+      level-of-care transition).
+    gap_id: "G3"
+
+  - code: "R3-25"
+    title: "Discharge / transition planning documented within 72 hours of admission"
+    standard: "R3 Report Issue 25 — transitions of care for SUD treatment"
+    description: >
+      For substance use disorder treatment, discharge and transition-of-care
+      planning is documented within 72 hours of admission.
+    gap_id: "G4"
+
+  - code: "RC.01.02.01"
+    title: "Clinical documentation is authenticated"
+    standard: "Record of Care, Treatment, and Services — authentication"
+    description: >
+      Entries in the clinical record are authenticated; documentation by a
+      non-clinical role carries an appropriate clinical co-signature.
+    gap_id: "G5"

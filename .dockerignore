@@ -9,7 +9,10 @@ __pycache__/
 .ruff_cache/
 .env
 .env.*
-data/
+# The synthetic export is uploaded to /ingest at runtime — it does not belong
+# in the image. But data/seed/ (the ASAM + TJC reference catalogs) IS needed at
+# runtime, so it is deliberately NOT excluded here and is COPYed in the Dockerfile.
+data/synthetic_export/
 documents/
 tests/
 *.md
