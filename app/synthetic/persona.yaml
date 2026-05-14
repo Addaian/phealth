@@ -1,0 +1,606 @@
+# persona.yaml — single source of truth for the synthetic patient
+# ----------------------------------------------------------------
+# This file drives:
+#   • the BPS intake content authored in SimplePractice (M2)
+#   • the three progress notes authored in SimplePractice (M2)
+#   • the golden tests in tests/test_scale_extractor.py and tests/test_provenance.py
+#   • the face-validity checklist in tests/face_validity_checklist.md
+#
+# Every ASAM dimension (1-6) MUST trace to at least one field below.
+# Every intentional compliance gap (G1-G5) MUST trace to a specific note/section.
+# See documents/phase_1_PRD.md §5.1, §6.1, §6.3 for the contract this file fulfils.
+#
+# IMPORTANT: this is synthetic data. Do NOT introduce any field that maps to a
+# real person you know — see playbook §Step 8 (face-validity / de-identification).
+
+# -----------------------------------------------------------------------------
+# 1. Demographics
+# -----------------------------------------------------------------------------
+demographics:
+  external_id: "SP-MARCUS-REYES-0001"          # SimplePractice client ID, populated post-export
+  given_name: "Marcus"
+  middle_name: "J."
+  family_name: "Reyes"
+  date_of_birth: "1991-11-04"                  # age 34 at intake
+  gender: "male"
+  pronouns: "he/him"
+  race_ethnicity: "Hispanic or Latino"
+  preferred_language: "English"
+  marital_status: "single"
+  emergency_contact:
+    name: "Daniel Reyes"
+    relationship: "brother"
+    phone: "(555) 010-4421"                   # synthetic, NXX-555 reserved range
+  address:
+    line: "412 Maplewood Ave, Apt 3B"          # fictional; do not map to a real address
+    city: "Springfield"
+    state: "IL"
+    postal_code: "62704"
+  insurance: "Medicaid (state managed care)"
+
+# -----------------------------------------------------------------------------
+# 2. Encounter context
+# -----------------------------------------------------------------------------
+encounter:
+  admission_date: "2026-05-04"                 # day 0; all relative dates below are offsets
+  referral_source: "Emergency Department"      # admitted after fall while intoxicated
+  level_of_care_on_admission: "3.7"            # ASAM Medically Monitored Intensive Inpatient
+  level_of_care_recommended_on_discharge: "2.5" # IOP (Note 3 step-down)
+  expected_los_days: 14
+  bps_intake_date: "2026-05-04"
+  bps_clinician:
+    name: "Dr. Aisha Patel, MD"
+    role: "psychiatrist"
+    npi: "1234567890"                          # synthetic NPI for demo
+    credentials: "MD, board-certified addiction psychiatry"
+
+# -----------------------------------------------------------------------------
+# 3. Presenting problem / HPI
+# -----------------------------------------------------------------------------
+presenting_problem:
+  chief_complaint: >
+    "I fell at home and my brother brought me to the ED. They said I was withdrawing."
+  hpi: >
+    34yo male with 4-year history of heavy alcohol use and 18-month history of daily
+    alprazolam (originally prescribed for anxiety, now obtained illicitly), presenting
+    36 hours after last drink with tremor, sweats, sleep <2h, and a witnessed fall at
+    home. Referred from ED for medically monitored withdrawal management after CIWA-Ar
+    of 12 on arrival. Lost employment 6 weeks prior due to intoxication at work; DUI
+    charge pending. Ambivalent about treatment ("I'm here because my brother said so").
+  precipitants:
+    - "Job loss 6 weeks ago (intoxication at work)"
+    - "Pending DUI charge"
+    - "Brother delivered ultimatum about housing"
+  prior_treatment_attempts:
+    - year: 2023
+      type: "Outpatient counseling, 6 weeks"
+      outcome: "Self-discontinued"
+    - year: 2024
+      type: "PCP-prescribed naltrexone, 3 months"
+      outcome: "Non-adherent"
+
+# -----------------------------------------------------------------------------
+# 4. Substance use history (load-bearing for ASAM Dim 1 and Dim 4)
+# -----------------------------------------------------------------------------
+substance_use:
+  - substance: "Alcohol"
+    age_of_first_use: 16
+    current_pattern: "~14 standard drinks/day x 4 years (vodka, beer)"
+    last_use: "2026-05-03"                     # 24h before admission per HPI (36h before BPS)
+    route: "oral"
+    withdrawal_history: "Multiple episodes; one prior ED visit for seizure precaution"
+    prior_treatment: "2023 outpatient, 2024 naltrexone trial"
+  - substance: "Alprazolam (Xanax)"
+    age_of_first_use: 32
+    current_pattern: "1 mg PO daily x 18 months (originally Rx, now illicit)"
+    last_use: "2026-05-03"
+    route: "oral"
+    withdrawal_history: "Anticipated; not yet manifest at intake"
+    prior_treatment: "None"
+  - substance: "Cannabis"
+    age_of_first_use: 17
+    current_pattern: "2-3 joints per week, recreational"
+    last_use: "2026-04-28"
+    route: "inhaled"
+    withdrawal_history: "None reported"
+    prior_treatment: "None"
+  - substance: "Opioids"
+    current_pattern: "DENIES current or past opioid use"
+    notes: "COWS recorded as N/A; documented to demonstrate negative-finding handling"
+
+# -----------------------------------------------------------------------------
+# 5. Medical history (ASAM Dim 2)
+# -----------------------------------------------------------------------------
+medical_history:
+  active_conditions:
+    - name: "Essential hypertension, uncontrolled"
+      icd10: "I10"
+      notes: "BP 158/96 at intake; no current antihypertensive"
+    - name: "Alcoholic hepatitis (suspected, not yet biopsy-confirmed)"
+      icd10: "K70.10"
+      notes: "AST 142, ALT 98, GGT 312"
+    - name: "Mild traumatic brain injury, remote (2019, MVA)"
+      icd10: "S06.0X0S"
+      notes: "No current cognitive sequelae per MSE"
+  vitals_on_admission:
+    blood_pressure: "158/96"
+    heart_rate: 104
+    respiratory_rate: 18
+    temperature_f: 99.1
+    oxygen_saturation: 97
+  labs:
+    - name: "AST"
+      value: 142
+      units: "U/L"
+      reference: "10-40"
+      loinc: "1920-8"
+    - name: "ALT"
+      value: 98
+      units: "U/L"
+      reference: "7-56"
+      loinc: "1742-6"
+    - name: "GGT"
+      value: 312
+      units: "U/L"
+      reference: "9-48"
+      loinc: "2324-2"
+    - name: "Total bilirubin"
+      value: 1.4
+      units: "mg/dL"
+      reference: "0.1-1.2"
+      loinc: "1975-2"
+    - name: "Urine drug screen"
+      result: "POSITIVE for ethanol, benzodiazepines, cannabinoids; NEGATIVE for opioids, cocaine, amphetamines"
+      loinc: "19272-7"
+  medications:
+    - name: "None at admission"
+      notes: "Patient was not adherent to prior antihypertensive (lisinopril 10mg)"
+  allergies:
+    - "No known drug allergies"
+
+# -----------------------------------------------------------------------------
+# 6. Psychiatric history (ASAM Dim 3)
+# -----------------------------------------------------------------------------
+psychiatric_history:
+  diagnoses:
+    - name: "Major Depressive Disorder, recurrent, moderate"
+      icd10: "F33.1"
+      dsm5tr: "296.32"
+      onset_year: 2019
+    - name: "Generalized Anxiety Disorder"
+      icd10: "F41.1"
+      dsm5tr: "300.02"
+      onset_year: 2020
+  hospitalizations:
+    - year: 2021
+      reason: "Suicidal ideation, voluntary 72-hour hold"
+      facility: "Memorial Behavioral Health"
+  prior_medications:
+    - name: "Sertraline 100mg"
+      years: "2020-2022"
+      outcome: "Self-discontinued"
+    - name: "Alprazolam 0.5mg PRN"
+      years: "2023"
+      outcome: "Escalated to daily then illicit"
+  self_harm_history: "One episode of superficial cutting age 22; no attempts; no recent ideation with plan"
+
+# -----------------------------------------------------------------------------
+# 7. Family / social history (ASAM Dim 5 — Recovery Environment)
+# -----------------------------------------------------------------------------
+family_social_history:
+  family_psychiatric_history: "Father with alcohol use disorder; mother with depression"
+  living_situation: "Lives with brother (active substance user); no sober supports identified"
+  employment: "Unemployed x 6 weeks; previously warehouse logistics x 5 years"
+  education: "High school graduate, some community college"
+  legal: "Pending DUI charge (2026-04-12); no prior convictions"
+  spiritual_orientation: "Identifies as non-practicing Catholic; not currently a source of support"
+  supports:
+    - "Brother Daniel (but is an active user — see Dim 5 risk)"
+    - "Former AA sponsor from 2023 cycle, lost contact"
+
+# -----------------------------------------------------------------------------
+# 8. Mental Status Exam (snapshot at intake)
+# -----------------------------------------------------------------------------
+mental_status_exam:
+  appearance: "Disheveled, appropriate for age, malodorous of alcohol on arrival"
+  behavior: "Cooperative, mild psychomotor restlessness"
+  speech: "Normal rate, mildly pressured"
+  mood: "Depressed and anxious"
+  affect: "Constricted, congruent with mood"
+  thought_process: "Linear and goal-directed"
+  thought_content: "Passive death wish; no active SI/HI; no delusions"
+  perception: "No hallucinations"
+  cognition: "Alert and oriented x3; MoCA deferred due to withdrawal"
+  insight: "Limited — minimizes severity of substance use"
+  judgment: "Impaired — recent fall, continued use despite consequences"
+
+# -----------------------------------------------------------------------------
+# 9. Risk assessment + scales — VERBATIM with item-level scores
+# -----------------------------------------------------------------------------
+# These strings are exactly what must appear (modulo phrasing tweaks for note
+# voice) in the chart so the regex-first scale_extractor.py can lift them.
+# Format follows PRD §6.2.
+# -----------------------------------------------------------------------------
+scales:
+  phq9:
+    administered_date: "2026-05-04"
+    instrument: "PHQ-9"
+    loinc: "44261-6"                            # PHQ-9 total
+    items:
+      anhedonia: 3
+      depressed_mood: 3
+      sleep: 3
+      fatigue: 2
+      appetite: 2
+      self_worth: 2
+      concentration: 2
+      psychomotor: 1
+      suicidal_ideation: 0
+    total: 18
+    severity: "moderately severe"
+    verbatim: >
+      PHQ-9 administered 2026-05-04: anhedonia 3, depressed mood 3, sleep 3,
+      fatigue 2, appetite 2, self-worth 2, concentration 2, psychomotor 1,
+      suicidal ideation 0 — total 18 (moderately severe).
+    repeats_in_progress_notes: false           # ← G1 is embedded here
+
+  gad7:
+    administered_date: "2026-05-04"
+    instrument: "GAD-7"
+    loinc: "70274-6"
+    items:
+      nervousness: 3
+      uncontrollable_worry: 3
+      excessive_worry: 2
+      trouble_relaxing: 2
+      restlessness: 2
+      irritability: 2
+      fear: 1
+    total: 15
+    severity: "severe"
+    verbatim: >
+      GAD-7 administered 2026-05-04: nervousness 3, uncontrollable worry 3,
+      excessive worry 2, trouble relaxing 2, restlessness 2, irritability 2,
+      fear 1 — total 15 (severe).
+
+  audit_c:
+    administered_date: "2026-05-04"
+    instrument: "AUDIT-C"
+    loinc: "75624-7"
+    items:
+      frequency: 4
+      typical_quantity: 4
+      heavy_episodic: 3
+    total: 11
+    interpretation: "positive (>=4 for men); high risk"
+    verbatim: >
+      AUDIT-C administered 2026-05-04: frequency 4, typical quantity 4,
+      heavy episodic 3 — total 11 (positive, high risk).
+
+  dast10:
+    administered_date: "2026-05-04"
+    instrument: "DAST-10"
+    loinc: "82666-9"
+    total: 7
+    severity: "substantial"
+    verbatim: >
+      DAST-10 administered 2026-05-04: total 7 (substantial level, indicates
+      intensive assessment and treatment indicated).
+
+  ciwa_ar:
+    administered_date: "2026-05-04T14:30"
+    instrument: "CIWA-Ar"
+    loinc: "72109-3"
+    items:
+      nausea_vomiting: 2
+      tremor: 3
+      sweats: 2
+      anxiety: 2
+      agitation: 1
+      tactile_disturbances: 0
+      auditory_disturbances: 0
+      visual_disturbances: 0
+      headache: 1
+      orientation: 1
+    total_at_intake: 12
+    severity_at_intake: "moderate"
+    verbatim: >
+      CIWA-Ar administered 2026-05-04 14:30: nausea/vomiting 2, tremor 3,
+      sweats 2, anxiety 2, agitation 1, tactile 0, auditory 0, visual 0,
+      headache 1, orientation 1 — total 12 (moderate).
+    serial_measurements:
+      - datetime: "2026-05-06T09:00"            # Day 2, Note 1 (SOAP)
+        total: 8
+        note: "Down from 12; librium taper working"
+      - datetime: "2026-05-12T11:00"            # Day 8, Note 3 (DSAP)
+        total: 2
+        note: "No withdrawal x 48h"
+
+  cows:
+    administered_date: "2026-05-04"
+    instrument: "COWS"
+    loinc: "92103-9"
+    result: "Not administered — patient denies opioid use; UDS negative for opioids"
+    verbatim: >
+      COWS: not administered. Patient denies any opioid use; UDS negative for
+      opioids. Documented for completeness.
+
+  c_ssrs:
+    administered_date: "2026-05-04"
+    instrument: "C-SSRS"
+    loinc: "93373-7"                            # C-SSRS suicide ideation
+    items:
+      q1_wish_to_be_dead: false
+      q2_nonspecific_active_si: true            # ← positive on Q2 only
+      q3_si_with_methods: false
+      q4_si_with_intent: false
+      q5_si_with_plan: false
+      q6_suicidal_behavior: false
+    interpretation: "Low-intensity passive ideation; no active SI, plan, or intent. NPSG.15.01.01 baseline screen on admission."
+    verbatim: >
+      C-SSRS administered 2026-05-04: Q1 no, Q2 YES ("I sometimes wish I weren't
+      here"), Q3 no, Q4 no, Q5 no, Q6 no lifetime suicidal behavior. Risk:
+      low-intensity passive ideation; no active SI/plan/intent.
+    reassessment_planned: "Note 3 plan calls for re-administration prior to step-down to PHP"
+    reassessment_documented: false              # ← G3 is embedded here
+
+# -----------------------------------------------------------------------------
+# 10. ASAM 4th-edition dimensional risk profile
+# -----------------------------------------------------------------------------
+# Each dimension must trace to concrete evidence in the chart for the
+# asam_evidence_index.py extractor to find.
+# -----------------------------------------------------------------------------
+asam_dimensions:
+  dim_1:
+    name: "Intoxication, Withdrawal, and Addiction Medications"
+    risk_rating: "moderate-to-severe"
+    evidence:
+      - "CIWA-Ar = 12 on arrival (moderate withdrawal)"
+      - "Concurrent alcohol + benzodiazepine dependence; benzo withdrawal anticipated"
+      - "Last drink 36h prior; ETOH ~14 SD/day x 4 years"
+      - "UDS positive for ethanol, benzodiazepines"
+      - "Witnessed fall at home in context of intoxication"
+    medications_indicated: "Librium taper (chlordiazepoxide), gabapentin adjunct, thiamine"
+    moud_evaluation: "N/A — no opioid use disorder"
+
+  dim_2:
+    name: "Biomedical Conditions and Complications"
+    risk_rating: "moderate"
+    evidence:
+      - "BP 158/96 (uncontrolled hypertension)"
+      - "AST 142, ALT 98, GGT 312 (alcohol-related hepatic injury)"
+      - "Total bilirubin 1.4 (mildly elevated)"
+      - "Remote mTBI 2019"
+
+  dim_3:
+    name: "Emotional, Behavioral, and Cognitive Conditions/Complications"
+    risk_rating: "moderate"
+    evidence:
+      - "PHQ-9 = 18 (moderately severe depression)"
+      - "GAD-7 = 15 (severe anxiety)"
+      - "C-SSRS Q2-positive (passive ideation)"
+      - "Hx MDD recurrent, GAD; one prior psych hospitalization (2021)"
+      - "Currently off psychiatric medications"
+
+  dim_4:
+    name: "Readiness to Change / Substance Use-Related Risks"
+    risk_rating: "moderate-to-high"
+    evidence:
+      - "AUDIT-C = 11, DAST-10 = 7 (both high)"
+      - "Continued use despite job loss, pending DUI, fall"
+      - "Multiple prior failed outpatient and pharmacologic attempts"
+
+  dim_5:
+    name: "Recovery / Living Environment"
+    risk_rating: "high"
+    evidence:
+      - "Lives with brother who is an active substance user"
+      - "No sober supports identified"
+      - "Unemployed; lost prior job for intoxication at work"
+      - "Pending DUI charge"
+
+  dim_6:
+    name: "Person-Centered Considerations (ASAM 4th ed.)"
+    risk_rating: "moderate"
+    evidence:
+      - "Ambivalent: 'I'm here because my brother said so'"
+      - "Cultural identity: Hispanic Catholic background, currently not a source of support"
+      - "Limited insight on MSE; willing to engage but reluctant"
+    notes: "Per ASAM 4th edition, readiness-to-change is woven across all dimensions; Dim 6 captures person-centered factors assessed AFTER the other five."
+
+recommended_level_of_care:
+  on_admission: "3.7 — Medically Monitored Intensive Inpatient"
+  rationale: >
+    Dim 1 moderate-to-severe (active polysubstance withdrawal requiring 24h medical
+    monitoring) and Dim 5 high (unsafe recovery environment) jointly drive a 3.7
+    placement. Dims 2-4 are moderate and supported by inpatient resources.
+  reassessment_at_day_8: "2.5 — Partial Hospitalization (IOP)"
+  reassessment_rationale: >
+    Dims 1 and 2 down to low (CIWA-Ar 2, no withdrawal x48h, BP improving on
+    lisinopril); Dim 5 remains high but mitigated by daytime structured program.
+
+# -----------------------------------------------------------------------------
+# 11. Treatment plan (CTS.03.01.03 — golden thread anchor)
+# -----------------------------------------------------------------------------
+treatment_plan:
+  established_date: "2026-05-04"
+  goals:
+    - id: "G-1"
+      domain: "Substance use"
+      goal: "Achieve and maintain 30 days of abstinence from alcohol and benzodiazepines"
+      target_date: "2026-06-03"
+      measure: "Daily breathalyzer, weekly UDS"
+    - id: "G-2"
+      domain: "Mental health"
+      goal: "Reduce PHQ-9 score from 18 to <10 by 60 days"
+      target_date: "2026-07-03"
+      measure: "Bi-weekly PHQ-9"                # ← G1: this is the measure that never gets repeated
+    - id: "G-3"
+      domain: "Recovery environment"
+      goal: "Identify and engage one sober support person and one alternate housing option"
+      target_date: "2026-05-25"
+      measure: "Social-work documentation"
+  interventions:
+    - "Cognitive Behavioral Therapy (CBT) — 3x/week individual"
+    - "Motivational Interviewing (MI) — woven across sessions"
+    - "Librium taper, gabapentin adjunct, thiamine"
+    - "Psychiatric medication evaluation for MDD/GAD (in week 2)"
+    - "Case-management for housing and DUI court navigation"
+  # NOTE: peer-support is INTENTIONALLY NOT listed here. Note 2 documents a peer
+  # group session; the absence here is gap G2.
+  expected_outcomes:
+    - "Stable medical withdrawal within 7 days"
+    - "PHQ-9 < 10 by week 8"
+    - "Step-down to PHP/IOP by week 2 if Dims 1 and 2 resolve"
+
+# -----------------------------------------------------------------------------
+# 12. Progress notes — content blueprint
+# -----------------------------------------------------------------------------
+# These are the three notes authored in SimplePractice in M2. Each entry lists
+# the date, format, author, and the content beats that must appear so the
+# section_detector + scale_extractor + asam_evidence_index can do their work.
+# Gap embeddings are flagged with `embeds_gap`.
+# -----------------------------------------------------------------------------
+progress_notes:
+  - sequence: 1
+    date: "2026-05-06"                          # Day 2
+    template_title: "[SOAP] Progress Note"
+    format: "SOAP"
+    author:
+      name: "Dr. Aisha Patel, MD"
+      role: "psychiatrist"
+    encounter_type: "individual session"
+    embeds_gap: "G1"                            # no PHQ-9 repeat in this or any later note
+    sections:
+      subjective: >
+        "Tremor better, sleep still rough. Want to leave AMA but my brother won't take
+        me back." Reports anxiety improving with librium. Denies SI/HI.
+      objective: >
+        BP 142/88, HR 92. CIWA-Ar = 8 (nausea 1, tremor 2, sweats 1, anxiety 2,
+        agitation 1, headache 1) — down from 12 at intake. MSE: alert, cooperative,
+        affect constricted, no acute distress. UDS pending.
+      assessment: >
+        Alcohol withdrawal, moderate, improving on chlordiazepoxide taper. Benzodiazepine
+        withdrawal anticipated but not yet manifest. MDD and GAD untreated;
+        defer pharmacologic initiation until withdrawal resolves.
+      plan: >
+        Continue chlordiazepoxide taper, add gabapentin 300mg TID for benzo
+        withdrawal prophylaxis. Continue daily CIWA monitoring. MOUD evaluation
+        deferred — no opioid use. Re-evaluate level of care in 5 days.
+    expected_observations:
+      - "CIWA-Ar = 8 (LOINC 72109-3)"
+      - "BP 142/88"
+      - "Medications added: gabapentin 300mg TID"
+
+  - sequence: 2
+    date: "2026-05-09"                          # Day 5
+    template_title: "[DAP] Progress Note"
+    format: "DAP"
+    author:
+      name: "Jordan Kim, CPRS"
+      role: "peer recovery support specialist"
+    encounter_type: "peer support group"
+    embeds_gap: "G2"                            # peer-support is NOT on the treatment plan
+    sections:
+      data: >
+        90-minute peer recovery support group. Marcus attended for full duration,
+        contributed once regarding job loss and the impact on his sense of identity.
+        Affect engaged during others' shares; observable reduction in psychomotor
+        restlessness compared to admission week. No safety concerns.
+      assessment: >
+        Engagement improving. Continues to express ambivalence about long-term
+        recovery but is participating in milieu. Peer connection appears protective.
+      plan: >
+        Continue daily peer-support groups. Schedule family-coordination call with
+        brother for boundary-setting and post-discharge planning.
+    expected_observations:
+      - "Group attendance documented (intervention not on plan — gap G2)"
+
+  - sequence: 3
+    date: "2026-05-12"                          # Day 8
+    template_title: "[DSAP] Progress Note"
+    format: "DSAP"
+    author:
+      name: "Maria Gonzales, LCSW"
+      role: "licensed clinical social worker"
+    encounter_type: "individual + level-of-care reassessment"
+    embeds_gap: "G3"                            # plan calls for C-SSRS re-administration but no result captured
+    sections:
+      data: >
+        UDS negative across panel. CIWA-Ar = 2 (no withdrawal x 48h). BP 128/82 on
+        lisinopril 10mg restarted day 4. LFTs trending down (AST 92, ALT 71). Attended
+        4/4 daily groups this week.
+      subjective: >
+        "I think I'm ready to step down to PHP. My brother is still using though,
+        so I'm worried about going home." Denies SI/HI today.
+      assessment: >
+        Ready clinically for step-down per Dim 1 (resolved withdrawal) and Dim 2
+        (improving). Dim 3 (PHQ-9 not repeated this admission — see note),
+        Dim 5 remains the limiting factor (unsafe home environment).
+        Recommending 3.7 → 2.5 (Partial Hospitalization with IOP step) rather than
+        full community discharge.
+      plan: >
+        Coordinate transfer to PHP starting 2026-05-15. Social-work to secure
+        sober-housing referral. Re-administer C-SSRS prior to transfer per
+        NPSG.15.01.01. Continue gabapentin; psychiatry follow-up scheduled day 14
+        for MDD/GAD pharmacologic eval.
+    expected_observations:
+      - "CIWA-Ar = 2 (LOINC 72109-3) — terminal measurement"
+      - "BP 128/82"
+      - "ASAM LoC change: 3.7 → 2.5"
+      - "C-SSRS re-administration planned but result NOT documented (gap G3)"
+
+# -----------------------------------------------------------------------------
+# 13. Intentional compliance gaps (must all be findable by tjc_coverage_matrix.py)
+# -----------------------------------------------------------------------------
+# Each gap is referenced from the relevant note above. The tjc_coverage_matrix
+# emits one TjcCoverage row per EP with status `satisfied` | `gap` | `ambiguous`
+# and a pointer to the evidence char-offset (or absence thereof).
+# -----------------------------------------------------------------------------
+intentional_gaps:
+  - id: "G1"
+    ep_code: "CTS.03.01.09"
+    description: "Outcomes assessed with a standardized tool (measurement-based care)"
+    gap: "PHQ-9 administered at intake (total = 18) but never repeated in any of the three progress notes despite a 60-day measurable goal in the treatment plan."
+    embedded_in: "Absent from progress_notes[1].sections.assessment and from progress_notes[3].sections (where it should re-appear)"
+    expected_finding_status: "gap"
+
+  - id: "G2"
+    ep_code: "CTS.03.01.03"
+    description: "Plan for care reflects assessed needs (golden thread)"
+    gap: "Note 2 (DAP, day 5) documents a peer recovery support group session. The treatment plan interventions list does NOT include peer-support — the intervention is being delivered without a planning entry."
+    embedded_in: "progress_notes[2].sections.data references group attendance; treatment_plan.interventions has no peer-support entry"
+    expected_finding_status: "gap"
+    mirrors_perspectives_example: true          # see playbook §D landing-page example
+
+  - id: "G3"
+    ep_code: "NPSG.15.01.01"
+    description: "Suicide screening using a validated tool (C-SSRS) at clinically appropriate intervals"
+    gap: "Initial C-SSRS administered at intake (Q2-positive). Note 3 plan states 'Re-administer C-SSRS prior to transfer' but no C-SSRS result is documented anywhere in the chart prior to the recommended step-down."
+    embedded_in: "scales.c_ssrs.reassessment_documented = false; progress_notes[3].sections.plan references reassessment without delivering it"
+    expected_finding_status: "gap"
+
+  - id: "G4"
+    ep_code: "R3-25 (transitions of care)"
+    description: "Discharge planning documented within 72 hours of admission for SUD treatment"
+    gap: "No discharge planning note exists within the 72-hour window after admission (2026-05-04 → 2026-05-07). The first transition-of-care documentation is in Note 3 on day 8."
+    embedded_in: "Absence: no document with type 'discharge_planning' between admission_date and admission_date + 72h"
+    expected_finding_status: "gap"
+
+  - id: "G5"
+    ep_code: "RC.01.02.01"
+    description: "Documentation authentication (signatures, co-signatures, timestamps)"
+    gap: "Note 2 is authored by a peer recovery support specialist and should bear a clinical co-signature; the co-signature timestamp is inconsistent with the note's authored-on date (co-signed BEFORE the note's authored-on date, indicating a metadata error)."
+    embedded_in: "progress_notes[2] author is non-clinical; co-signature timestamp anomaly to be created in SimplePractice or in the exported PDF metadata"
+    expected_finding_status: "gap"
+
+# -----------------------------------------------------------------------------
+# 14. Face-validity / de-identification check (run before committing)
+# -----------------------------------------------------------------------------
+face_validity:
+  - "Persona is wholly fictional; name, DOB, address, phone, NPI do not correspond to any real person known to author."
+  - "All scale item-level scores sum correctly to documented totals (PHQ-9 = 18, GAD-7 = 15, AUDIT-C = 11, DAST-10 = 7, CIWA-Ar = 12)."
+  - "Clinical trajectory is internally consistent (CIWA-Ar 12 → 8 → 2 over 8 days is plausible on a librium taper)."
+  - "Every ASAM dimension (1-6) has >=1 evidence anchor."
+  - "Every gap G1-G5 traces to a concrete absence or inconsistency."
+  - "Telephone area code uses NXX-555-01XX (reserved-for-fiction range, per North American Numbering Plan)."

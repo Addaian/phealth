@@ -1,0 +1,29 @@
+════════════════════════════════════════════════════════════════════════
+  [SOAP] Progress Note for Marcus Reyes
+  Date: 2026-05-06
+  Clinician: Dr. Aisha Patel, MD (psychiatrist)
+  Encounter type: individual session
+  Template to select in SP: '[SOAP] Progress Note'
+════════════════════════════════════════════════════════════════════════
+
+▶ Subjective
+
+"Tremor better, sleep still rough. Want to leave AMA but my brother won't take me back." Reports anxiety improving with librium. Denies SI/HI.
+
+▶ Objective
+
+BP 142/88, HR 92. CIWA-Ar = 8 (nausea 1, tremor 2, sweats 1, anxiety 2, agitation 1, headache 1) — down from 12 at intake. MSE: alert, cooperative, affect constricted, no acute distress. UDS pending.
+
+▶ Assessment
+
+Alcohol withdrawal, moderate, improving on chlordiazepoxide taper. Benzodiazepine withdrawal anticipated but not yet manifest. MDD and GAD untreated; defer pharmacologic initiation until withdrawal resolves.
+
+▶ Plan
+
+Continue chlordiazepoxide taper, add gabapentin 300mg TID for benzo withdrawal prophylaxis. Continue daily CIWA monitoring. MOUD evaluation deferred — no opioid use. Re-evaluate level of care in 5 days.
+
+────────────────────────────────────────────────────────────────────────
+AUTHOR NOTE — intentional gap embedded here: G1 (CTS.03.01.09)
+  PHQ-9 administered at intake (total = 18) but never repeated in any of the three progress notes despite a 60-day measurable goal in the treatment plan.
+DO NOT paste this footer into SimplePractice.
+────────────────────────────────────────────────────────────────────────

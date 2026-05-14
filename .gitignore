@@ -1,0 +1,28 @@
+# ── Python ──────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# ── Environment / secrets ───────────────────────────────────────────────────
+# .env carries real (local-dev) values; .env.example is the checked-in template.
+.env
+.env.local
+.env.demo
+
+# ── OS noise ────────────────────────────────────────────────────────────────
+.DS_Store
+
+# ── Synthetic data ──────────────────────────────────────────────────────────
+# Nothing under data/ is ignored on purpose. The SimplePractice export under
+# data/synthetic_export/ IS committed — it is the Phase-2 input contract
+# (PRD §5.2) and is fully synthetic (persona: Marcus Reyes). Generated chart
+# text under app/synthetic/chart_text/ is likewise committed.
+# If a real (non-synthetic) export ever lands in this repo, add an ignore rule
+# here immediately and document a deletion path in the README.

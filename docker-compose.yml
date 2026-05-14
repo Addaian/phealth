@@ -1,0 +1,52 @@
+# Local development stack for Phase 1.
+#   postgres : PostgreSQL 16 with the pgvector extension preinstalled.
+#   app      : the FastAPI service.
+#
+# Bring it all up:        docker compose up
+# Postgres only:          docker compose up -d postgres
+#
+# The synthetic export under data/ is intentionally NOT mounted into the app
+# image — the ingest endpoint receives uploads at runtime. data/ stays a
+# host-side convenience for the demo.
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: phealth
+      POSTGRES_PASSWORD: phealth_dev_pw
+      POSTGRES_DB: phealth
+    ports:
+      # Host port 5433 (not the default 5432) to avoid colliding with any
+      # other Postgres already running on the developer's machine. Inside the
+      # compose network the app still reaches Postgres on 5432.
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      # Enables the `vector` extension on first boot so M5's migration can
+      # create vector columns without a manual step.
+      - ./docker/initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U phealth -d phealth"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  app:
+    build: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      # Override the host-oriented DATABASE_URL from .env: inside the compose
+      # network Postgres is reachable at the service name `postgres`.
+      DATABASE_URL: postgresql+psycopg://phealth:phealth_dev_pw@postgres:5432/phealth
+      INGEST_API_KEY: ${INGEST_API_KEY:-phealth_dev_ingest_key}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-text-embedding-3-small}
+      MAX_LLM_CALLS_PER_INGEST: ${MAX_LLM_CALLS_PER_INGEST:-5}
+    ports:
+      - "8000:8000"
+
+volumes:
+  postgres_data:

@@ -1,0 +1,65 @@
+# Project metadata and tooling configuration for the Phase 1 service.
+#
+# The dependency set is pinned with `>=` floors taken from the implementation
+# plan (documents/phase_1_implementation_plan.md §4). Reproducible builds come
+# from a lockfile (uv.lock / pip freeze), not from this file — these floors
+# just guarantee a known-good minimum.
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "phealth"
+version = "0.1.0"
+description = "FHIR-shaped clinical ingestion substrate over the SimplePractice Data Export — Perspectives Health intern technical assessment, Phase 1."
+requires-python = ">=3.11,<3.13"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
+    "sqlmodel>=0.0.22",
+    "sqlalchemy>=2.0",
+    "alembic>=1.13",
+    "psycopg[binary]>=3.2",
+    "pgvector>=0.3",
+    "pydantic>=2.8",
+    "pydantic-settings>=2.4",
+    "fhir.resources>=7.1",
+    "pdfplumber>=0.11",
+    "pypdf>=4.3",
+    "python-multipart>=0.0.9",
+    "httpx>=0.27",
+    "openai>=1.40",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3",
+    "pytest-asyncio>=0.24",
+    "ruff>=0.6",
+    "mypy>=1.11",
+]
+
+# `app` is the importable package; the synthetic data and chart text travel
+# with it (they are small and the ingest pipeline may reference persona.yaml).
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+# Pragmatic default set: pyflakes (F), pycodestyle (E), isort (I),
+# flake8-bugbear (B), pyupgrade (UP).
+select = ["E", "F", "I", "B", "UP"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# asyncio_mode is set ahead of M9, where async ingestion tests are added.
+asyncio_mode = "auto"
+
+[tool.mypy]
+python_version = "3.11"
+ignore_missing_imports = true

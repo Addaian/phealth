@@ -1,0 +1,25 @@
+════════════════════════════════════════════════════════════════════════
+  [DAP] Progress Note for Marcus Reyes
+  Date: 2026-05-09
+  Clinician: Jordan Kim, CPRS (peer recovery support specialist)
+  Encounter type: peer support group
+  Template to select in SP: '[DAP] Progress Note'
+════════════════════════════════════════════════════════════════════════
+
+▶ Data
+
+90-minute peer recovery support group. Marcus attended for full duration, contributed once regarding job loss and the impact on his sense of identity. Affect engaged during others' shares; observable reduction in psychomotor restlessness compared to admission week. No safety concerns.
+
+▶ Assessment
+
+Engagement improving. Continues to express ambivalence about long-term recovery but is participating in milieu. Peer connection appears protective.
+
+▶ Plan
+
+Continue daily peer-support groups. Schedule family-coordination call with brother for boundary-setting and post-discharge planning.
+
+────────────────────────────────────────────────────────────────────────
+AUTHOR NOTE — intentional gap embedded here: G2 (CTS.03.01.03)
+  Note 2 (DAP, day 5) documents a peer recovery support group session. The treatment plan interventions list does NOT include peer-support — the intervention is being delivered without a planning entry.
+DO NOT paste this footer into SimplePractice.
+────────────────────────────────────────────────────────────────────────

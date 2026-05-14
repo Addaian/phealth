@@ -1,0 +1,16 @@
+# Keep the application image lean — exclude everything not needed to serve.
+.git/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.env
+.env.*
+data/
+documents/
+tests/
+*.md
+.DS_Store

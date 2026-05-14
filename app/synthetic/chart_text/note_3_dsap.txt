@@ -1,0 +1,29 @@
+════════════════════════════════════════════════════════════════════════
+  [DSAP] Progress Note for Marcus Reyes
+  Date: 2026-05-12
+  Clinician: Maria Gonzales, LCSW (licensed clinical social worker)
+  Encounter type: individual + level-of-care reassessment
+  Template to select in SP: '[DSAP] Progress Note'
+════════════════════════════════════════════════════════════════════════
+
+▶ Data
+
+UDS negative across panel. CIWA-Ar = 2 (no withdrawal x 48h). BP 128/82 on lisinopril 10mg restarted day 4. LFTs trending down (AST 92, ALT 71). Attended 4/4 daily groups this week.
+
+▶ Subjective
+
+"I think I'm ready to step down to PHP. My brother is still using though, so I'm worried about going home." Denies SI/HI today.
+
+▶ Assessment
+
+Ready clinically for step-down per Dim 1 (resolved withdrawal) and Dim 2 (improving). Dim 3 (PHQ-9 not repeated this admission — see note), Dim 5 remains the limiting factor (unsafe home environment). Recommending 3.7 → 2.5 (Partial Hospitalization with IOP step) rather than full community discharge.
+
+▶ Plan
+
+Coordinate transfer to PHP starting 2026-05-15. Social-work to secure sober-housing referral. Re-administer C-SSRS prior to transfer per NPSG.15.01.01. Continue gabapentin; psychiatry follow-up scheduled day 14 for MDD/GAD pharmacologic eval.
+
+────────────────────────────────────────────────────────────────────────
+AUTHOR NOTE — intentional gap embedded here: G3 (NPSG.15.01.01)
+  Initial C-SSRS administered at intake (Q2-positive). Note 3 plan states 'Re-administer C-SSRS prior to transfer' but no C-SSRS result is documented anywhere in the chart prior to the recommended step-down.
+DO NOT paste this footer into SimplePractice.
+────────────────────────────────────────────────────────────────────────
