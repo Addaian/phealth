@@ -5,13 +5,6 @@ Data Export, with a **dual-surface read API** on top: an ergonomic
 `/api/v1/*` namespace and a strict `/fhir/*` namespace, with char-offset
 provenance on every observation in every response.
 
-> **This is not a wrapper.** SimplePractice has no public chart-data API; the
-> only sanctioned programmatic path is the Data Export — a directory tree of
-> text-layer PDFs and vCards. The substrate ingests that export into a
-> FHIR-shaped row store with pre-computed evidence tables, so the downstream
-> clinical-intelligence work (Task 2 extraction, Task 3 reasoning) becomes a
-> *retrieval* problem rather than a full-document inference problem.
-
 ---
 
 ## Quickstart (clone → click-through in ~5 min)
@@ -162,6 +155,14 @@ dimension and every gap traces back to a field there.
 
 ---
 
+## UI Pictures
+<img width="984" height="870" alt="Screenshot 2026-05-15 at 4 17 48 PM" src="https://github.com/user-attachments/assets/c5ef169d-6c57-4abe-99b2-98c57956e5c8" />
+<img width="1024" height="570" alt="Screenshot 2026-05-15 at 4 17 41 PM" src="https://github.com/user-attachments/assets/dc6df28a-a4a8-4aba-a9d2-08ce4190650c" />
+<img width="1012" height="856" alt="Screenshot 2026-05-15 at 4 17 33 PM" src="https://github.com/user-attachments/assets/8c662f1c-7e4f-4242-9baf-3775994a3f92" />
+<img width="1008" height="849" alt="Screenshot 2026-05-15 at 4 06 39 PM" src="https://github.com/user-attachments/assets/b1dc2108-e4c7-4d16-bff5-fab6322d46f0" />
+<img width="945" height="749" alt="Screenshot 2026-05-15 at 4 06 30 PM" src="https://github.com/user-attachments/assets/d5c9e166-f474-4079-b7f8-3adae688cea4" />
+
+___
 ## Architecture
 
 ```
