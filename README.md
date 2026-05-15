@@ -16,8 +16,8 @@ provenance on every observation in every response.
 
 ## Quickstart (clone → click-through in ~5 min)
 
-The fastest way for a reviewer to see the system end-to-end is to bring
-it up locally and open the demo UI in a browser. One paste-block:
+The fastest way to see the system end-to-end is to bring it up locally
+and open the demo UI in a browser. One paste-block:
 
 ```bash
 # 0. Prereqs: Docker Desktop running, ports 8000 and 5433 free.
@@ -56,8 +56,90 @@ exercises Task 2 fully. The ASAM/TJC "Compute" buttons need an
 rule-engine-only degraded response (still useful: deterministic level +
 deterministic findings, just no LLM-narrated rationale paragraphs).
 
-For the curl/JSON path and the additional `/fhir/*` endpoints, see
-[**How to run (full reference)**](#how-to-run) further down.
+For the raw JSON shapes and the FHIR endpoints, see
+[**API walkthrough**](#api-walkthrough-curl-reference) below.
+
+---
+
+## Demo UI
+
+Mounted at `/ui` (Jinja2 templates, no SPA, no build step). Three pages:
+
+- `/ui/` — patient list.
+- `/ui/patients/{id}/chart` — the canonical Task 2 chart, sections
+  collapsible, timeline + extracted scales + ASAM evidence + TJC
+  coverage in one view.
+- `/ui/patients/{id}/asam-loc` — the latest ASAM Level-of-Care
+  assessment, or a "Compute" button if none yet. Renders the level,
+  modifiers (COE / BIO), per-dimension risk ratings, cited rationale
+  chips, and a "rules fired" list from the Chapter 10 cascade.
+- `/ui/patients/{id}/tjc-audit` — the latest compliance audit, with
+  status badges per EP and the planted-gap (G1–G5) tag visible on the
+  matching rows.
+
+The UI's route handlers call the existing JSON API in-process via an
+`httpx.AsyncClient(transport=ASGITransport(app=app))` — so clicking
+"Compute" exercises the same auth, ETag, audit-on-read and error stack
+as an external API client. The UI is a *client* of the API, not a
+parallel data path; `app/` has no knowledge of `ui/`. See
+`ui/router.py` for the rationale.
+
+---
+
+## API walkthrough (curl reference)
+
+The Quickstart above gets you to the UI. The block below picks up
+**after** the chart is ingested and exercises the JSON API directly
+with `curl` — useful for seeing the raw response shapes, the
+ETag/304 contract, or the FHIR `/fhir/*` surface without going through
+the UI.
+
+```bash
+# Discover the patient id:
+PID=$(curl -s -H "X-API-Key: phealth_dev_ingest_key" \
+        localhost:8000/api/v1/patients | jq -r '.[0].id')
+
+# The Task 2 deliverable -- one consolidated JSON:
+curl -H "X-API-Key: phealth_dev_ingest_key" localhost:8000/api/v1/patients/$PID/chart
+
+# The strict-FHIR surface:
+curl localhost:8000/fhir/metadata                                            # auth-free
+curl -H "X-API-Key: phealth_dev_ingest_key" \
+     localhost:8000/fhir/Patient/$PID/\$everything
+
+# Conditional read -- repeat with the ETag for a 304:
+ETAG=$(curl -sI -H "X-API-Key: phealth_dev_ingest_key" \
+            localhost:8000/api/v1/patients/$PID/chart | awk '/^etag:/ {print $2}' | tr -d '\r')
+curl -sI -H "X-API-Key: phealth_dev_ingest_key" -H "If-None-Match: $ETAG" \
+     localhost:8000/api/v1/patients/$PID/chart    # → HTTP/1.1 304 Not Modified
+
+# Task 3 endpoints (need ANTHROPIC_API_KEY in .env for full rationale;
+# without one you get the documented rule-engine-only degraded path).
+curl -X POST -H "X-API-Key: phealth_dev_ingest_key" \
+     -H "Content-Type: application/json" -d '{}' \
+     localhost:8000/api/v1/patients/$PID/asam-loc   | jq .recommendation
+curl -X POST -H "X-API-Key: phealth_dev_ingest_key" \
+     -H "Content-Type: application/json" -d '{}' \
+     localhost:8000/api/v1/patients/$PID/tjc-audit  | jq .summary
+```
+
+Postgres is published on host port **5433** (not 5432, to avoid
+colliding with a local Postgres). To run the app or Alembic directly on
+the host instead of in the container, the `.env` `DATABASE_URL` already
+points at `localhost:5433`.
+
+Interactive API docs at <http://localhost:8000/docs>; FHIR capability
+discovery at <http://localhost:8000/fhir/metadata>; demo UI at
+<http://localhost:8000/ui/>.
+
+**Tests:** `pytest` — 290 tests, `ruff check` and `ruff format` clean.
+Coverage includes golden tests for the section detector and scale
+extractor, the provenance round-trip across every endpoint that returns
+observations, FHIR Bundle validation on every `/fhir/*` response, the
+ETag/304 contract, the RFC 7807 / OperationOutcome envelopes, cursor
+pagination invariants, and the audit-on-read invariant. The Task 3
+ASAM + TJC narration tests stub the Anthropic SDK; live-Claude tests
+are opt-in via `pytest -m manual`.
 
 ---
 
@@ -91,7 +173,7 @@ SimplePractice (Essential trial)
         |
         v   POST /ingest/simplepractice-zip   (202 Accepted; background task)
   ┌──────────────────────────────────────────────────────────────────┐
-  │  Phase 1 substrate (PostgreSQL 16)                                 │
+  │  Task 1 substrate (PostgreSQL 16)                                  │
   │                                                                    │
   │   Patient · Encounter · ClinicalDocument                           │
   │   (raw_text + sectioned JSONB + fhir_json + tsvector)              │
@@ -132,7 +214,7 @@ ingest path.
 
 ---
 
-## Phase 2 deliverable — `GET /api/v1/patients/{id}/chart`
+## Task 2 deliverable — `GET /api/v1/patients/{id}/chart`
 
 One consolidated JSON object containing the brief's literal ask (patient +
 intake + timeline) plus the extraction surplus. **Every observation carries
@@ -146,7 +228,7 @@ char-offset provenance whose snippet round-trips
     "extraction_version": "phase2-v1.0.0",
     "completeness_score": 1.0,                    // |found| / (|found| + |looked_but_missing|)
     "etag": null,                                 // ETag HTTP header is the source of truth
-    "audit_id": null, "compliance_check_id": null // pre-allocated for Phase 3
+    "audit_id": null, "compliance_check_id": null // pre-allocated for Task 3
   },
   "patient": {
     "id": "<uuid>",
@@ -186,8 +268,8 @@ the full live response.
 
 ## The dual-surface argument
 
-- **`/api/v1/*`** is ergonomic snake_case. A reviewer hits `/chart` and gets
-  one JSON with everything inline. Errors are RFC 7807 Problem Details
+- **`/api/v1/*`** is ergonomic snake_case. Hitting `/chart` returns one
+  JSON with everything inline. Errors are RFC 7807 Problem Details
   (`application/problem+json`). ETag + `If-None-Match` → `304 Not Modified`.
 - **`/fhir/*`** is strict FHIR R4 (via `fhir.resources.R4B`). Every response
   validates against the spec. Search results are `Bundle.searchset` with
@@ -195,10 +277,10 @@ the full live response.
   (`application/fhir+json`). `/fhir/metadata` is the auth-free
   `CapabilityStatement` that self-describes the surface.
 
-Reviewers grading the brief read `/chart`; FHIR clients (Synthea, OpenEMR
-integrations) read `/fhir/Patient/{id}/$everything`. Same data, two shapes,
-no parallel pipeline — the FHIR surface is a different projection of the same
-row store.
+Direct evaluation reads `/chart`; FHIR clients (Synthea, OpenEMR
+integrations) read `/fhir/Patient/{id}/$everything`. Same data, two
+shapes, no parallel pipeline — the FHIR surface is a different
+projection of the same row store.
 
 ---
 
@@ -252,77 +334,9 @@ matrix flags all five as `gap`, alongside three `satisfied` EPs for contrast.
 
 ---
 
-## How to run
+## Task 3 — Clinical decision endpoints
 
-The [Quickstart](#quickstart-clone--click-through-in-5-min) at the top covers
-clone → ingest → UI in one paste-block. The walkthrough below picks up
-**after** the chart is ingested and exercises the JSON API directly with
-`curl` — useful if you want to see the raw response shapes, the
-ETag/304 contract, or the FHIR `/fhir/*` surface without going through
-the UI.
-
-```bash
-# Discover the patient id:
-PID=$(curl -s -H "X-API-Key: phealth_dev_ingest_key" \
-        localhost:8000/api/v1/patients | jq -r '.[0].id')
-
-# The Task 2 deliverable -- one consolidated JSON:
-curl -H "X-API-Key: phealth_dev_ingest_key" localhost:8000/api/v1/patients/$PID/chart
-
-# The strict-FHIR surface:
-curl localhost:8000/fhir/metadata                                            # auth-free
-curl -H "X-API-Key: phealth_dev_ingest_key" \
-     localhost:8000/fhir/Patient/$PID/\$everything
-
-# Conditional read -- repeat with the ETag for a 304:
-ETAG=$(curl -sI -H "X-API-Key: phealth_dev_ingest_key" \
-            localhost:8000/api/v1/patients/$PID/chart | awk '/^etag:/ {print $2}' | tr -d '\r')
-curl -sI -H "X-API-Key: phealth_dev_ingest_key" -H "If-None-Match: $ETAG" \
-     localhost:8000/api/v1/patients/$PID/chart    # → HTTP/1.1 304 Not Modified
-```
-
-Postgres is published on host port **5433** (not 5432, to avoid colliding with
-a local Postgres). To run the app or Alembic directly on the host instead of
-in the container, the `.env` `DATABASE_URL` already points at `localhost:5433`.
-
-Interactive docs at <http://localhost:8000/docs>; capability discovery at
-<http://localhost:8000/fhir/metadata>; demo UI at
-<http://localhost:8000/ui/>.
-
-### Optional demo UI
-
-A thin server-rendered UI is mounted at `/ui` (Jinja2 templates, no SPA, no
-build step). It exists for a reviewer who wants to click through the
-deliverables without writing curl:
-
-- `/ui/` — patient list.
-- `/ui/patients/{id}/chart` — the canonical Task 2 chart, sections collapsed,
-  timeline + extracted scales + ASAM evidence + TJC coverage in one view.
-- `/ui/patients/{id}/asam-loc` — the latest ASAM Level-of-Care assessment, or
-  a "Compute" button if none yet. Renders the level, modifiers (COE / BIO),
-  per-dimension risk ratings, cited rationale chips, and "rules fired"
-  list from the Chapter 10 cascade.
-- `/ui/patients/{id}/tjc-audit` — the latest compliance audit, with status
-  badges per EP and the planted-gap (G1–G5) tag visible on the matching rows.
-
-The UI's route handlers call the existing JSON API in-process via an
-`httpx.AsyncClient(transport=ASGITransport(app=app))` — so clicking
-"Compute" exercises the same auth, ETag, audit-on-read and error stack as
-an external API client. The UI is a *client* of the API, not a parallel
-data path. See `app/ui/router.py` for the rationale.
-
-**Tests:** `pytest` — 127 tests, `ruff check` and `mypy app/` clean. Coverage
-includes golden tests for the section detector and scale extractor, the
-provenance round-trip across every endpoint that returns observations, FHIR
-Bundle validation on every `/fhir/*` response, the ETag/304 contract, the
-RFC 7807 / OperationOutcome envelopes, cursor pagination invariants, and the
-audit-on-read invariant.
-
----
-
-## Phase 3 — Clinical decision endpoints
-
-Two new POST endpoints layered on the Phase 2 substrate:
+Two new POST endpoints layered on the Task 2 substrate:
 
 - **`POST /api/v1/patients/{id}/asam-loc`** — ASAM 4th-edition Level-of-Care
   recommendation with per-dimension cited rationale. Marcus → **Level 3.7**
@@ -351,8 +365,8 @@ the EP catalog (`app/clinical/tjc/ep_catalog.py`) is paraphrased from public
 R3 reports, not copied. The LLM is constrained to surveyor-RFI register and
 explicit absence-language for negative findings.
 
-Beyond IP: deterministic levels are *reproducible* — reviewers who re-run
-the demo get the same recommendation. The cache layer (keyed by
+Beyond IP: deterministic levels are *reproducible* — anyone re-running
+the demo gets the same recommendation. The cache layer (keyed by
 `(patient_id, evidence_hash, model_version)`) makes the response **byte-
 identical** on repeat POSTs even though Claude itself is not bit-stable.
 
@@ -451,7 +465,7 @@ Full design: [`documents/phase_3_PRD.md`](documents/phase_3_PRD.md).
   successful read writes a row, off the response critical path via
   `BackgroundTasks`.
 - **Idempotent ingest** (`sha256(raw_text)`) and a generated `tsvector` FTS
-  column on every document — the hooks Phase 3 retrieval needs.
+  column on every document — the hooks Task 3 retrieval needs.
 
 ---
 
@@ -474,7 +488,7 @@ app/                ─── the clinical model + JSON API (no UI knowledge)
                etag (xxh64 middleware), pagination (cursor + Bundle.link),
                completeness (trinary classifier),
                schemas / chart_schemas / fhir_schemas
-  clinical/    Phase 3 reasoning: asam/{rubric, risk_ratings, level_decision,
+  clinical/    Task 3 reasoning: asam/{rubric, risk_ratings, level_decision,
                narration}, tjc/{audit_functions, runner, narration},
                llm/{claude_client, structured_output}, shared/
   db/          SQLModel schema + session
@@ -494,8 +508,8 @@ data/
 documents/   the assessment brief, research playbook, PRDs, implementation plans
 examples/    marcus_reyes_chart.json       (live /chart response)
              marcus_reyes_everything.json  (live $everything Bundle)
-             marcus_reyes_asam_admission.json (Phase 3 ASAM Level 3.7)
-             marcus_reyes_tjc.json         (Phase 3 TJC audit)
+             marcus_reyes_asam_admission.json (Task 3 ASAM Level 3.7)
+             marcus_reyes_tjc.json         (Task 3 TJC audit)
 tests/       290 tests + the face-validity checklist
 ```
 
@@ -512,9 +526,9 @@ tests/       290 tests + the face-validity checklist
   defaults; `pydantic-settings` fails fast on a missing required value.
 - **LLM cost caps.** Claude is the single LLM provider. Section detection is
   regex-first; the LLM fallback is bounded by `MAX_LLM_CALLS_PER_INGEST` and
-  never fires for the well-formed synthetic chart. Phase 3 endpoints cache
+  never fires for the well-formed synthetic chart. Task 3 endpoints cache
   every assessment by `(patient_id, evidence_hash, model_version)`, so
-  reviewer re-runs cost zero after the first.
+  repeat runs cost zero after the first.
 - **HIPAA posture.** The dev environment is treated as if it held PHI even
   though the data is synthetic — Postgres on a private Docker network, no
   secrets in git, audit-on-read enabled.
@@ -528,15 +542,19 @@ If SimplePractice access became unavailable, the documented fallback is
 **OpenEMR in Docker** with equivalent custom note templates — the same
 ingestion architecture over a different EMR's export.
 
-## Phase boundaries
+## Task boundaries
 
-- **Phase 1** delivered the synthetic chart, the FHIR-shaped ingestion
+The brief is structured as Task 1 / Task 2 / Task 3; the project's
+internal PRDs and plans use the file prefix `phase_*` for historical
+reasons but map 1:1 onto the brief's tasks.
+
+- **Task 1** delivered the synthetic chart, the FHIR-shaped ingestion
   substrate, and the read API (`documents/phase_1_PRD.md`).
-- **Phase 2** delivered the dual-surface read API, the consolidated
+- **Task 2** delivered the dual-surface read API, the consolidated
   `/chart` endpoint, the strict `/fhir/*` namespace, the custom
   Provenance extension, audit-on-read, ETag, and unified errors
   (`documents/phase_2_PRD.md`).
-- **Phase 3** delivered `POST /api/v1/patients/{id}/asam-loc` +
+- **Task 3** delivered `POST /api/v1/patients/{id}/asam-loc` +
   `POST /api/v1/patients/{id}/tjc-audit` (cached by `evidence_hash`),
   FHIR `ClinicalImpression` + `DetectedIssue` mirrors, and the
   deterministic-core-plus-LLM-narration architecture

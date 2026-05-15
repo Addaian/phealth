@@ -94,19 +94,33 @@
         <thead>
           <tr>
             <th>Instrument</th>
-            <th>LOINC</th>
             <th>Score</th>
-            <th>Interpretation</th>
+            <th>Severity</th>
+            <th>Status</th>
             <th>Provenance</th>
           </tr>
         </thead>
         <tbody>
+          {# ScaleRead schema (app/api/schemas.py): instrument / score /
+             severity / status / items / provenance. No LOINC code on
+             this surface — the LOINC is on the parent Observation; the
+             chart surface here is a clinician-facing summary. #}
           {% for scale in intake["scales"] %}
             <tr>
-              <td>{{ scale["display"] or scale["loinc"] }}</td>
-              <td><code>{{ scale["loinc"] }}</code></td>
-              <td><strong>{{ scale["score"] }}</strong></td>
-              <td>{{ scale.get("interpretation") or "—" }}</td>
+              <td>{{ scale["instrument"] }}</td>
+              <td>
+                {% if scale["score"] is not none %}
+                  <strong>{{ scale["score"] }}</strong>
+                {% else %}
+                  <span class="muted">—</span>
+                {% endif %}
+              </td>
+              <td>{{ scale.get("severity") or "—" }}</td>
+              <td>
+                <span class="status status-{{ scale['status'] }}">
+                  {{ scale["status"] | replace("_", " ") }}
+                </span>
+              </td>
               <td>
                 {% if scale.get("provenance") %}
                   <code>{{ scale["provenance"]["char_start"] }}–{{ scale["provenance"]["char_end"] }}</code>
