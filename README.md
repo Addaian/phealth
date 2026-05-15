@@ -14,6 +14,53 @@ provenance on every observation in every response.
 
 ---
 
+## Quickstart (clone → click-through in ~5 min)
+
+The fastest way for a reviewer to see the system end-to-end is to bring
+it up locally and open the demo UI in a browser. One paste-block:
+
+```bash
+# 0. Prereqs: Docker Desktop running, ports 8000 and 5433 free.
+
+# 1. Clone + dev config (.env is gitignored; this just seeds dev defaults).
+git clone https://github.com/Addaian/phealth.git
+cd phealth
+cp .env.example .env
+
+# 2. (Optional) Drop your own ANTHROPIC_API_KEY into .env to enable the
+#    UI's "Compute" buttons. Without a key, the UI still loads fine; the
+#    Compute action falls through to the documented rule-engine-only
+#    degraded path (phase_3_PRD.md §5.9 — engine output preserved, no
+#    LLM narration). For a no-key preview, you can skip ahead to the
+#    examples/*.json files instead.
+
+# 3. Bring up Postgres + the app and build the schema.
+docker compose up -d
+docker compose exec app alembic upgrade head
+
+# 4. Ingest the committed synthetic chart (the patient is Marcus Reyes).
+( cd data/synthetic_export && zip -rq /tmp/export.zip "Marcus Reyes" )
+curl -X POST localhost:8000/ingest/simplepractice-zip \
+     -H "X-API-Key: phealth_dev_ingest_key" \
+     -F "file=@/tmp/export.zip"
+# -> 202 Accepted; ingest runs in a background task (≈3–5 s).
+
+# 5. Open the demo UI.
+open http://localhost:8000/ui/      # macOS; on Linux: xdg-open / on Windows: start
+```
+
+From `/ui/` you can click into the chart, then run the ASAM Level-of-Care
+and TJC compliance audit. **No API key needed for the chart view** — that
+exercises Task 2 fully. The ASAM/TJC "Compute" buttons need an
+`ANTHROPIC_API_KEY` to call Claude; without one they return the
+rule-engine-only degraded response (still useful: deterministic level +
+deterministic findings, just no LLM-narrated rationale paragraphs).
+
+For the curl/JSON path and the additional `/fhir/*` endpoints, see
+[**How to run (full reference)**](#how-to-run) further down.
+
+---
+
 ## The patient (TL;DR)
 
 **Marcus J. Reyes**, 34 M — concurrent alcohol + benzodiazepine use disorder,
@@ -207,19 +254,14 @@ matrix flags all five as `gap`, alongside three `satisfied` EPs for contrast.
 
 ## How to run
 
+The [Quickstart](#quickstart-clone--click-through-in-5-min) at the top covers
+clone → ingest → UI in one paste-block. The walkthrough below picks up
+**after** the chart is ingested and exercises the JSON API directly with
+`curl` — useful if you want to see the raw response shapes, the
+ETag/304 contract, or the FHIR `/fhir/*` surface without going through
+the UI.
+
 ```bash
-cp .env.example .env                              # dev defaults; .env is gitignored
-
-docker compose up -d                              # Postgres 16 and the app
-docker compose exec app alembic upgrade head      # build the schema
-
-# Ingest the committed synthetic export (the endpoint takes a ZIP):
-( cd data/synthetic_export && zip -rq /tmp/export.zip "Marcus Reyes" )
-curl -X POST localhost:8000/ingest/simplepractice-zip \
-     -H "X-API-Key: phealth_dev_ingest_key" \
-     -F "file=@/tmp/export.zip"
-# -> 202 Accepted; the patient id is logged: `docker compose logs app`
-
 # Discover the patient id:
 PID=$(curl -s -H "X-API-Key: phealth_dev_ingest_key" \
         localhost:8000/api/v1/patients | jq -r '.[0].id')
@@ -244,7 +286,30 @@ a local Postgres). To run the app or Alembic directly on the host instead of
 in the container, the `.env` `DATABASE_URL` already points at `localhost:5433`.
 
 Interactive docs at <http://localhost:8000/docs>; capability discovery at
-<http://localhost:8000/fhir/metadata>.
+<http://localhost:8000/fhir/metadata>; demo UI at
+<http://localhost:8000/ui/>.
+
+### Optional demo UI
+
+A thin server-rendered UI is mounted at `/ui` (Jinja2 templates, no SPA, no
+build step). It exists for a reviewer who wants to click through the
+deliverables without writing curl:
+
+- `/ui/` — patient list.
+- `/ui/patients/{id}/chart` — the canonical Task 2 chart, sections collapsed,
+  timeline + extracted scales + ASAM evidence + TJC coverage in one view.
+- `/ui/patients/{id}/asam-loc` — the latest ASAM Level-of-Care assessment, or
+  a "Compute" button if none yet. Renders the level, modifiers (COE / BIO),
+  per-dimension risk ratings, cited rationale chips, and "rules fired"
+  list from the Chapter 10 cascade.
+- `/ui/patients/{id}/tjc-audit` — the latest compliance audit, with status
+  badges per EP and the planted-gap (G1–G5) tag visible on the matching rows.
+
+The UI's route handlers call the existing JSON API in-process via an
+`httpx.AsyncClient(transport=ASGITransport(app=app))` — so clicking
+"Compute" exercises the same auth, ETag, audit-on-read and error stack as
+an external API client. The UI is a *client* of the API, not a parallel
+data path. See `app/ui/router.py` for the rationale.
 
 **Tests:** `pytest` — 127 tests, `ruff check` and `mypy app/` clean. Coverage
 includes golden tests for the section detector and scale extractor, the
@@ -392,8 +457,12 @@ Full design: [`documents/phase_3_PRD.md`](documents/phase_3_PRD.md).
 
 ## Repository layout
 
+Top level reads as a one-way dependency: `app/` is the clinical model + JSON
+API (no knowledge of `ui/`); `ui/` is a thin server-rendered surface that
+calls into `app/`'s API in-process. `app/` is fully usable without `ui/`.
+
 ```
-app/
+app/                ─── the clinical model + JSON API (no UI knowledge)
   ingest/      pipeline: pdf_parser, vcard_parser, section_detector,
                scale_extractor, entity_tagger, asam_evidence_index,
                tjc_coverage_matrix, provenance, simplepractice_zip
@@ -405,17 +474,29 @@ app/
                etag (xxh64 middleware), pagination (cursor + Bundle.link),
                completeness (trinary classifier),
                schemas / chart_schemas / fhir_schemas
+  clinical/    Phase 3 reasoning: asam/{rubric, risk_ratings, level_decision,
+               narration}, tjc/{audit_functions, runner, narration},
+               llm/{claude_client, structured_output}, shared/
   db/          SQLModel schema + session
   core/        config (pydantic-settings) + API-key security
   synthetic/   persona.yaml (source of truth) + the chart-text generator
+  main.py      wiring: middleware, exception handlers, all routers (incl. /ui)
+
+ui/                 ─── the demo surface (depends on app, not vice versa)
+  router.py    HTML routes; each calls /api/v1/* in-process via
+               httpx.AsyncClient + ASGITransport (no real socket).
+  templates/   Jinja2 templates (base, index, chart, asam, tjc).
+  static/      one stylesheet — no SPA, no build step.
+
 data/
   synthetic_export/   the committed SimplePractice export (fully synthetic)
   seed/               ASAM dimension + TJC EP catalogs (reviewable YAML)
 documents/   the assessment brief, research playbook, PRDs, implementation plans
 examples/    marcus_reyes_chart.json       (live /chart response)
              marcus_reyes_everything.json  (live $everything Bundle)
-             marcus_reyes.json             (Phase 1 sample — superseded)
-tests/       127 tests + the face-validity checklist
+             marcus_reyes_asam_admission.json (Phase 3 ASAM Level 3.7)
+             marcus_reyes_tjc.json         (Phase 3 TJC audit)
+tests/       290 tests + the face-validity checklist
 ```
 
 ---

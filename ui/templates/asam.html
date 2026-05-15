@@ -1,0 +1,173 @@
+{# ASAM Level-of-Care view -- mirrors the JSON response of
+   GET /api/v1/asam-assessments/{id} (Phase 3 §6.1).
+
+   Two states:
+     1. ``assessment is None`` -- no row persisted yet. Show a "Compute"
+        button that POSTs to /ui/patients/{id}/asam-loc/compute.
+     2. ``assessment`` is a dict -- render the level recommendation,
+        per-dimension risk ratings with citations, and the global
+        rationale paragraph. A "Recompute" button stays visible so the
+        user can re-run after data changes.
+
+   Citations render as inline ``[doc:start–end]`` chips after each
+   rationale paragraph. The "rule-engine-only" banner is shown when
+   ``rationale_status == "unavailable"`` per phase_3_PRD.md §5.9. #}
+{% extends "base.html" %}
+
+{% block content %}
+  <section class="patient-header">
+    <h1>ASAM Level of Care</h1>
+    <p class="lede">Patient: <strong>{{ patient_name }}</strong></p>
+  </section>
+
+  {# ─── No assessment yet ─────────────────────────────────────────── #}
+  {% if assessment is none %}
+    <section class="panel cta-panel">
+      <h2>No assessment computed yet</h2>
+      <p>
+        Clicking <em>Compute</em> runs the deterministic rule engine
+        (ASAM Chapter 10 cascade, pp. 279–281) plus the cited-rationale
+        narration layer. Result is cached by evidence-hash; subsequent
+        clicks return the same row unless the chart changes.
+      </p>
+      <form method="post" action="/ui/patients/{{ patient_id }}/asam-loc/compute">
+        <button type="submit" class="button button-primary">
+          Compute ASAM Level of Care
+        </button>
+      </form>
+    </section>
+
+  {# ─── Render persisted assessment ───────────────────────────────── #}
+  {% else %}
+    {% set rec = assessment["recommendation"] %}
+
+    {% if assessment["rationale_status"] == "unavailable" %}
+      <div class="banner banner-warn">
+        <strong>Rule-engine-only output.</strong>
+        The Claude narration layer was unavailable for this assessment.
+        Level and per-dimension ratings are deterministic; rationale
+        text is omitted per phase_3_PRD.md §5.9.
+      </div>
+    {% elif assessment["rationale_status"] == "degraded" %}
+      <div class="banner banner-warn">
+        <strong>Degraded rationale.</strong>
+        Narration completed with warnings:
+        {{ assessment["rationale_warnings"] | join("; ") }}.
+      </div>
+    {% endif %}
+
+    <section class="panel result-card">
+      <header class="result-header">
+        <div class="level-pill">
+          <span class="level-token">{{ rec["level"] }}</span>
+          <span class="level-display">{{ rec["level_display"] }}</span>
+        </div>
+        <dl class="modifiers">
+          {% if rec["co_occurring_enhanced"] %}
+            <dt>CO-OCCURRING ENHANCED</dt>
+            <dd>Engaged per Chapter 10 §10.3</dd>
+          {% endif %}
+          {% if rec["biomedical_enhanced"] %}
+            <dt>BIOMEDICAL ENHANCED</dt>
+            <dd>Engaged per Chapter 10 §10.4</dd>
+          {% endif %}
+          {% if rec["modifiers"] %}
+            <dt>Modifiers</dt>
+            <dd>{{ rec["modifiers"] | join(", ") }}</dd>
+          {% endif %}
+        </dl>
+      </header>
+
+      {% if assessment["rationale"] %}
+        <blockquote class="rationale">{{ assessment["rationale"] }}</blockquote>
+      {% endif %}
+
+      <dl class="kv">
+        <dt>Confidence</dt><dd><code>{{ assessment["confidence"] }}</code></dd>
+        <dt>Model</dt><dd><code>{{ assessment["model_version"] }}</code></dd>
+        <dt>Evidence hash</dt>
+        <dd><code class="hash">{{ assessment["evidence_hash"][:16] }}…</code></dd>
+        <dt>Computed at</dt><dd>{{ assessment["computed_at"] }}</dd>
+        <dt>Cached</dt><dd>{{ "yes" if assessment["cached"] else "no" }}</dd>
+      </dl>
+    </section>
+
+    <section class="panel">
+      <h2>Risk ratings by dimension</h2>
+      {% for dimension in assessment["dimensions"] %}
+        <div class="dimension-card">
+          <header>
+            <h3>Dim {{ dimension["dimension"] }} — {{ dimension["name"] }}</h3>
+            <span class="confidence-badge confidence-{{ dimension['confidence'] }}">
+              {{ dimension["confidence"] }}
+            </span>
+          </header>
+
+          {% if dimension.get("subdimensions") %}
+            <table class="data-table compact">
+              <thead>
+                <tr>
+                  <th>Subdimension</th>
+                  <th>Risk rating</th>
+                  <th>Min level supported</th>
+                  <th>Rationale</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for sub in dimension["subdimensions"] %}
+                  <tr>
+                    <td>{{ sub["name"] }}</td>
+                    <td><code>{{ sub["rating"] }}</code></td>
+                    <td><code>{{ sub["min_level"] }}</code></td>
+                    <td>
+                      {{ sub["rationale"] }}
+                      {% if sub.get("citations") %}
+                        <div class="citations">
+                          {% for citation in sub["citations"] %}
+                            <span class="citation-chip"
+                                  title="document {{ citation['document_id'] }}">
+                              [{{ citation["char_start"] }}–{{ citation["char_end"] }}]
+                            </span>
+                          {% endfor %}
+                        </div>
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          {% endif %}
+
+          {% if dimension.get("rationale") %}
+            <p class="dimension-rationale">{{ dimension["rationale"] }}</p>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </section>
+
+    {% if assessment.get("rules_fired") %}
+      <section class="panel">
+        <h2>Rules fired (Chapter 10 cascade)</h2>
+        <ul class="rules-list">
+          {% for rule in assessment["rules_fired"] %}
+            <li><code>{{ rule }}</code></li>
+          {% endfor %}
+        </ul>
+        <p class="muted">
+          Each rule corresponds to a step in the deterministic ASAM 4th
+          edition Chapter 10 Determination Rules cascade (pp. 279–281).
+          No Chapter 10 rubric text is sent to the LLM (ASAM IP boundary).
+        </p>
+      </section>
+    {% endif %}
+
+    <section class="panel">
+      <form method="post"
+            action="/ui/patients/{{ patient_id }}/asam-loc/compute">
+        <button type="submit" class="button">
+          Recompute (cache-first)
+        </button>
+      </form>
+    </section>
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,222 @@
+{# Canonical chart view -- mirrors the JSON response of
+   GET /api/v1/patients/{id}/chart (Phase 2 §6.1).
+
+   Sections, in order:
+     * Patient header (demographics + meta strip)
+     * Intake (LOINC type + collapsible BPS sections + extracted scales)
+     * Timeline (one card per progress note)
+     * Observations (flat table with per-row provenance chips)
+     * ASAM evidence summary + TJC coverage summary (engine inputs, not outputs)
+
+   ``chart`` is the parsed JSON body. Field access deliberately uses
+   bracket lookup (``chart["patient"]``) for fields that are always
+   present per the Pydantic schema. Optional fields use ``.get()``. #}
+{% extends "base.html" %}
+
+{% block content %}
+  {% set patient = chart["patient"] %}
+  {% set intake = chart["intake"] %}
+  {% set meta = chart["meta"] %}
+
+  <section class="patient-header">
+    <h1>
+      {{ patient["name"]["given"] | join(" ") }} {{ patient["name"]["family"] }}
+    </h1>
+    <dl class="kv">
+      <dt>Date of birth</dt><dd>{{ patient["birth_date"] }}</dd>
+      <dt>Gender</dt><dd>{{ patient["gender"] }}</dd>
+      <dt>SimplePractice ID</dt>
+      <dd>
+        {% for identifier in patient["identifiers"] %}
+          <code>{{ identifier["value"] }}</code>
+        {% endfor %}
+      </dd>
+      <dt>Completeness</dt>
+      <dd>
+        <span class="completeness">
+          {{ "%.0f%%" | format(meta["completeness_score"] * 100) }}
+        </span>
+      </dd>
+      <dt>Extraction</dt><dd><code>{{ meta["extraction_version"] }}</code></dd>
+    </dl>
+  </section>
+
+  {# ─── Intake ─────────────────────────────────────────────────────── #}
+  <section class="panel">
+    <header class="panel-header">
+      <h2>Admission Assessment (BPS Intake)</h2>
+      <span class="badge">
+        {{ intake["loinc_type"]["display"] }} ·
+        <code>{{ intake["loinc_type"]["code"] }}</code>
+      </span>
+    </header>
+
+    <dl class="kv">
+      <dt>Author</dt><dd>{{ intake["author"]["name"] }}</dd>
+      <dt>Encounter date</dt><dd>{{ intake["encounter_date"] }}</dd>
+      <dt>Document type</dt><dd>{{ intake["document_type"] }}</dd>
+    </dl>
+
+    <h3>Sections</h3>
+    {% if intake["sections"] %}
+      <div class="sections-grid">
+        {% for section_key, section in intake["sections"].items() %}
+          <details class="section-card">
+            <summary>
+              <span class="section-title">{{ section["title"] }}</span>
+              <span class="status status-{{ section['status'] }}">
+                {{ section["status"] | replace("_", " ") }}
+              </span>
+            </summary>
+            {% if section.get("text") %}
+              <pre class="section-text">{{ section["text"] }}</pre>
+            {% else %}
+              <p class="muted">No text captured for this section.</p>
+            {% endif %}
+            {% if section.get("provenance") %}
+              {% set provenance = section["provenance"] %}
+              <p class="provenance">
+                Source:
+                <code>{{ provenance["document_id"] }}</code>
+                @ <code>{{ provenance["char_start"] }}–{{ provenance["char_end"] }}</code>
+              </p>
+            {% endif %}
+          </details>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="muted">No sections extracted.</p>
+    {% endif %}
+
+    {% if intake["scales"] %}
+      <h3>Standardized scales</h3>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Instrument</th>
+            <th>LOINC</th>
+            <th>Score</th>
+            <th>Interpretation</th>
+            <th>Provenance</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for scale in intake["scales"] %}
+            <tr>
+              <td>{{ scale["display"] or scale["loinc"] }}</td>
+              <td><code>{{ scale["loinc"] }}</code></td>
+              <td><strong>{{ scale["score"] }}</strong></td>
+              <td>{{ scale.get("interpretation") or "—" }}</td>
+              <td>
+                {% if scale.get("provenance") %}
+                  <code>{{ scale["provenance"]["char_start"] }}–{{ scale["provenance"]["char_end"] }}</code>
+                {% else %}
+                  —
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+  </section>
+
+  {# ─── Timeline ───────────────────────────────────────────────────── #}
+  <section class="panel">
+    <h2>Progress notes timeline</h2>
+    {% if chart["timeline"] %}
+      <ol class="timeline">
+        {% for note in chart["timeline"] %}
+          <li class="timeline-entry">
+            <div class="timeline-meta">
+              <time>{{ note["date"] }}</time>
+              <span class="badge">{{ note["format"] }}</span>
+              <span class="muted">by {{ note["author"]["name"] }}</span>
+            </div>
+            <details class="note-card">
+              <summary>
+                {{ note["loinc_type"]["display"] }}
+                (<code>{{ note["loinc_type"]["code"] }}</code>)
+              </summary>
+              {% if note["sections"] %}
+                <dl class="kv kv-stacked">
+                  {% for label, text in note["sections"].items() %}
+                    <dt>{{ label }}</dt>
+                    <dd><pre>{{ text }}</pre></dd>
+                  {% endfor %}
+                </dl>
+              {% else %}
+                <pre class="section-text">{{ note["full_text"] }}</pre>
+              {% endif %}
+            </details>
+          </li>
+        {% endfor %}
+      </ol>
+    {% else %}
+      <p class="muted">No progress notes in this chart.</p>
+    {% endif %}
+  </section>
+
+  {# ─── ASAM evidence summary ─────────────────────────────────────── #}
+  <section class="panel">
+    <h2>ASAM evidence (engine inputs)</h2>
+    <p class="muted">
+      Counts of contributing rows per ASAM dimension. These are inputs
+      to the Phase 3 LoC reasoning engine, not severity labels.
+    </p>
+    <table class="data-table compact">
+      <thead>
+        <tr><th>Dimension</th><th>Evidence rows</th></tr>
+      </thead>
+      <tbody>
+        {% for dim_label, count in [
+            ("Dim 1 — Intoxication / Withdrawal", chart["asam_summary"]["dim_1"]),
+            ("Dim 2 — Biomedical", chart["asam_summary"]["dim_2"]),
+            ("Dim 3 — Emotional / Behavioral / Cognitive", chart["asam_summary"]["dim_3"]),
+            ("Dim 4 — Readiness to change / Substance use severity", chart["asam_summary"]["dim_4"]),
+            ("Dim 5 — Relapse / Continued use potential", chart["asam_summary"]["dim_5"]),
+            ("Dim 6 — Recovery environment", chart["asam_summary"]["dim_6"]),
+        ] %}
+          <tr>
+            <td>{{ dim_label }}</td>
+            <td><strong>{{ count }}</strong></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <p class="cta-row">
+      <a class="button" href="/ui/patients/{{ patient_id }}/asam-loc">
+        Open ASAM Level of Care →
+      </a>
+    </p>
+  </section>
+
+  {# ─── TJC coverage summary ─────────────────────────────────────── #}
+  <section class="panel">
+    <h2>Joint Commission coverage (engine inputs)</h2>
+    <p class="muted">
+      Per-EP coverage rolled up from the extraction pipeline. The audit
+      endpoint converts these to a surveyor-style findings narrative.
+    </p>
+    <dl class="kv">
+      <dt>EPs covered</dt>
+      <dd>
+        <strong>{{ chart["tjc_coverage"]["covered_eps"] }}</strong>
+        / {{ chart["tjc_coverage"]["total_eps"] }}
+      </dd>
+      {% if chart["tjc_coverage"]["gap_eps"] %}
+        <dt>Gap EPs</dt>
+        <dd>
+          {% for ep in chart["tjc_coverage"]["gap_eps"] %}
+            <code class="gap-chip">{{ ep }}</code>
+          {% endfor %}
+        </dd>
+      {% endif %}
+    </dl>
+    <p class="cta-row">
+      <a class="button" href="/ui/patients/{{ patient_id }}/tjc-audit">
+        Open TJC Compliance Audit →
+      </a>
+    </p>
+  </section>
+{% endblock %}

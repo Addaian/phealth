@@ -1,0 +1,60 @@
+{# Landing page: lists every patient currently in the row store and
+   links into the chart / ASAM / TJC views.
+
+   The brief seeds one patient (Marcus Reyes), so this is effectively a
+   one-row table. Kept as a list rather than auto-redirecting because a
+   reviewer should see the canonical "find the patient first" flow. #}
+{% extends "base.html" %}
+
+{% block content %}
+  <section class="hero">
+    <h1>Clinical Intelligence Demo</h1>
+    <p class="lede">
+      End-to-end view of the ingestion pipeline + the two clinical
+      decision endpoints. Click a patient to open their chart; from
+      there compute an ASAM Level of Care or run a TJC compliance audit.
+    </p>
+  </section>
+
+  <section class="panel">
+    <h2>Patients</h2>
+
+    {% if patients %}
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>SimplePractice ID</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for patient in patients %}
+            <tr>
+              <td>
+                <a href="/ui/patients/{{ patient.id }}/chart">
+                  {{ patient.given_name }} {{ patient.family_name }}
+                </a>
+              </td>
+              <td><code>{{ patient.external_id or "—" }}</code></td>
+              <td class="row-actions">
+                <a class="pill" href="/ui/patients/{{ patient.id }}/chart">Chart</a>
+                <a class="pill" href="/ui/patients/{{ patient.id }}/asam-loc">ASAM</a>
+                <a class="pill" href="/ui/patients/{{ patient.id }}/tjc-audit">TJC</a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <div class="empty-state">
+        <p>No patients ingested yet.</p>
+        <p>
+          Ingest the seeded SimplePractice export by POSTing the chart
+          ZIP to <code>/ingest/simplepractice-zip</code>. See the README
+          for the curl command.
+        </p>
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}

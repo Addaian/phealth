@@ -12,7 +12,10 @@ RUN pip install --no-cache-dir --upgrade pip && pip install --no-cache-dir .
 
 # Copy the application source, migration tooling, and the seed catalogs the
 # ingestion pipeline loads at runtime (ASAM dimensions + TJC EP catalog).
+# ``ui/`` is a sibling package containing the demo UI's templates + static
+# assets; the FastAPI app imports from it via ``from ui.router import ...``.
 COPY app/ ./app/
+COPY ui/ ./ui/
 COPY alembic/ ./alembic/
 COPY alembic.ini ./
 COPY data/seed/ ./data/seed/

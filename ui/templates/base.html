@@ -1,0 +1,42 @@
+{# Base shell for the /ui demo surface.
+
+   Single column, system font stack, no JS frameworks. The nav lives in
+   the header; each derived template fills the ``content`` block. Pages
+   set their own ``page_title`` via the template context.
+#}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ page_title|default("Perspectives Health") }} · Perspectives Health</title>
+  <link rel="stylesheet" href="/ui/static/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="/ui/">
+      <span class="brand-name">Perspectives Health</span>
+      <span class="brand-sub">Clinical Intelligence Demo</span>
+    </a>
+    {% if patient_id is defined and patient_id %}
+      <nav class="patient-nav" aria-label="Patient pages">
+        <a href="/ui/patients/{{ patient_id }}/chart">Chart</a>
+        <a href="/ui/patients/{{ patient_id }}/asam-loc">ASAM</a>
+        <a href="/ui/patients/{{ patient_id }}/tjc-audit">TJC</a>
+      </nav>
+    {% endif %}
+  </header>
+
+  <main class="content">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <span>{{ "Perspectives Health Intern Technical Assessment" }}</span>
+    <span class="dot">·</span>
+    <span>API docs at <a href="/docs">/docs</a></span>
+    <span class="dot">·</span>
+    <span>FHIR metadata at <a href="/fhir/metadata">/fhir/metadata</a></span>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,283 @@
+/*
+ * Single stylesheet for the /ui surface.
+ *
+ * Design goals (intentionally narrow):
+ *   - Readable for a clinical-data review demo.
+ *   - System font stack: no webfonts, no FOUT, no licensing.
+ *   - One column, ~880px max width -- fits 1280-class laptop displays
+ *     and stays usable on a 14" screen during a screen-share.
+ *   - Status colour cues for satisfied/gap/n_a/ambiguous + severity
+ *     and confidence chips.
+ *
+ * No CSS framework, no preprocessor. If this page needs more layout
+ * complexity later, swap in Pico.css or similar -- but the brief does
+ * not justify a build step.
+ */
+
+/* ─── Reset-ish ─────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+               Helvetica, Arial, sans-serif, "Apple Color Emoji",
+               "Segoe UI Emoji";
+  color: #1f2933;
+  background: #f6f7f9;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: #2257c1; }
+a:hover { text-decoration: underline; }
+code { font-family: "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+       font-size: 0.92em; background: #eef0f3; padding: 0.05em 0.35em;
+       border-radius: 3px; }
+pre { font-family: "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+      font-size: 0.88em; background: #f0f2f5; padding: 0.75em 1em;
+      border-radius: 6px; overflow-x: auto; white-space: pre-wrap;
+      word-break: break-word; }
+h1, h2, h3 { color: #102a43; line-height: 1.25; }
+h1 { font-size: 1.75rem; margin: 0 0 0.5rem; }
+h2 { font-size: 1.25rem; margin: 0 0 0.75rem; }
+h3 { font-size: 1.05rem; margin: 1.25rem 0 0.5rem; }
+
+/* ─── Layout ────────────────────────────────────────────────────── */
+.site-header {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; padding: 1rem 1.5rem;
+  background: #fff; border-bottom: 1px solid #e1e6eb;
+}
+.brand { text-decoration: none; color: #102a43; display: inline-flex;
+         flex-direction: column; }
+.brand-name { font-weight: 600; font-size: 1.05rem; }
+.brand-sub { font-size: 0.85rem; color: #5c6b7a; }
+.patient-nav { display: inline-flex; gap: 0.25rem; }
+.patient-nav a {
+  display: inline-block; padding: 0.4rem 0.85rem; border-radius: 6px;
+  text-decoration: none; color: #2257c1; font-weight: 500;
+}
+.patient-nav a:hover { background: #eef3fb; }
+
+.content { max-width: 880px; margin: 1.5rem auto; padding: 0 1.5rem; }
+.site-footer {
+  max-width: 880px; margin: 2rem auto 3rem; padding: 0 1.5rem;
+  color: #67737d; font-size: 0.85rem; display: flex; gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.site-footer .dot { color: #c0c7cf; }
+
+/* ─── Hero / landing ────────────────────────────────────────────── */
+.hero { margin-bottom: 1.5rem; }
+.lede { font-size: 1.05rem; color: #324054; margin: 0; }
+
+/* ─── Panels ────────────────────────────────────────────────────── */
+.panel {
+  background: #fff; border: 1px solid #e1e6eb; border-radius: 10px;
+  padding: 1.25rem 1.5rem; margin-bottom: 1.25rem;
+}
+.panel-header {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; flex-wrap: wrap;
+}
+.cta-panel { text-align: left; }
+.cta-row { margin: 1rem 0 0; }
+
+/* ─── Definition lists (kv) ────────────────────────────────────── */
+.kv {
+  display: grid; grid-template-columns: max-content 1fr;
+  gap: 0.4rem 1rem; margin: 0;
+}
+.kv dt { color: #5c6b7a; font-weight: 500; }
+.kv dd { margin: 0; }
+.kv-stacked { grid-template-columns: 1fr; gap: 0.2rem 0; }
+.kv-stacked dt { color: #324054; font-weight: 600; margin-top: 0.5rem; }
+
+/* ─── Tables ────────────────────────────────────────────────────── */
+.data-table {
+  width: 100%; border-collapse: collapse; margin: 0.5rem 0 0;
+  font-size: 0.95rem;
+}
+.data-table th, .data-table td {
+  padding: 0.6rem 0.75rem; text-align: left; vertical-align: top;
+  border-bottom: 1px solid #ecf0f3;
+}
+.data-table th { color: #5c6b7a; font-weight: 600; font-size: 0.85rem;
+                 text-transform: uppercase; letter-spacing: 0.04em; }
+.data-table.compact td, .data-table.compact th { padding: 0.4rem 0.6rem; }
+.row-actions { white-space: nowrap; }
+
+/* ─── Pills / badges ───────────────────────────────────────────── */
+.pill {
+  display: inline-block; padding: 0.2rem 0.6rem; border-radius: 999px;
+  background: #eef3fb; color: #2257c1; font-size: 0.85rem;
+  text-decoration: none; font-weight: 500; margin-right: 0.25rem;
+}
+.pill:hover { background: #dde7f6; text-decoration: none; }
+.badge {
+  display: inline-block; padding: 0.15rem 0.55rem; border-radius: 4px;
+  background: #eef0f3; color: #324054; font-size: 0.85rem;
+}
+
+/* ─── Status chips ─────────────────────────────────────────────── */
+.status {
+  display: inline-block; padding: 0.1rem 0.55rem; border-radius: 999px;
+  font-size: 0.8rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.status-found, .status-satisfied {
+  background: #defbe7; color: #036b3b;
+}
+.status-looked_but_missing, .status-gap {
+  background: #fde2e2; color: #a02929;
+}
+.status-not_assessed, .status-not_applicable {
+  background: #e7eaee; color: #5c6b7a;
+}
+.status-ambiguous {
+  background: #fff3cf; color: #946800;
+}
+.severity { font-size: 0.8rem; margin-left: 0.25rem; color: #5c6b7a; }
+.severity-high { color: #a02929; }
+.severity-moderate { color: #946800; }
+.severity-low { color: #036b3b; }
+
+.confidence-badge {
+  display: inline-block; padding: 0.1rem 0.5rem; border-radius: 4px;
+  font-size: 0.78rem; font-weight: 600; text-transform: uppercase;
+}
+.confidence-high { background: #defbe7; color: #036b3b; }
+.confidence-moderate { background: #fff3cf; color: #946800; }
+.confidence-low { background: #fde2e2; color: #a02929; }
+
+/* ─── Patient header (top of chart / ASAM / TJC pages) ────────── */
+.patient-header { margin-bottom: 1rem; }
+.patient-header h1 { margin-bottom: 0.5rem; }
+.completeness { font-weight: 600; color: #036b3b; }
+
+/* ─── Sections grid (BPS intake) ──────────────────────────────── */
+.sections-grid {
+  display: grid; grid-template-columns: 1fr; gap: 0.5rem;
+  margin: 0.75rem 0;
+}
+.section-card {
+  background: #fafbfc; border: 1px solid #ecf0f3; border-radius: 8px;
+  padding: 0.6rem 0.85rem;
+}
+.section-card summary {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; cursor: pointer; font-weight: 500;
+}
+.section-title { color: #102a43; }
+.section-text {
+  margin-top: 0.75rem; background: #fff; border: 1px solid #ecf0f3;
+}
+.provenance { color: #5c6b7a; font-size: 0.85rem; margin: 0.5rem 0 0; }
+
+/* ─── Timeline ─────────────────────────────────────────────────── */
+.timeline { list-style: none; padding: 0; margin: 0;
+            display: flex; flex-direction: column; gap: 0.75rem; }
+.timeline-entry { border-left: 3px solid #cbd2d9; padding-left: 1rem; }
+.timeline-meta {
+  display: flex; align-items: center; gap: 0.6rem;
+  margin-bottom: 0.4rem; font-size: 0.9rem; color: #324054;
+}
+.note-card {
+  background: #fff; border: 1px solid #ecf0f3; border-radius: 8px;
+  padding: 0.6rem 0.85rem;
+}
+.note-card summary { cursor: pointer; font-weight: 500; }
+
+/* ─── Result card (ASAM / TJC headline) ───────────────────────── */
+.result-card .result-header {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; flex-wrap: wrap; padding-bottom: 0.75rem;
+  border-bottom: 1px solid #ecf0f3; margin-bottom: 0.75rem;
+}
+.level-pill {
+  display: inline-flex; flex-direction: column; gap: 0.15rem;
+  padding: 0.6rem 1rem; border-radius: 10px;
+  background: linear-gradient(135deg, #2257c1, #1e3a8a); color: #fff;
+  min-width: 11rem;
+}
+.level-pill.level-compliant {
+  background: linear-gradient(135deg, #0c8a4a, #06532c);
+}
+.level-pill.level-noncompliant {
+  background: linear-gradient(135deg, #b9302a, #7d1e1b);
+}
+.level-token { font-size: 1.4rem; font-weight: 700; letter-spacing: 0.02em; }
+.level-display { font-size: 0.9rem; opacity: 0.92; }
+.modifiers {
+  display: grid; grid-template-columns: max-content 1fr;
+  gap: 0.25rem 0.75rem; font-size: 0.9rem; margin: 0;
+}
+.modifiers dt { color: #5c6b7a; font-weight: 600; font-size: 0.78rem;
+                text-transform: uppercase; letter-spacing: 0.05em; }
+.modifiers dd { margin: 0; }
+
+.rationale {
+  border-left: 4px solid #2257c1; background: #f0f5fd; padding: 0.85rem 1rem;
+  margin: 0 0 1rem; color: #102a43; font-size: 1rem;
+}
+
+.dimension-card {
+  border: 1px solid #ecf0f3; border-radius: 8px; padding: 0.85rem 1rem;
+  margin-bottom: 0.75rem; background: #fafbfc;
+}
+.dimension-card header {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; margin-bottom: 0.5rem;
+}
+.dimension-rationale { margin: 0.75rem 0 0; color: #324054;
+                       font-size: 0.95rem; }
+
+.rules-list { list-style: disc; padding-left: 1.4rem; margin: 0.5rem 0; }
+.rules-list li { margin-bottom: 0.2rem; }
+
+/* ─── Citations / planted gaps ────────────────────────────────── */
+.citations { margin-top: 0.4rem; display: flex; gap: 0.3rem;
+             flex-wrap: wrap; }
+.citation-chip {
+  display: inline-block; padding: 0.1rem 0.45rem; border-radius: 4px;
+  background: #eef3fb; color: #2257c1; font-size: 0.78rem;
+  font-family: "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  cursor: help;
+}
+.planted-tag {
+  display: inline-block; margin-left: 0.4rem; padding: 0.05rem 0.4rem;
+  border-radius: 4px; background: #fff3cf; color: #946800;
+  font-size: 0.75rem; font-weight: 600;
+}
+.gap-chip {
+  display: inline-block; margin-right: 0.25rem; padding: 0.1rem 0.45rem;
+  background: #fde2e2; color: #a02929;
+}
+
+/* ─── Findings table rows ─────────────────────────────────────── */
+.finding-row.finding-gap { background: #fff8f8; }
+.finding-row.finding-not_applicable { background: #fafbfc; }
+.finding-narrative { max-width: 28rem; }
+
+/* ─── Buttons + forms ─────────────────────────────────────────── */
+.button {
+  display: inline-block; padding: 0.55rem 1rem; border-radius: 6px;
+  border: 1px solid #cbd2d9; background: #fff; color: #102a43;
+  font-size: 0.95rem; font-weight: 500; cursor: pointer;
+  text-decoration: none;
+}
+.button:hover { background: #f0f2f5; text-decoration: none; }
+.button-primary {
+  background: #2257c1; border-color: #2257c1; color: #fff;
+}
+.button-primary:hover { background: #1e3a8a; border-color: #1e3a8a; }
+
+/* ─── Banners ─────────────────────────────────────────────────── */
+.banner {
+  border-radius: 8px; padding: 0.85rem 1rem; margin-bottom: 1rem;
+}
+.banner-warn { background: #fff3cf; border: 1px solid #f6c34a;
+               color: #6e4d04; }
+
+/* ─── Misc ─────────────────────────────────────────────────────── */
+.muted { color: #5c6b7a; }
+.hash { font-size: 0.85em; }
+.empty-state { color: #5c6b7a; }

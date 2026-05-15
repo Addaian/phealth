@@ -1,0 +1,150 @@
+{# TJC Compliance Audit view -- mirrors GET /api/v1/tjc-audits/{id}
+   (Phase 3 §6.2).
+
+   Two states (same shape as the ASAM view):
+     1. ``audit is None`` -- no row persisted yet. Show a "Compute" CTA.
+     2. ``audit`` is a dict -- show the summary strip + a findings
+        table with one row per EP.
+
+   Status badge colours: ``satisfied`` green, ``gap`` red,
+   ``not_applicable`` gray, ``ambiguous`` amber. Findings flagged as
+   planted gaps (G1–G5 from the seeded chart) carry a small "planted"
+   tag so a reviewer can see the gold-set matches at a glance. #}
+{% extends "base.html" %}
+
+{% block content %}
+  <section class="patient-header">
+    <h1>TJC Compliance Audit</h1>
+    <p class="lede">Patient: <strong>{{ patient_name }}</strong></p>
+  </section>
+
+  {% if audit is none %}
+    <section class="panel cta-panel">
+      <h2>No audit computed yet</h2>
+      <p>
+        Clicking <em>Compute</em> runs 13 deterministic EP audit
+        predicates over the chart and asks Claude to narrate each
+        finding as a surveyor request-for-information. Result is cached
+        by evidence-hash; repeat clicks return the cached row unless
+        the chart changes.
+      </p>
+      <p class="muted">
+        EP catalog is paraphrased from public Joint Commission R3
+        Reports — no verbatim CAMBHC text is shipped or used in prompts.
+      </p>
+      <form method="post"
+            action="/ui/patients/{{ patient_id }}/tjc-audit/compute">
+        <button type="submit" class="button button-primary">
+          Compute Joint Commission audit
+        </button>
+      </form>
+    </section>
+
+  {% else %}
+    {% set summary = audit["summary"] %}
+
+    {% if audit["rationale_status"] == "unavailable" %}
+      <div class="banner banner-warn">
+        <strong>Rule-engine-only output.</strong>
+        Claude was unavailable. Findings reflect deterministic
+        predicates only; narrative text uses the engine template.
+      </div>
+    {% endif %}
+
+    <section class="panel result-card">
+      <header class="result-header">
+        <div class="level-pill
+                    {{ 'level-compliant' if summary['overall_status'] == 'compliant' else 'level-noncompliant' }}">
+          <span class="level-token">
+            {{ "Compliant" if summary["overall_status"] == "compliant" else "Non-compliant" }}
+          </span>
+          <span class="level-display">
+            {{ summary["gap"] }} EP gap{{ "" if summary["gap"] == 1 else "s" }}
+          </span>
+        </div>
+        <dl class="modifiers">
+          <dt>EPs audited</dt><dd>{{ summary["total_eps_audited"] }}</dd>
+          <dt>Satisfied</dt><dd>{{ summary["satisfied"] }}</dd>
+          <dt>Gaps</dt><dd>{{ summary["gap"] }}</dd>
+          <dt>Not applicable</dt><dd>{{ summary["not_applicable"] }}</dd>
+          {% if summary["ambiguous"] %}
+            <dt>Ambiguous</dt><dd>{{ summary["ambiguous"] }}</dd>
+          {% endif %}
+        </dl>
+      </header>
+
+      <dl class="kv">
+        <dt>Model</dt><dd><code>{{ audit["model_version"] }}</code></dd>
+        <dt>Evidence hash</dt>
+        <dd><code class="hash">{{ audit["evidence_hash"][:16] }}…</code></dd>
+        <dt>Computed at</dt><dd>{{ audit["computed_at"] }}</dd>
+        <dt>Cached</dt><dd>{{ "yes" if audit["cached"] else "no" }}</dd>
+      </dl>
+    </section>
+
+    <section class="panel">
+      <h2>Findings (one per Element of Performance)</h2>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>EP</th>
+            <th>Domain</th>
+            <th>Status</th>
+            <th>Narrative</th>
+            <th>Citations</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for finding in audit["findings"] %}
+            <tr class="finding-row finding-{{ finding['status'] }}">
+              <td>
+                <code>{{ finding["ep_code"] }}</code>
+                {% if finding.get("linked_planted_gap") %}
+                  <span class="planted-tag"
+                        title="Planted gap in the seeded chart">
+                    {{ finding["linked_planted_gap"] }}
+                  </span>
+                {% endif %}
+              </td>
+              <td>{{ finding["ep_domain"] }}</td>
+              <td>
+                <span class="status status-{{ finding['status'] }}">
+                  {{ finding["status"] | replace("_", " ") }}
+                </span>
+                {% if finding["severity"] not in ("none", None) %}
+                  <span class="severity severity-{{ finding['severity'] }}">
+                    {{ finding["severity"] }}
+                  </span>
+                {% endif %}
+              </td>
+              <td class="finding-narrative">
+                {{ finding["narrative"] }}
+              </td>
+              <td>
+                {% if finding.get("citations") %}
+                  {% for citation in finding["citations"] %}
+                    <span class="citation-chip"
+                          title="document {{ citation['document_id'] }}">
+                      [{{ citation["char_start"] }}–{{ citation["char_end"] }}]
+                    </span>
+                  {% endfor %}
+                {% else %}
+                  <span class="muted">—</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+
+    <section class="panel">
+      <form method="post"
+            action="/ui/patients/{{ patient_id }}/tjc-audit/compute">
+        <button type="submit" class="button">
+          Recompute (cache-first)
+        </button>
+      </form>
+    </section>
+  {% endif %}
+{% endblock %}

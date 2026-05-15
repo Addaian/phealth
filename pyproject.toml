@@ -42,6 +42,11 @@ dependencies = [
     # circuit-breaker-aware retry around our application-level failure modes
     # (citation validation failure, schema-violation retry).
     "tenacity>=8",
+    # Optional server-rendered demo UI (`/ui`). Templates live in
+    # ``app/ui/templates``; routes call the existing JSON API via an in-process
+    # ASGI transport so the UI exercises the same auth/etag/audit stack as any
+    # external client. Brief lists UI as "nice but not required" — kept thin.
+    "jinja2>=3.1",
 ]
 
 [project.optional-dependencies]
@@ -55,7 +60,11 @@ dev = [
 # `app` is the importable package; the synthetic data and chart text travel
 # with it (they are small and the ingest pipeline may reference persona.yaml).
 [tool.hatch.build.targets.wheel]
-packages = ["app"]
+# Both the API package (``app``) and the optional demo UI (``ui``) ship
+# in the wheel. ``ui`` is a sibling of ``app`` — not a subpackage — to
+# make the separation obvious: ``app`` is the clinical model + JSON API;
+# ``ui`` is a thin server-rendered surface that consumes the API.
+packages = ["app", "ui"]
 
 [tool.ruff]
 target-version = "py311"
