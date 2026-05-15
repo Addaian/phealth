@@ -560,17 +560,3 @@ reasons but map 1:1 onto the brief's tasks.
   FHIR `ClinicalImpression` + `DetectedIssue` mirrors, and the
   deterministic-core-plus-LLM-narration architecture
   (`documents/phase_3_PRD.md` + `docs/adr/003-llm-narration.md`).
-
----
-
-## Submission
-
-Per the brief: the code repository plus the inline + attached sample
-JSON files goes to both `kyle@perspectiveshealth.ai` and
-`eshan@perspectiveshealth.ai`.
-
-Sample artifacts:
-- [`examples/marcus_reyes_chart.json`](examples/marcus_reyes_chart.json) — the canonical Task 2 `/chart` response.
-- [`examples/marcus_reyes_everything.json`](examples/marcus_reyes_everything.json) — the FHIR `$everything` Bundle.
-- [`examples/marcus_reyes_asam_admission.json`](examples/marcus_reyes_asam_admission.json) — Task 3 ASAM Level 3.7.
-- [`examples/marcus_reyes_tjc.json`](examples/marcus_reyes_tjc.json) — Task 3 TJC audit (5 gaps + 7 satisfied).
