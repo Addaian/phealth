@@ -125,7 +125,7 @@ Interactive API docs at <http://localhost:8000/docs>; FHIR capability
 discovery at <http://localhost:8000/fhir/metadata>; demo UI at
 <http://localhost:8000/ui/>.
 
-**Tests:** `pytest` — 290 tests, `ruff check` and `ruff format` clean.
+**Tests:** `pytest` — 292 tests, `ruff check` and `ruff format` clean.
 Coverage includes golden tests for the section detector and scale
 extractor, the provenance round-trip across every endpoint that returns
 observations, FHIR Bundle validation on every `/fhir/*` response, the
@@ -162,7 +162,7 @@ dimension and every gap traces back to a field there.
 <img width="1008" height="849" alt="Screenshot 2026-05-15 at 4 06 39 PM" src="https://github.com/user-attachments/assets/b1dc2108-e4c7-4d16-bff5-fab6322d46f0" />
 <img width="945" height="749" alt="Screenshot 2026-05-15 at 4 06 30 PM" src="https://github.com/user-attachments/assets/d5c9e166-f474-4079-b7f8-3adae688cea4" />
 
-___
+---
 ## Architecture
 
 ```
@@ -511,7 +511,7 @@ examples/    marcus_reyes_chart.json       (live /chart response)
              marcus_reyes_everything.json  (live $everything Bundle)
              marcus_reyes_asam_admission.json (Task 3 ASAM Level 3.7)
              marcus_reyes_tjc.json         (Task 3 TJC audit)
-tests/       290 tests + the face-validity checklist
+tests/       292 tests + the face-validity checklist
 ```
 
 ---
