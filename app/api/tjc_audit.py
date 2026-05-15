@@ -20,6 +20,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Response, status
 from pydantic import BaseModel, Field
+from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session, select
 
 from app.api.deps import PatientDep, SessionDep, audit_read
@@ -114,6 +115,28 @@ def _row_to_response(row: TjcAuditResult, *, cached: bool) -> TjcAuditRead:
     return TjcAuditRead.model_validate(payload)
 
 
+def _lookup_cached(
+    db: Session,
+    *,
+    patient_id: UUID,
+    evidence_hash: str,
+    model_version: str,
+) -> TjcAuditResult | None:
+    """Return the cached TjcAuditResult for this cache key, or None.
+
+    Used both for the pre-compute cache check and for the
+    post-IntegrityError recovery path (see ``post_tjc_audit``).
+    Mirrors the cache key on the UNIQUE constraint.
+    """
+    return db.exec(
+        select(TjcAuditResult).where(
+            (TjcAuditResult.patient_id == patient_id)
+            & (TjcAuditResult.evidence_hash == evidence_hash)
+            & (TjcAuditResult.model_version == model_version)
+        )
+    ).first()
+
+
 def _persist(
     db: Session,
     *,
@@ -121,7 +144,14 @@ def _persist(
     evidence_hash: str,
     model_version: str,
 ) -> TjcAuditResult:
-    """Insert one TjcAuditResult row mirroring the response payload."""
+    """Insert one TjcAuditResult row mirroring the response payload.
+
+    Adds the row and flushes (no commit) -- the caller wraps this in
+    ``db.begin_nested()`` and commits the outer transaction after the
+    SAVEPOINT releases cleanly. Flushing here is important: it issues
+    the INSERT immediately so any UNIQUE-constraint violation
+    surfaces inside the SAVEPOINT for the recovery path to catch.
+    """
     row = TjcAuditResult(
         id=response.id,
         patient_id=response.patient_id,
@@ -134,8 +164,7 @@ def _persist(
         computed_at=response.computed_at,
     )
     db.add(row)
-    db.commit()
-    db.refresh(row)
+    db.flush()
     return row
 
 
@@ -218,13 +247,12 @@ def post_tjc_audit(
         )
 
     if not body.force_recompute:
-        cached_row = db.exec(
-            select(TjcAuditResult).where(
-                (TjcAuditResult.patient_id == patient.id)
-                & (TjcAuditResult.evidence_hash == evidence_hash)
-                & (TjcAuditResult.model_version == model_version)
-            )
-        ).first()
+        cached_row = _lookup_cached(
+            db,
+            patient_id=patient.id,
+            evidence_hash=evidence_hash,
+            model_version=model_version,
+        )
         if cached_row is not None:
             response.status_code = status.HTTP_200_OK
             response.headers["ETag"] = _etag_for(evidence_hash, model_version)
@@ -245,12 +273,41 @@ def post_tjc_audit(
         computed_at=datetime.now(UTC).replace(tzinfo=None),
     )
 
-    _persist(
-        db,
-        response=api_response,
-        evidence_hash=evidence_hash,
-        model_version=model_version,
-    )
+    # Concurrent-insert recovery: a rapid double-click can put two
+    # requests through the cache check before either commits. The
+    # UNIQUE(patient_id, evidence_hash, model_version) constraint
+    # rejects the loser's INSERT. We wrap the persist in a SAVEPOINT
+    # so the failure only rolls back the failed INSERT, not the
+    # surrounding transaction; we then re-read the winning row and
+    # return it as a cache hit (200) rather than 500ing.
+    try:
+        with db.begin_nested():
+            _persist(
+                db,
+                response=api_response,
+                evidence_hash=evidence_hash,
+                model_version=model_version,
+            )
+        # SAVEPOINT released cleanly; commit the outer transaction.
+        db.commit()
+    except IntegrityError:
+        # begin_nested has already rolled the SAVEPOINT back; the outer
+        # transaction is intact.
+        winning_row = _lookup_cached(
+            db,
+            patient_id=patient.id,
+            evidence_hash=evidence_hash,
+            model_version=model_version,
+        )
+        if winning_row is None:
+            raise HTTPException(
+                status_code=500,
+                detail="Concurrent insert race lost without recoverable cache row; retry.",
+            ) from None
+        response.status_code = status.HTTP_200_OK
+        response.headers["ETag"] = _etag_for(evidence_hash, model_version)
+        response.headers["Location"] = f"/api/v1/tjc-audits/{winning_row.id}"
+        return _row_to_response(winning_row, cached=True)
 
     response.status_code = status.HTTP_201_CREATED
     response.headers["ETag"] = _etag_for(evidence_hash, model_version)

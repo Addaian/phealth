@@ -33,6 +33,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Response, status
 from pydantic import BaseModel, Field
+from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session, select
 
 from app.api.deps import PatientDep, SessionDep, audit_read
@@ -143,6 +144,29 @@ def _row_to_response(row: AsamAssessment, *, cached: bool) -> AsamAssessmentRead
     return AsamAssessmentRead.model_validate(payload)
 
 
+def _lookup_cached(
+    db: Session,
+    *,
+    patient_id: UUID,
+    evidence_hash: str,
+    model_version: str,
+) -> AsamAssessment | None:
+    """Return the cached AsamAssessment row for this cache key, or None.
+
+    Cache key matches the ``UNIQUE(patient_id, evidence_hash,
+    model_version)`` constraint on the table — used both for the
+    pre-compute cache check and for the post-IntegrityError recovery
+    path (see ``post_asam_loc``).
+    """
+    return db.exec(
+        select(AsamAssessment).where(
+            (AsamAssessment.patient_id == patient_id)
+            & (AsamAssessment.evidence_hash == evidence_hash)
+            & (AsamAssessment.model_version == model_version)
+        )
+    ).first()
+
+
 def _persist(
     db: Session,
     *,
@@ -151,6 +175,13 @@ def _persist(
     model_version: str,
 ) -> AsamAssessment:
     """Insert one AsamAssessment row mirroring the response payload.
+
+    Adds the row and flushes -- the caller wraps this in
+    ``db.begin_nested()`` (a SAVEPOINT) and commits the outer
+    transaction afterwards. Flushing here is important: it issues the
+    INSERT immediately, so any UNIQUE-constraint violation surfaces
+    as ``IntegrityError`` inside the SAVEPOINT (which the route
+    handler catches for the concurrent-insert recovery path).
 
     The row stores the response's full ``dimensions`` list under a
     private ``_dimensions_payload`` key in the ``dimensions`` JSONB
@@ -177,8 +208,7 @@ def _persist(
         computed_at=response.computed_at,
     )
     db.add(row)
-    db.commit()
-    db.refresh(row)
+    db.flush()
     return row
 
 
@@ -262,13 +292,12 @@ def post_asam_loc(
 
     # 2. Cache lookup. Hit -> 200 with cached row's body + ETag.
     if not body.force_recompute:
-        cached_row = db.exec(
-            select(AsamAssessment).where(
-                (AsamAssessment.patient_id == patient.id)
-                & (AsamAssessment.evidence_hash == evidence_hash)
-                & (AsamAssessment.model_version == model_version)
-            )
-        ).first()
+        cached_row = _lookup_cached(
+            db,
+            patient_id=patient.id,
+            evidence_hash=evidence_hash,
+            model_version=model_version,
+        )
         if cached_row is not None:
             response.status_code = status.HTTP_200_OK
             response.headers["ETag"] = _etag_for(evidence_hash, model_version)
@@ -297,17 +326,47 @@ def post_asam_loc(
         computed_at=datetime.now(UTC).replace(tzinfo=None),
     )
 
-    # 6. Persist. UniqueConstraint(patient_id, evidence_hash,
-    #    model_version) protects against duplicate inserts under
-    #    concurrent requests -- the second commit raises IntegrityError
-    #    and the API layer would 500. For the MVP single-process flow
-    #    that race is negligible; documented as a known limitation.
-    _persist(
-        db,
-        response=api_response,
-        evidence_hash=evidence_hash,
-        model_version=model_version,
-    )
+    # 6. Persist. UNIQUE(patient_id, evidence_hash, model_version) on the
+    #    table protects against duplicate inserts under concurrent
+    #    requests; if we lose that race (a second click that arrives
+    #    after we passed the cache check at step 2 but before this
+    #    commit), the INSERT raises IntegrityError. We wrap the persist
+    #    in a SAVEPOINT so the failure only rolls back the failed
+    #    INSERT, not the surrounding transaction -- then re-read the
+    #    winning row and return it as a cache hit. A rapid double-click
+    #    therefore returns 200 with the same body rather than 500ing.
+    try:
+        with db.begin_nested():
+            _persist(
+                db,
+                response=api_response,
+                evidence_hash=evidence_hash,
+                model_version=model_version,
+            )
+        # SAVEPOINT released cleanly; commit the outer transaction so
+        # the row is durably persisted before we respond.
+        db.commit()
+    except IntegrityError:
+        # begin_nested has already rolled the SAVEPOINT back; the outer
+        # transaction (and any prior reads / writes) is intact.
+        winning_row = _lookup_cached(
+            db,
+            patient_id=patient.id,
+            evidence_hash=evidence_hash,
+            model_version=model_version,
+        )
+        if winning_row is None:
+            # The constraint fired but the row isn't visible. Should
+            # be impossible under read-committed isolation (Postgres
+            # default); surface a clear 500 rather than masking it.
+            raise HTTPException(
+                status_code=500,
+                detail="Concurrent insert race lost without recoverable cache row; retry.",
+            ) from None
+        response.status_code = status.HTTP_200_OK
+        response.headers["ETag"] = _etag_for(evidence_hash, model_version)
+        response.headers["Location"] = f"/api/v1/asam-assessments/{winning_row.id}"
+        return _row_to_response(winning_row, cached=True)
 
     response.status_code = status.HTTP_201_CREATED
     response.headers["ETag"] = _etag_for(evidence_hash, model_version)

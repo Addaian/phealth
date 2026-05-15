@@ -22,18 +22,27 @@ from sqlalchemy import delete, func
 from sqlmodel import select
 
 from app.db.models import (
+    AsamAssessment,
     AsamEvidence,
     AuditEvent,
     ClinicalDocument,
     Encounter,
     ExtractedObservation,
+    LlmInvocation,
     Patient,
+    TjcAuditResult,
     TjcCoverage,
 )
 from app.ingest.simplepractice_zip import ingest_export
 
 # Child-to-parent order, so foreign-key constraints are satisfied on delete.
+# Task 3 tables (AsamAssessment, TjcAuditResult, LlmInvocation) FK back
+# to Patient and must be cleared first; live Compute runs leave rows
+# behind that would otherwise block `DELETE FROM patient`.
 _CLEAR_ORDER = (
+    AsamAssessment,
+    TjcAuditResult,
+    LlmInvocation,
     AsamEvidence,
     ExtractedObservation,
     TjcCoverage,

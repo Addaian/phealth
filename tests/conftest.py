@@ -23,12 +23,15 @@ from sqlmodel import Session, select
 
 from app.core.security import require_api_key
 from app.db.models import (
+    AsamAssessment,
     AsamEvidence,
     AuditEvent,
     ClinicalDocument,
     Encounter,
     ExtractedObservation,
+    LlmInvocation,
     Patient,
+    TjcAuditResult,
     TjcCoverage,
 )
 from app.db.session import get_session
@@ -36,7 +39,14 @@ from app.ingest.simplepractice_zip import ingest_export
 from app.main import app
 
 # Child-to-parent order, so foreign-key constraints are satisfied on delete.
+# Task 3 tables (AsamAssessment, TjcAuditResult, LlmInvocation) FK back
+# to Patient, so they must be cleared before Patient itself; the live
+# Compute flow leaves rows in those tables that would otherwise block
+# `DELETE FROM patient` at test setup.
 _PIPELINE_TABLES = (
+    AsamAssessment,
+    TjcAuditResult,
+    LlmInvocation,
     AsamEvidence,
     ExtractedObservation,
     TjcCoverage,

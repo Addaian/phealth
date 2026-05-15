@@ -221,3 +221,62 @@ def test_get_asam_assessment_returns_404(api_client, mocked_client_factory):
     response = api_client.get(f"/api/v1/asam-assessments/{uuid4()}")
     assert response.status_code == 404
     assert "application/problem+json" in response.headers["content-type"]
+
+
+# ────────────────────────────────────────────────────────────────────────
+# 8. Concurrent-insert race recovery.
+#
+# Simulates two near-simultaneous POSTs: the first writes the cache
+# row; the second uses ``force_recompute=true`` so it skips the cache
+# check, computes a fresh response, and then loses the race on the
+# UNIQUE(patient_id, evidence_hash, model_version) constraint. The
+# endpoint must catch the IntegrityError and return the winning row
+# as a cache hit (200) rather than 500ing.
+# ────────────────────────────────────────────────────────────────────────
+
+
+def test_post_recovers_from_unique_constraint_race(
+    ingested_patient, api_client, mocked_client_factory, monkeypatch
+):
+    """A second POST with force_recompute=true hits the UNIQUE row the
+    first POST just wrote; recovery returns 200 + the winning id.
+
+    The test fixture's joined-session pattern (one connection, one
+    outer transaction) can't faithfully simulate two real concurrent
+    connections -- a real Postgres IntegrityError would abort the
+    fixture's outer transaction and roll back the first POST's row,
+    making the recovery's lookup fail spuriously. We monkey-patch
+    ``_persist`` to raise the same IntegrityError the real constraint
+    would raise in production (where each request has its own
+    connection), so the recovery handler runs against a session that
+    still sees the first POST's row.
+    """
+    from sqlalchemy.exc import IntegrityError
+
+    from app.api import asam_loc
+
+    mocked_client_factory(payloads=[_canned_rationale_for_marcus(), _canned_rationale_for_marcus()])
+
+    first = api_client.post(f"/api/v1/patients/{ingested_patient.id}/asam-loc", json={})
+    assert first.status_code == 201
+    first_id = first.json()["id"]
+    first_etag = first.headers["etag"]
+
+    # Simulate the race: force the second POST's persist to raise the
+    # same IntegrityError the real UNIQUE(patient_id, evidence_hash,
+    # model_version) constraint would raise under concurrent inserts.
+    def _persist_raises(*_args, **_kwargs):
+        raise IntegrityError("simulated unique violation", None, Exception())
+
+    monkeypatch.setattr(asam_loc, "_persist", _persist_raises)
+
+    second = api_client.post(
+        f"/api/v1/patients/{ingested_patient.id}/asam-loc",
+        json={"force_recompute": True},
+    )
+
+    # Recovery path: 200 cache-hit with the winning row's id + ETag.
+    assert second.status_code == 200, second.text
+    assert second.json()["id"] == first_id
+    assert second.headers["etag"] == first_etag
+    assert second.json()["cached"] is True

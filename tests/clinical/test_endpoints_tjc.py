@@ -184,3 +184,52 @@ def test_get_tjc_audit_returns_404(api_client, mocked_client_factory):
     response = api_client.get(f"/api/v1/tjc-audits/{uuid4()}")
     assert response.status_code == 404
     assert "application/problem+json" in response.headers["content-type"]
+
+
+# ────────────────────────────────────────────────────────────────────────
+# 8. Concurrent-insert race recovery.
+#
+# Same scenario as the ASAM endpoint test: the second POST uses
+# force_recompute=true so it skips the cache check, computes a fresh
+# response, and loses the UNIQUE-constraint race. The endpoint must
+# return the winning row as a cache hit (200) instead of 500.
+# ────────────────────────────────────────────────────────────────────────
+
+
+def test_post_tjc_recovers_from_unique_constraint_race(
+    ingested_patient, db_session, api_client, mocked_client_factory, monkeypatch
+):
+    """A second POST with force_recompute=true hits the UNIQUE row the
+    first POST just wrote; recovery returns 200 + the winning id.
+
+    See the parallel ASAM test for why we monkey-patch ``_persist``
+    rather than letting a real IntegrityError abort the fixture's
+    outer transaction.
+    """
+    from sqlalchemy.exc import IntegrityError
+
+    from app.api import tjc_audit
+
+    findings = run_audit(ingested_patient.id, db_session)
+    mocked_client_factory(
+        payloads=[_canned_tjc_payload_for(findings), _canned_tjc_payload_for(findings)]
+    )
+
+    first = api_client.post(f"/api/v1/patients/{ingested_patient.id}/tjc-audit", json={})
+    assert first.status_code == 201
+    first_id = first.json()["id"]
+    first_etag = first.headers["etag"]
+
+    def _persist_raises(*_args, **_kwargs):
+        raise IntegrityError("simulated unique violation", None, Exception())
+
+    monkeypatch.setattr(tjc_audit, "_persist", _persist_raises)
+
+    second = api_client.post(
+        f"/api/v1/patients/{ingested_patient.id}/tjc-audit",
+        json={"force_recompute": True},
+    )
+    assert second.status_code == 200, second.text
+    assert second.json()["id"] == first_id
+    assert second.headers["etag"] == first_etag
+    assert second.json()["cached"] is True

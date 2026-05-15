@@ -337,12 +337,15 @@ def test_llm_invocation_captures_cache_token_fields(db_session):
         )
     )
     client = _client_with(sdk, db_session)
+    # Filter by the test's own patient_id so any pre-existing
+    # LlmInvocation rows from live demo runs do not pollute the lookup.
+    pid = uuid4()
     client.messages_create(
         endpoint="tjc-audit",
-        patient_id=uuid4(),
+        patient_id=pid,
         messages=[{"role": "user", "content": "x"}],
     )
-    row = db_session.exec(select(LlmInvocation)).first()
+    row = db_session.exec(select(LlmInvocation).where(LlmInvocation.patient_id == pid)).first()
     assert row.cache_read_tokens == 180
     assert row.cache_creation_tokens == 20
 
@@ -357,7 +360,7 @@ def test_llm_invocation_records_endpoint_and_patient_id(db_session):
         patient_id=pid,
         messages=[{"role": "user", "content": "x"}],
     )
-    row = db_session.exec(select(LlmInvocation)).first()
+    row = db_session.exec(select(LlmInvocation).where(LlmInvocation.patient_id == pid)).first()
     assert row.endpoint == "asam-loc"
     assert row.patient_id == pid
 
