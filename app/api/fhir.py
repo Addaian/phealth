@@ -46,11 +46,21 @@ from sqlmodel import select
 from app.api.deps import PatientDep, SessionDep, audit_read
 from app.api.pagination import build_searchset_bundle, decode_cursor, encode_cursor
 from app.core.security import require_api_key
-from app.db.models import ClinicalDocument, Encounter, ExtractedObservation, Patient
+from app.db.models import (
+    AsamAssessment,
+    ClinicalDocument,
+    Encounter,
+    ExtractedObservation,
+    Patient,
+    TjcAuditResult,
+)
 from app.fhir.mappers import (
     build_capability_statement,
     build_everything_bundle,
     build_patient_bundle,
+    slug_ep_code,
+    to_clinical_impression,
+    to_detected_issue,
     to_fhir_clinical_impression,
     to_fhir_document_reference,
     to_fhir_encounter,
@@ -579,6 +589,185 @@ def search_provenance(
     bundle = build_searchset_bundle(
         resources=resources,
         resource_type="Provenance",
+        total=len(resources),
+        self_url=_self_url(request),
+        next_cursor=None,
+    )
+    return JSONResponse(_serialise(bundle), media_type=_FHIR_JSON)
+
+
+# ---------------------------------------------------------------------------
+# Phase 3 — /fhir/ClinicalImpression (ASAM assessment) + /fhir/DetectedIssue
+# (TJC compliance gap).
+# ---------------------------------------------------------------------------
+
+
+@router.get("/fhir/ClinicalImpression/{assessment_id}")
+def read_clinical_impression(assessment_id: uuid.UUID, session: SessionDep) -> JSONResponse:
+    """Return one FHIR R4 ClinicalImpression for a persisted ASAM assessment."""
+    assessment = session.get(AsamAssessment, assessment_id)
+    if assessment is None:
+        raise HTTPException(
+            status.HTTP_404_NOT_FOUND,
+            detail=f"ClinicalImpression/{assessment_id} not found",
+        )
+    patient = session.get(Patient, assessment.patient_id)
+    if patient is None:  # FK protects against this in practice
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Patient not found")
+    return JSONResponse(
+        _serialise(to_clinical_impression(assessment, patient)),
+        media_type=_FHIR_JSON,
+    )
+
+
+@router.get("/fhir/ClinicalImpression")
+def search_clinical_impressions(
+    request: Request,
+    session: SessionDep,
+    subject: str | None = Query(
+        default=None, description="Patient/{id} or {id} -- the assessment's subject"
+    ),
+) -> JSONResponse:
+    """Search ClinicalImpression resources by ``subject``.
+
+    Returns a Bundle.searchset of every persisted ``AsamAssessment`` for
+    the given patient, mapped to ClinicalImpression. No pagination for
+    the MVP -- one patient typically has 1-N assessments, well under any
+    page-size threshold.
+    """
+    query = select(AsamAssessment)
+    patient_uuid = _parse_reference(subject, "Patient")
+    if patient_uuid is not None:
+        query = query.where(AsamAssessment.patient_id == patient_uuid)
+
+    assessments = sorted(session.exec(query).all(), key=lambda a: a.computed_at)
+    # Build resources -- one Patient lookup is reused across all of this
+    # patient's assessments.
+    patient_cache: dict[uuid.UUID, Patient | None] = {}
+
+    def _patient_for(pid: uuid.UUID) -> Patient | None:
+        if pid not in patient_cache:
+            patient_cache[pid] = session.get(Patient, pid)
+        return patient_cache[pid]
+
+    resources = []
+    for a in assessments:
+        patient = _patient_for(a.patient_id)
+        if patient is None:
+            continue
+        resources.append(_serialise(to_clinical_impression(a, patient)))
+
+    bundle = build_searchset_bundle(
+        resources=resources,
+        resource_type="ClinicalImpression",
+        total=len(resources),
+        self_url=_self_url(request),
+        next_cursor=None,
+    )
+    return JSONResponse(_serialise(bundle), media_type=_FHIR_JSON)
+
+
+def _parse_detected_issue_id(issue_id: str) -> tuple[uuid.UUID, str] | None:
+    """Parse a DetectedIssue id ``{audit_uuid}-{ep_slug}`` -> (UUID, slug).
+
+    UUID hex form is 36 chars (32 hex + 4 dashes), so the audit id is
+    the first 36 characters and the rest is the EP slug. Returns
+    ``None`` if the prefix is not a valid UUID or the shape is wrong;
+    the caller maps None to 404.
+    """
+    if len(issue_id) < 38 or issue_id[36] != "-":
+        return None
+    try:
+        return uuid.UUID(issue_id[:36]), issue_id[37:]
+    except ValueError:
+        return None
+
+
+@router.get("/fhir/DetectedIssue/{issue_id}")
+def read_detected_issue(issue_id: str, session: SessionDep) -> JSONResponse:
+    """Return one FHIR R4 DetectedIssue for a persisted TJC-audit gap.
+
+    ``issue_id`` is ``{audit_id}-{ep_slug}`` (see ``to_detected_issue``).
+    The slug is re-derived from each finding's ``ep_code`` via the
+    ``slug_ep_code`` helper, so the read path and write path cannot drift.
+    """
+    parsed = _parse_detected_issue_id(issue_id)
+    if parsed is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail=f"DetectedIssue/{issue_id} not found")
+    audit_id, ep_slug = parsed
+
+    audit = session.get(TjcAuditResult, audit_id)
+    if audit is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail=f"DetectedIssue/{issue_id} not found")
+    patient = session.get(Patient, audit.patient_id)
+    if patient is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Patient not found")
+
+    target_finding = next(
+        (f for f in audit.findings if slug_ep_code(f["ep_code"]) == ep_slug),
+        None,
+    )
+    if target_finding is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail=f"DetectedIssue/{issue_id} not found")
+
+    return JSONResponse(
+        _serialise(to_detected_issue(target_finding, audit, patient)),
+        media_type=_FHIR_JSON,
+    )
+
+
+@router.get("/fhir/DetectedIssue")
+def search_detected_issues(
+    request: Request,
+    session: SessionDep,
+    subject: str | None = Query(default=None, description="Patient/{id} or {id}"),
+    category: str | None = Query(
+        default=None, description="Token; supply 'tjc-audit' to filter the Phase 3 findings"
+    ),
+) -> JSONResponse:
+    """Search DetectedIssue resources by ``subject`` (+ optional ``category``).
+
+    Returns a Bundle of every gap finding across every TJC-audit row for
+    the patient. ``category=tjc-audit`` is the only valid filter today;
+    other values produce an empty Bundle (forward-compatible: future
+    DetectedIssue uses would slot under different categories without
+    breaking this endpoint).
+    """
+    query = select(TjcAuditResult)
+    patient_uuid = _parse_reference(subject, "Patient")
+    if patient_uuid is not None:
+        query = query.where(TjcAuditResult.patient_id == patient_uuid)
+
+    audits = sorted(session.exec(query).all(), key=lambda a: a.computed_at)
+
+    # Filter on category if supplied. Our category token is the literal
+    # 'tjc-audit'; anything else short-circuits to an empty Bundle.
+    if category is not None and category != "tjc-audit":
+        audits = []
+
+    # Materialize one DetectedIssue per *gap* finding (satisfied / n-a
+    # findings are not "detected issues" -- the FHIR DetectedIssue
+    # resource semantically marks a problem, not a confirmation).
+    patient_cache: dict[uuid.UUID, Patient | None] = {}
+
+    def _patient_for(pid: uuid.UUID) -> Patient | None:
+        if pid not in patient_cache:
+            patient_cache[pid] = session.get(Patient, pid)
+        return patient_cache[pid]
+
+    resources: list[dict[str, Any]] = []
+    for audit in audits:
+        patient = _patient_for(audit.patient_id)
+        if patient is None:
+            continue
+        for finding in audit.findings:
+            if finding.get("status") != "gap":
+                continue
+            resources.append(_serialise(to_detected_issue(finding, audit, patient)))
+
+    bundle = build_searchset_bundle(
+        resources=resources,
+        resource_type="DetectedIssue",
         total=len(resources),
         self_url=_self_url(request),
         next_cursor=None,

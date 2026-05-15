@@ -35,6 +35,7 @@ from zoneinfo import ZoneInfo
 from fhir.resources.R4B.bundle import Bundle
 from fhir.resources.R4B.capabilitystatement import CapabilityStatement
 from fhir.resources.R4B.clinicalimpression import ClinicalImpression
+from fhir.resources.R4B.detectedissue import DetectedIssue
 from fhir.resources.R4B.documentreference import DocumentReference
 from fhir.resources.R4B.encounter import Encounter as FhirEncounter
 from fhir.resources.R4B.observation import Observation
@@ -42,7 +43,14 @@ from fhir.resources.R4B.patient import Patient as FhirPatient
 from fhir.resources.R4B.provenance import Provenance
 from fhir.resources.R4B.resource import Resource
 
-from app.db.models import ClinicalDocument, Encounter, ExtractedObservation, Patient
+from app.db.models import (
+    AsamAssessment,
+    ClinicalDocument,
+    Encounter,
+    ExtractedObservation,
+    Patient,
+    TjcAuditResult,
+)
 
 # Code systems referenced by the resources.
 _LOINC_SYSTEM = "http://loinc.org"
@@ -88,16 +96,35 @@ _CHART_TZ = ZoneInfo("America/Chicago")
 
 
 def _fhir_datetime(value: datetime) -> str:
-    """Render a datetime for a FHIR ``dateTime`` / ``instant`` field.
+    """Render a chart-tz datetime for a FHIR ``dateTime`` / ``instant`` field.
 
     Both FHIR types require a timezone offset. The synthetic chart's
     timestamps are stored naive (Postgres ``TIMESTAMP WITHOUT TIME ZONE`` --
     see app/db/models.py); a naive value is attached to the clinic timezone
     (``America/Chicago``) so the emitted ISO string carries the right offset
     rather than mislabelling the time as UTC.
+
+    Phase 3 server-clock timestamps (``AsamAssessment.computed_at`` /
+    ``TjcAuditResult.computed_at``) are naive **UTC**, not chart-local
+    time -- use ``_fhir_datetime_utc`` for those instead.
     """
     if value.tzinfo is None:
         value = value.replace(tzinfo=_CHART_TZ)
+    return value.isoformat()
+
+
+def _fhir_datetime_utc(value: datetime) -> str:
+    """Render a naive-UTC datetime for a FHIR ``dateTime`` / ``instant`` field.
+
+    Used for Phase 3 server-clock timestamps (``computed_at`` on
+    ``AsamAssessment`` and ``TjcAuditResult``). These are generated via
+    ``datetime.now(UTC)`` then stored naive (the column has no tz); the
+    FHIR layer reattaches UTC so the wire offset is ``+00:00``, not
+    Chicago. Bypassing this and using ``_fhir_datetime`` would shift
+    every computed_at by 5-6 hours.
+    """
+    if value.tzinfo is None:
+        value = value.replace(tzinfo=UTC)
     return value.isoformat()
 
 
@@ -509,8 +536,184 @@ def build_capability_statement() -> CapabilityStatement:
                             "interaction": [{"code": "search-type"}],
                             "searchParam": [{"name": "target", "type": "reference"}],
                         },
+                        # Phase 3 — clinical-decision resources.
+                        {
+                            "type": "ClinicalImpression",
+                            "interaction": [{"code": "read"}, {"code": "search-type"}],
+                            "searchParam": [
+                                {"name": "subject", "type": "reference"},
+                                {"name": "_count", "type": "number"},
+                            ],
+                        },
+                        {
+                            "type": "DetectedIssue",
+                            "interaction": [{"code": "read"}, {"code": "search-type"}],
+                            "searchParam": [
+                                # ``patient`` is the canonical R4 search param.
+                                # ``category`` is an out-of-band filter handled
+                                # at the application level, not a FHIR field,
+                                # so it's intentionally absent from this
+                                # advertisement.
+                                {"name": "patient", "type": "reference"},
+                            ],
+                        },
                     ],
                 }
             ],
         }
     )
+
+
+# ────────────────────────────────────────────────────────────────────────
+# Phase 3 — ClinicalImpression (ASAM assessment) + DetectedIssue (TJC gap).
+# ────────────────────────────────────────────────────────────────────────
+
+# Custom CodeSystem URLs for the Phase 3 endpoints (phase_3_PRD.md §5.10).
+# Both are project-owned -- no proprietary ASAM / CAMBHC text is used.
+ASAM_LEVEL_SYSTEM = "http://perspectiveshealth.ai/CodeSystem/asam-level"
+TJC_EP_SYSTEM = "http://perspectiveshealth.ai/CodeSystem/tjc-ep"
+
+
+def slug_ep_code(ep_code: str) -> str:
+    """Render a TJC EP code as a URL-safe slug.
+
+    Used to build stable ``DetectedIssue.id`` values
+    (``{audit_id}-{slug}``) so the FHIR read endpoint can reverse the
+    mapping. Drops parentheses; replaces dots, spaces, and other
+    structural punctuation with dashes.
+
+    Shared helper so ``to_detected_issue`` (write path) and the FHIR
+    read endpoint in ``app.api.fhir.read_detected_issue`` (parse path)
+    cannot drift -- a slug change in one without the other would break
+    every persisted DetectedIssue id.
+    """
+    return ep_code.lower().replace(" ", "-").replace(".", "-").replace("(", "").replace(")", "")
+
+
+def to_clinical_impression(assessment: AsamAssessment, patient: Patient) -> ClinicalImpression:
+    """Map a persisted ``AsamAssessment`` row to a FHIR R4 ``ClinicalImpression``.
+
+    Per phase_3_PRD.md §5.10:
+      * status = "completed"
+      * subject -> Patient/{id}
+      * effectiveDateTime -> assessment.computed_at
+      * summary -> the overall rationale
+      * finding[].itemCodeableConcept -> recommended level (custom CodeSystem)
+      * extension -> per-dimension rationale narrative, attached as a
+        text extension on the ClinicalImpression itself. Per-citation
+        char-offset extensions ride on the ``investigation`` references
+        in the per-dim narrative (a future hardening; for the MVP they
+        flow through the canonical API response, not the FHIR surface).
+
+    The dimensions JSONB column carries the assessment's full structured
+    output; we extract just the level_display + dimensions payload here
+    and leave the rest in the relational row.
+    """
+    level_display = assessment.dimensions.get("_level_display", assessment.recommended_level)
+    return ClinicalImpression.model_validate(
+        {
+            "id": str(assessment.id),
+            "status": "completed",
+            "subject": {"reference": f"Patient/{patient.id}"},
+            "effectiveDateTime": _fhir_datetime_utc(assessment.computed_at),
+            "date": _fhir_datetime_utc(assessment.computed_at),
+            "summary": assessment.rationale,
+            "finding": [
+                {
+                    "itemCodeableConcept": {
+                        "coding": [
+                            {
+                                "system": ASAM_LEVEL_SYSTEM,
+                                "code": assessment.recommended_level,
+                                "display": level_display,
+                            }
+                        ],
+                        "text": (f"ASAM Level {assessment.recommended_level}: {level_display}"),
+                    }
+                }
+            ],
+            # Document each rule the engine fired as an investigation note.
+            # ``itemReference`` would be the ideal target but the rules
+            # aren't independently addressable FHIR resources; we use
+            # ``code`` to carry the rule text inline.
+            "investigation": [
+                {
+                    "code": {"text": "ASAM Chapter 10 Determination Rules"},
+                    "item": [
+                        # FHIR R4B requires every Reference to be a real
+                        # Reference object; we stub with a Patient self-ref
+                        # so the list is non-empty and rule trace lives in
+                        # the surrounding ``code.text``. Future hardening
+                        # could emit one Observation per rule_fired and
+                        # reference them properly.
+                        {
+                            "reference": f"Patient/{patient.id}",
+                            "display": rule,
+                        }
+                        for rule in assessment.rules_fired
+                    ],
+                }
+            ]
+            if assessment.rules_fired
+            else [],
+        }
+    )
+
+
+def to_detected_issue(
+    finding: dict,
+    audit: TjcAuditResult,
+    patient: Patient,
+) -> DetectedIssue:
+    """Map one TJC finding dict (from ``TjcAuditResult.findings``) to a
+    FHIR R4 ``DetectedIssue`` resource (phase_3_PRD.md §5.10).
+
+    ``finding`` is the dict shape persisted in the row's JSONB column,
+    not an EpFinding dataclass -- M10 already serialized it. The dict
+    has keys matching the ``TjcFindingRead`` Pydantic model.
+
+    Fields:
+      * status = "final"
+      * code -> {system: TJC_EP_SYSTEM, code: <ep_code>}
+      * severity -> mapped from the engine's severity vocab
+      * patient -> Patient/{id}
+      * identifiedDateTime -> audit.computed_at
+      * detail -> the surveyor-narrated finding text
+      * id -> stable from ``{audit_id}-{ep_slug}`` so /fhir/DetectedIssue/{id}
+        resolves deterministically across cache hits.
+    """
+    # FHIR severity codes are high | moderate | low. ``none`` (engine's
+    # value on satisfied/n-a findings) collapses to ``low`` since FHIR
+    # DetectedIssue has no "informational" severity.
+    severity_map = {"high": "high", "moderate": "moderate", "low": "low", "none": "low"}
+    fhir_severity = severity_map.get(finding.get("severity", "low"), "low")
+
+    # Stable id: hash-free slug of the EP code so users walking the
+    # Bundle see ``DetectedIssue/{audit_id}-cts-03-01-09``-style ids.
+    issue_id = f"{audit.id}-{slug_ep_code(finding['ep_code'])}"
+
+    # NOTE: R4 DetectedIssue has no ``category`` field (that's R5). The
+    # ``category=tjc-audit`` query param the search endpoint accepts is
+    # an out-of-band filter; the discrimination already rides on the
+    # ``code.coding.system`` URL (TJC_EP_SYSTEM is project-owned, so
+    # any DetectedIssue with that system is unambiguously a Phase 3
+    # finding).
+    resource: dict = {
+        "id": issue_id,
+        "status": "final",
+        "code": {
+            "coding": [
+                {
+                    "system": TJC_EP_SYSTEM,
+                    "code": finding["ep_code"],
+                    "display": finding.get("ep_domain", finding["ep_code"]),
+                }
+            ],
+            "text": finding.get("ep_domain", finding["ep_code"]),
+        },
+        "severity": fhir_severity,
+        "patient": {"reference": f"Patient/{patient.id}"},
+        "identifiedDateTime": _fhir_datetime_utc(audit.computed_at),
+        "detail": finding.get("narrative", "")[:32000],  # FHIR string limit
+    }
+    return DetectedIssue.model_validate(resource)

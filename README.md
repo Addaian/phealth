@@ -44,10 +44,10 @@ SimplePractice (Essential trial)
         |
         v   POST /ingest/simplepractice-zip   (202 Accepted; background task)
   ┌──────────────────────────────────────────────────────────────────┐
-  │  Phase 1 substrate (PostgreSQL 16 + pgvector)                      │
+  │  Phase 1 substrate (PostgreSQL 16)                                 │
   │                                                                    │
   │   Patient · Encounter · ClinicalDocument                           │
-  │   (raw_text + sectioned JSONB + fhir_json + tsvector + embedding)  │
+  │   (raw_text + sectioned JSONB + fhir_json + tsvector)              │
   │   ExtractedObservation (char-offset provenance)                    │
   │   AsamEvidence · TjcCoverage (pre-computed evidence)               │
   │   AuditEvent (append-only event log)                               │
@@ -210,7 +210,7 @@ matrix flags all five as `gap`, alongside three `satisfied` EPs for contrast.
 ```bash
 cp .env.example .env                              # dev defaults; .env is gitignored
 
-docker compose up -d                              # Postgres 16 + pgvector, and the app
+docker compose up -d                              # Postgres 16 and the app
 docker compose exec app alembic upgrade head      # build the schema
 
 # Ingest the committed synthetic export (the endpoint takes a ZIP):
@@ -255,6 +255,111 @@ audit-on-read invariant.
 
 ---
 
+## Phase 3 — Clinical decision endpoints
+
+Two new POST endpoints layered on the Phase 2 substrate:
+
+- **`POST /api/v1/patients/{id}/asam-loc`** — ASAM 4th-edition Level-of-Care
+  recommendation with per-dimension cited rationale. Marcus → **Level 3.7**
+  (Medically Monitored Intensive Inpatient), non-COE, non-BIO.
+- **`POST /api/v1/patients/{id}/tjc-audit`** — Joint Commission compliance
+  audit over a 13-EP behavioral-health catalog. Marcus → **7 satisfied / 5
+  gap / 1 n/a**, all 5 planted gaps (G1–G5) surfaced.
+
+The architectural commitment: **the recommendation is deterministic Python;
+the rationale is LLM-narrated.** ASAM 4th-edition Chapter 10's Level-of-Care
+Determination Rules (pp. 279–281) are encoded as a pure-Python decision tree
+in `app/clinical/asam/level_decision.py`. The TJC audit is 13 Python
+predicates in `app/clinical/tjc/audit_functions.py`. Claude Sonnet 4.6
+writes the human-readable rationale around the engine's already-computed
+decision; it cannot alter the level or the EP-status verdicts because they
+aren't in its tool-use schema.
+
+### Why not LLM-only?
+
+ASAM publicly states: *"Inputting ASAM Criteria and other ASAM intellectual
+property into artificial intelligence is strictly prohibited."* This design
+respects that — Chapter 10 rules live in code; the LLM only sees the
+project's derived clinical findings + the engine's outputs, never any
+proprietary ASAM rubric text. Same with the CAMBHC manual on the TJC side:
+the EP catalog (`app/clinical/tjc/ep_catalog.py`) is paraphrased from public
+R3 reports, not copied. The LLM is constrained to surveyor-RFI register and
+explicit absence-language for negative findings.
+
+Beyond IP: deterministic levels are *reproducible* — reviewers who re-run
+the demo get the same recommendation. The cache layer (keyed by
+`(patient_id, evidence_hash, model_version)`) makes the response **byte-
+identical** on repeat POSTs even though Claude itself is not bit-stable.
+
+### Endpoint contract
+
+```
+POST /api/v1/patients/{patient_id}/asam-loc        →  AsamAssessmentRead
+  Body:           { "force_recompute": false }
+  201 Created     fresh compute
+  200 OK          cache hit; body and ETag identical to the original 201
+  304 Not Modified  on If-None-Match for the GET-by-id
+  422             patient has no AsamEvidence (RFC 7807)
+  503             Claude rate-limited or breaker open (RFC 7807 + Retry-After)
+  201 + degraded  Claude unreachable; engine's recommendation preserved
+                  (headers: x-rationale-status: unavailable, x-rule-engine-only: true)
+  502             malformed structured output (RFC 7807)
+  Headers:        ETag: W/"{evidence_hash}-{model_version}"
+                  Location: /api/v1/asam-assessments/{id}
+
+GET /api/v1/asam-assessments/{id}                  →  AsamAssessmentRead | 304
+POST /api/v1/patients/{patient_id}/tjc-audit       →  TjcAuditRead   (same semantics)
+GET /api/v1/tjc-audits/{id}                        →  TjcAuditRead | 304
+```
+
+FHIR mirrors:
+- `GET /fhir/ClinicalImpression?subject=Patient/{id}` — one per ASAM assessment.
+- `GET /fhir/DetectedIssue?subject=Patient/{id}` — one per TJC gap finding.
+- Both round-trip through `fhir.resources.R4B`.
+
+### Cost, latency, cache
+
+| Path                      | Cost            | Latency  |
+|---------------------------|-----------------|----------|
+| Fresh `/asam-loc` POST    | ~$0.06          | 8–12 s   |
+| Fresh `/tjc-audit` POST   | ~$0.08          | 15–25 s  |
+| Cached re-POST (same evidence_hash + model) | $0 | < 20 ms |
+| GET by id + If-None-Match | $0              | < 10 ms (304) |
+| `force_recompute: true`   | full cost again | full latency |
+
+Every Claude call writes one `LlmInvocation` row capturing tokens / latency /
+citation-validation outcome — the cost/reliability ground truth for the demo
+recording.
+
+### Quick start
+
+```bash
+# 1. Add ANTHROPIC_API_KEY to .env (obtain at https://console.anthropic.com).
+# 2. (Optional) Smoke-test the SDK + Citations API:
+python scripts/smoke_anthropic.py
+
+# 3. Hit the endpoints (X-API-Key header is required):
+PID=$(curl -s -H "X-API-Key: phealth_dev_ingest_key" \
+        localhost:8000/api/v1/patients | jq -r '.[0].id')
+
+curl -X POST localhost:8000/api/v1/patients/$PID/asam-loc \
+  -H "X-API-Key: phealth_dev_ingest_key" \
+  -H "Content-Type: application/json" -d '{}' | jq .recommendation
+
+curl -X POST localhost:8000/api/v1/patients/$PID/tjc-audit \
+  -H "X-API-Key: phealth_dev_ingest_key" \
+  -H "Content-Type: application/json" -d '{}' | jq .summary
+```
+
+Sample responses (regeneratable via `python scripts/generate_sample_json.py`):
+- [`examples/marcus_reyes_asam_admission.json`](examples/marcus_reyes_asam_admission.json) — Level 3.7
+- [`examples/marcus_reyes_tjc.json`](examples/marcus_reyes_tjc.json) — 5 planted gaps + 7 satisfied EPs
+
+Design rationale: [`docs/adr/003-llm-narration.md`](docs/adr/003-llm-narration.md).
+Full design: [`documents/phase_3_PRD.md`](documents/phase_3_PRD.md).
+
+---
+
 ## What makes this not a wrapper
 
 - **Char-offset provenance on every observation in every response.** Asserted
@@ -280,9 +385,8 @@ audit-on-read invariant.
 - **Event-sourced `AuditEvent` log** with audit-on-read enabled — every
   successful read writes a row, off the response critical path via
   `BackgroundTasks`.
-- **Idempotent ingest** (`sha256(raw_text)`), pgvector embeddings, and a
-  generated `tsvector` FTS column on every document — the hooks Phase 3
-  retrieval needs.
+- **Idempotent ingest** (`sha256(raw_text)`) and a generated `tsvector` FTS
+  column on every document — the hooks Phase 3 retrieval needs.
 
 ---
 
@@ -292,7 +396,7 @@ audit-on-read invariant.
 app/
   ingest/      pipeline: pdf_parser, vcard_parser, section_detector,
                scale_extractor, entity_tagger, asam_evidence_index,
-               tjc_coverage_matrix, embeddings, provenance, simplepractice_zip
+               tjc_coverage_matrix, provenance, simplepractice_zip
   fhir/        mappers.py — internal rows → FHIR R4 resources + Bundles
                (Patient, Encounter, DocumentReference, ClinicalImpression,
                 Observation, Provenance, CapabilityStatement)
@@ -325,9 +429,11 @@ tests/       127 tests + the face-validity checklist
   documented deletion procedure.
 - **Secrets.** `.env` is gitignored; `.env.example` carries dev-only
   defaults; `pydantic-settings` fails fast on a missing required value.
-- **LLM cost caps.** Section detection is regex-first; the LLM fallback is
-  bounded by `MAX_LLM_CALLS_PER_INGEST` and never fires for the well-formed
-  synthetic chart. Embeddings degrade gracefully when no OpenAI key is set.
+- **LLM cost caps.** Claude is the single LLM provider. Section detection is
+  regex-first; the LLM fallback is bounded by `MAX_LLM_CALLS_PER_INGEST` and
+  never fires for the well-formed synthetic chart. Phase 3 endpoints cache
+  every assessment by `(patient_id, evidence_hash, model_version)`, so
+  reviewer re-runs cost zero after the first.
 - **HIPAA posture.** The dev environment is treated as if it held PHI even
   though the data is synthetic — Postgres on a private Docker network, no
   secrets in git, audit-on-read enabled.
@@ -345,22 +451,26 @@ ingestion architecture over a different EMR's export.
 
 - **Phase 1** delivered the synthetic chart, the FHIR-shaped ingestion
   substrate, and the read API (`documents/phase_1_PRD.md`).
-- **Phase 2** (this README) delivered the dual-surface read API, the
-  consolidated `/chart` endpoint, the strict `/fhir/*` namespace, the
-  custom Provenance extension, audit-on-read, ETag, and unified errors
+- **Phase 2** delivered the dual-surface read API, the consolidated
+  `/chart` endpoint, the strict `/fhir/*` namespace, the custom
+  Provenance extension, audit-on-read, ETag, and unified errors
   (`documents/phase_2_PRD.md`).
-- **Phase 3** adds `POST /patients/{id}/asam-loc` and
-  `POST /patients/{id}/tjc-audit` — LLM-narrated clinical reasoning over
-  the pre-computed `AsamEvidence` and `TjcCoverage` tables, returning
-  cited findings.
+- **Phase 3** delivered `POST /api/v1/patients/{id}/asam-loc` +
+  `POST /api/v1/patients/{id}/tjc-audit` (cached by `evidence_hash`),
+  FHIR `ClinicalImpression` + `DetectedIssue` mirrors, and the
+  deterministic-core-plus-LLM-narration architecture
+  (`documents/phase_3_PRD.md` + `docs/adr/003-llm-narration.md`).
 
 ---
 
 ## Submission
 
-Per the brief: the code repository plus
-[`examples/marcus_reyes_chart.json`](examples/marcus_reyes_chart.json)
-(inline) and
-[`examples/marcus_reyes_everything.json`](examples/marcus_reyes_everything.json)
-(attached) go to both `kyle@perspectiveshealth.ai` and
+Per the brief: the code repository plus the inline + attached sample
+JSON files goes to both `kyle@perspectiveshealth.ai` and
 `eshan@perspectiveshealth.ai`.
+
+Sample artifacts:
+- [`examples/marcus_reyes_chart.json`](examples/marcus_reyes_chart.json) — the canonical Task 2 `/chart` response.
+- [`examples/marcus_reyes_everything.json`](examples/marcus_reyes_everything.json) — the FHIR `$everything` Bundle.
+- [`examples/marcus_reyes_asam_admission.json`](examples/marcus_reyes_asam_admission.json) — Task 3 ASAM Level 3.7.
+- [`examples/marcus_reyes_tjc.json`](examples/marcus_reyes_tjc.json) — Task 3 TJC audit (5 gaps + 7 satisfied).

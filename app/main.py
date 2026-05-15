@@ -24,8 +24,8 @@ import logging
 
 from fastapi import FastAPI
 
+from app.api import asam_loc, ingest, notes, patients, tjc_audit
 from app.api import fhir as fhir_api
-from app.api import ingest, notes, patients
 from app.api.errors import register_exception_handlers
 from app.api.etag import ETagMiddleware
 
@@ -61,6 +61,15 @@ app.include_router(notes.router)
 app.include_router(fhir_api.router)
 # Auth-free CapabilityStatement (FHIR R4 spec requirement, see app/api/fhir.py).
 app.include_router(fhir_api.metadata_router)
+
+# Phase 3 — clinical decision endpoints (POST /asam-loc + POST /tjc-audit, plus
+# GET /asam-assessments/{id} and GET /tjc-audits/{id}). Each module exposes two
+# routers because the POST and GET hang off different prefixes
+# (/api/v1/patients vs /api/v1/asam-assessments).
+app.include_router(asam_loc.patient_router)
+app.include_router(asam_loc.assessment_router)
+app.include_router(tjc_audit.patient_router)
+app.include_router(tjc_audit.audit_router)
 
 
 @app.get("/health", tags=["meta"])

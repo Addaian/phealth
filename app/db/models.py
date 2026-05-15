@@ -1,5 +1,5 @@
 """
-SQLModel ORM table definitions — the Phase 1 storage substrate.
+SQLModel ORM table definitions — the storage substrate across phases.
 
 This is the FHIR-R4-shaped schema described in documents/phase_1_PRD.md §5 and
 documents/phase_1.md §Step 3. Design intent:
@@ -18,6 +18,20 @@ documents/phase_1.md §Step 3. Design intent:
     Phase 3 reasoning endpoints into retrieval queries rather than
     full-document inference.
 
+Phase 3 (documents/phase_3_PRD.md §6.3) appends three cache / observability
+tables:
+
+  * ``AsamAssessment`` and ``TjcAuditResult`` cache each computed clinical
+    assessment by ``(patient_id, evidence_hash, model_version)``. The
+    ``evidence_hash`` is an xxhash64 over the contributing-row PKs; a re-POST
+    with identical inputs hits the cache and returns a byte-identical body so
+    the demo flow is deterministic even though Claude is not.
+  * ``LlmInvocation`` is a per-call cost / latency / reliability log. Every
+    Claude call writes one row, regardless of whether the assessment was a
+    cache hit (no row) or fresh compute (one row). Reviewers see the real
+    cost and latency numbers; the table is also the audit ground truth for
+    the citation-validation path.
+
 Alembic targets ``SQLModel.metadata``; importing this module registers all
 table classes onto it. Table names are explicit snake_case.
 
@@ -30,15 +44,9 @@ maintenance).
 import uuid
 from datetime import UTC, date, datetime
 
-from pgvector.sqlalchemy import Vector
-from sqlalchemy import Column
+from sqlalchemy import Column, UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlmodel import Field, SQLModel
-
-# Embedding dimensionality for OpenAI text-embedding-3-small (PRD §7; used in M6).
-# Must match the output dimension of whatever model the EMBEDDING_MODEL setting
-# (app/core/config.py) names — if that model is swapped, update this too.
-EMBEDDING_DIM = 1536
 
 
 def _utcnow() -> datetime:
@@ -128,12 +136,12 @@ class ClinicalDocument(SQLModel, table=True):
     fhir_clinical_impression: dict | None = Field(
         default=None, sa_column=Column(JSONB, nullable=True)
     )
-    # Per-document section embedding for Phase 3 semantic retrieval (pgvector).
     # NOTE: clinical_document.fts (tsvector) is added as a GENERATED column in
-    # the Alembic migration — see this module's docstring.
-    embedding: list[float] | None = Field(
-        default=None, sa_column=Column(Vector(EMBEDDING_DIM), nullable=True)
-    )
+    # the Alembic migration — see this module's docstring. The legacy pgvector
+    # ``embedding`` column was dropped during the Phase 3 OpenAI-removal pass
+    # (see Alembic revision ``phase3_000_drop_embedding`` and
+    # documents/phase_3_PRD.md §3 — Phase 3 retrieval is by structured query,
+    # not vector similarity, so the column was never queried).
 
 
 class ExtractedObservation(SQLModel, table=True):
@@ -221,9 +229,148 @@ class AuditEvent(SQLModel, table=True):
     payload: dict = Field(default_factory=dict, sa_column=Column(JSONB, nullable=False))
 
 
+class AsamAssessment(SQLModel, table=True):
+    """One ASAM 4th-edition Level-of-Care assessment for a patient.
+
+    Caches the output of the deterministic rule engine + Claude-narrated
+    rationale (phase_3_PRD.md §5.2, §5.7). The row is the *whole* response
+    body — ``dimensions`` carries the per-subdimension ratings + rationale
+    + citations, ``rules_fired`` lists every Chapter 10 rule that fired, and
+    ``rationale`` holds the overall narration.
+
+    Cache contract — POSTs are idempotent by ``(patient_id, evidence_hash,
+    model_version)``: a repeat POST with the same chart and the same model
+    returns this row verbatim, byte-stable ETag included. The unique
+    constraint enforces this at the DB level (a duplicate insert raises and
+    the API code falls back to a SELECT).
+
+    The ``evidence_hash`` is the xxhash64 hex over the sorted contributing
+    AsamEvidence + ExtractedObservation row PKs (phase_3_PRD.md §5.7) —
+    deterministic, and changes only when the underlying evidence does.
+    """
+
+    __tablename__ = "asam_assessment"
+    __table_args__ = (
+        UniqueConstraint(
+            "patient_id",
+            "evidence_hash",
+            "model_version",
+            name="uq_asam_assessment_cache_key",
+        ),
+    )
+
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    patient_id: uuid.UUID = Field(foreign_key="patient.id", index=True)
+    # xxhash64 hex of the canonical contributing-row set. Indexed for the
+    # cache lookup; combined with patient_id + model_version it forms the
+    # unique cache key (see __table_args__).
+    evidence_hash: str = Field(index=True)
+    # Recommended level token, e.g. "3.7" | "3.7-BIO" | "2.5-COE" — see
+    # phase_3_PRD.md §5.10 for the closed enumeration.
+    recommended_level: str
+    # List of applied modifiers ("COE", "BIO", ...). Empty list = no modifier.
+    modifiers: list = Field(default_factory=list, sa_column=Column(JSONB, nullable=False))
+    # Per-dimension findings: ratings, per-subdimension rationale, citations
+    # (phase_3_PRD.md §6.1). JSONB so the shape can evolve without a migration.
+    dimensions: dict = Field(default_factory=dict, sa_column=Column(JSONB, nullable=False))
+    # Ordered list of human-readable rules from Chapter 10 that contributed
+    # to the decision (phase_3_PRD.md §5.4).
+    rules_fired: list = Field(default_factory=list, sa_column=Column(JSONB, nullable=False))
+    rationale: str
+    # high | moderate | low — see phase_3_PRD.md §6.7 for the threshold rules.
+    confidence: str
+    # ok | unavailable | degraded — set to "unavailable" when Claude was
+    # unreachable (rule-engine-only fallback) and "degraded" when the
+    # citation validator forced a re-narration (phase_3_PRD.md §5.9).
+    rationale_status: str
+    # Free-form warning tags, e.g. ["citation_validation_failed"]. Empty list
+    # is the happy path.
+    rationale_warnings: list = Field(default_factory=list, sa_column=Column(JSONB, nullable=False))
+    # Claude model id at compute time, e.g. "claude-sonnet-4-6". Part of the
+    # cache key — swapping the model creates a new cache namespace so two
+    # models' outputs can be compared side by side (phase_3_PRD.md §5.7).
+    model_version: str
+    computed_at: datetime = Field(default_factory=_utcnow)
+
+
+class TjcAuditResult(SQLModel, table=True):
+    """One Joint Commission compliance audit for a patient.
+
+    Same caching pattern as ``AsamAssessment``: keyed by ``(patient_id,
+    evidence_hash, model_version)``, and the row is the whole response body.
+    ``findings`` is the per-EP list with the surveyor-narrated text and
+    citations; ``summary`` is the {satisfied, gap, n/a, overall} rollup
+    (phase_3_PRD.md §6.2).
+    """
+
+    __tablename__ = "tjc_audit_result"
+    __table_args__ = (
+        UniqueConstraint(
+            "patient_id",
+            "evidence_hash",
+            "model_version",
+            name="uq_tjc_audit_cache_key",
+        ),
+    )
+
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    patient_id: uuid.UUID = Field(foreign_key="patient.id", index=True)
+    evidence_hash: str = Field(index=True)
+    # List of TjcFinding dicts (phase_3_PRD.md §6.2). One entry per audited EP
+    # (13 entries on the seeded Marcus chart).
+    findings: list = Field(default_factory=list, sa_column=Column(JSONB, nullable=False))
+    # Rollup counts: {total_eps_audited, satisfied, gap, not_applicable,
+    # overall_status} per phase_3_PRD.md §6.2.
+    summary: dict = Field(default_factory=dict, sa_column=Column(JSONB, nullable=False))
+    rationale_status: str
+    rationale_warnings: list = Field(default_factory=list, sa_column=Column(JSONB, nullable=False))
+    model_version: str
+    computed_at: datetime = Field(default_factory=_utcnow)
+
+
+class LlmInvocation(SQLModel, table=True):
+    """One Claude API call's cost + latency + reliability record.
+
+    Written by the ClaudeClient on every call regardless of cache state on
+    the *assessment* side — cache hits don't call the LLM, so they don't
+    write an LlmInvocation row; only fresh computes do. The table is the
+    cost/latency ground truth surfaced in the demo recording and the
+    operational backstop for the rate-limit / circuit-breaker logic
+    (phase_3_PRD.md §5.8).
+
+    Not indexed beyond ``patient_id`` for the MVP — query volume is low and
+    the table is append-only. Add a (occurred_at) index if dashboards need
+    time-bounded scans later.
+    """
+
+    __tablename__ = "llm_invocation"
+
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    # "asam-loc" | "tjc-audit" | "section-detector" (the regex-miss fallback).
+    endpoint: str
+    patient_id: uuid.UUID = Field(index=True)
+    model: str
+    prompt_tokens: int
+    completion_tokens: int
+    # Anthropic prompt-cache reads — billed at 0.1× input rate; tracked
+    # separately so the README cost line is accurate (phase_3_PRD.md §7).
+    cache_read_tokens: int = 0
+    cache_creation_tokens: int = 0
+    latency_ms: int
+    # xxhash64 hex of the response body; lets us notice when two cache-bypass
+    # POSTs produced identical text (rare but useful for the demo).
+    response_hash: str
+    # False when the post-hoc CitationValidator (phase_3_PRD.md §5.6) flagged
+    # at least one citation as broken. The narration path retries once on a
+    # failure; this records the *final* outcome.
+    citation_validation_passed: bool
+    # Exception class name on a failed call, NULL on success.
+    error_class: str | None = None
+    occurred_at: datetime = Field(default_factory=_utcnow)
+
+
 __all__ = [
     "SQLModel",
-    "EMBEDDING_DIM",
     "Patient",
     "Encounter",
     "ClinicalDocument",
@@ -231,4 +378,7 @@ __all__ = [
     "AsamEvidence",
     "TjcCoverage",
     "AuditEvent",
+    "AsamAssessment",
+    "TjcAuditResult",
+    "LlmInvocation",
 ]

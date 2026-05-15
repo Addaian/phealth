@@ -83,6 +83,18 @@ class ETagMiddleware(BaseHTTPMiddleware):
         if any(media in content_type for media in _STREAMING_MEDIA_TYPES):
             return response
 
+        # Respect a handler-set ETag (Phase 3 §5.7: the clinical decision
+        # endpoints derive their ETag from the cache key
+        # ``W/"{evidence_hash}-{model_version}"`` rather than the
+        # body's content hash). When the handler has already set one,
+        # this middleware honors it for the If-None-Match → 304 path
+        # and leaves the body untouched.
+        if "etag" in (h.lower() for h in response.headers.keys()):
+            handler_etag = response.headers["etag"]
+            if request.headers.get("if-none-match") == handler_etag:
+                return Response(status_code=304, headers={"ETag": handler_etag})
+            return response
+
         # Buffer the streaming body so we can hash it. Under
         # ``BaseHTTPMiddleware`` Starlette always wraps the handler's response
         # as ``_StreamingResponse`` (a private subclass that shares the

@@ -42,9 +42,11 @@ services:
       # network Postgres is reachable at the service name `postgres`.
       DATABASE_URL: postgresql+psycopg://phealth:phealth_dev_pw@postgres:5432/phealth
       INGEST_API_KEY: ${INGEST_API_KEY:-phealth_dev_ingest_key}
-      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
-      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-text-embedding-3-small}
       MAX_LLM_CALLS_PER_INGEST: ${MAX_LLM_CALLS_PER_INGEST:-5}
+      # Phase 3 — Claude API. Without the key, /asam-loc and /tjc-audit
+      # return 503; the rest of the API is unaffected.
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      PHEALTH_LLM_MODEL: ${PHEALTH_LLM_MODEL:-claude-sonnet-4-6}
     ports:
       - "8000:8000"
 

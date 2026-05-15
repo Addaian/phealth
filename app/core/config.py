@@ -22,11 +22,18 @@ class Settings(BaseSettings):
         ingest_api_key -- shared secret guarding the POST /ingest/* endpoints.
 
     Optional:
-        openai_api_key -- only needed when the ingest pipeline falls back to
-                          an LLM for section detection. Absent is fine for the
-                          regex-only happy path.
-        embedding_model -- embedding model id; swap for an open model in a
-                          deployment that cannot egress to OpenAI (PRD §7).
+        anthropic_api_key -- API key for the Claude SDK. Powers both the
+                          section-detector LLM fallback (Phase 1) and the
+                          Phase 3 narration layer on /asam-loc and /tjc-audit.
+                          Absent is fine for the regex-only happy path on a
+                          well-formed chart; Phase 3 endpoints return 503 +
+                          a rule-engine-only body when missing
+                          (phase_3_PRD.md §5.9).
+        phealth_llm_model -- Claude model id; defaults to Sonnet 4.6. Swap to
+                          ``claude-opus-4-7`` for narration-quality fallback
+                          (phase_3_PRD.md §5.6). Logged on every
+                          AsamAssessment / TjcAuditResult row so a model swap
+                          creates a new cache namespace (§5.7).
         max_llm_calls_per_ingest -- hard cap on LLM calls per ingest job, so a
                           malformed document cannot run up an unbounded bill.
     """
@@ -39,9 +46,15 @@ class Settings(BaseSettings):
 
     database_url: str
     ingest_api_key: str
-    openai_api_key: str | None = None
-    embedding_model: str = "text-embedding-3-small"
     max_llm_calls_per_ingest: int = 5
+    # Claude is the single LLM provider for this project — used by the section
+    # detector's regex-miss fallback (Phase 1) and the cited-rationale
+    # narration on /asam-loc + /tjc-audit (Phase 3). Plain ``str | None``
+    # (not SecretStr) for consistency with the rest of the settings; never
+    # log the value — the LlmInvocation table records tokens and latency,
+    # never the key itself.
+    anthropic_api_key: str | None = None
+    phealth_llm_model: str = "claude-sonnet-4-6"
 
 
 @lru_cache

@@ -39,11 +39,22 @@ def test_metadata_is_auth_free(client):
 
 
 def test_metadata_enumerates_every_served_resource(client):
-    """rest[0].resource lists Patient, DocumentReference, Observation, Provenance."""
+    """rest[0].resource lists the Phase 2 + Phase 3 resources.
+
+    Phase 3 added ClinicalImpression (ASAM assessment) and DetectedIssue
+    (TJC compliance gap) to the served surface (phase_3_PRD.md §5.10).
+    """
     response = client.get("/fhir/metadata")
     statement = CapabilityStatement.model_validate(response.json())
     types = {resource.type for resource in statement.rest[0].resource}
-    assert types == {"Patient", "DocumentReference", "Observation", "Provenance"}
+    assert types == {
+        "Patient",
+        "DocumentReference",
+        "Observation",
+        "Provenance",
+        "ClinicalImpression",
+        "DetectedIssue",
+    }
 
 
 def test_metadata_advertises_patient_everything_operation(client):

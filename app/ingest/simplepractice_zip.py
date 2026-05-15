@@ -12,8 +12,6 @@ per-document pipeline, persisting the FHIR-shaped substrate:
         scale_extractor       -> ExtractedObservation rows (the 7 scales)
         entity_tagger         -> ExtractedObservation rows (substances/meds/dx)
         asam_evidence_index   -> AsamEvidence rows (6 dimensions)
-        embeddings            -> ClinicalDocument.embedding (pgvector; skipped
-                                 gracefully without an OpenAI key)
     whole document set        -> tjc_coverage_matrix -> TjcCoverage rows
 
 Idempotency (PRD §7)
@@ -67,7 +65,6 @@ from app.fhir.mappers import (
     to_fhir_patient,
 )
 from app.ingest.asam_evidence_index import build_asam_evidence
-from app.ingest.embeddings import embed_text
 from app.ingest.entity_tagger import tag_entities
 from app.ingest.pdf_parser import DocumentMetadata, parse_pdf
 from app.ingest.scale_extractor import extract_scales
@@ -297,7 +294,6 @@ def _persist_document(
         content_hash=content_hash,
         sections=sections,
         fhir_document_reference={},
-        embedding=embed_text(raw_text),
     )
     session.add(document)
     session.flush()

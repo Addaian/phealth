@@ -1,0 +1,168 @@
+{
+  "id": "af7c3c19-938e-4bd0-bacc-3e99027341f2",
+  "patient_id": "d72ea8f6-ba22-4f47-81b6-35ce2eae78d5",
+  "computed_at": "2026-05-15T19:16:57.037624",
+  "evidence_hash": "0364c24123f11a74",
+  "model_version": "claude-sonnet-4-6",
+  "cached": false,
+  "summary": {
+    "total_eps_audited": 13,
+    "satisfied": 7,
+    "gap": 5,
+    "not_applicable": 1,
+    "ambiguous": 0,
+    "overall_status": "non-compliant"
+  },
+  "findings": [
+    {
+      "ep_code": "CTS.02.03.07 EP 1",
+      "ep_domain": "SUD history collection",
+      "status": "satisfied",
+      "severity": "none",
+      "negative_finding": false,
+      "narrative": "Standard CTS.02.03.07 EP 1: met. The intake assessment documents the patient's substance use history (substances used and pattern) along with concordant ICD-10 SUD diagnoses.",
+      "citations": [],
+      "linked_planted_gap": null
+    },
+    {
+      "ep_code": "CTS.02.03.07 EP 7",
+      "ep_domain": "Withdrawal / intoxication risk in assessment",
+      "status": "satisfied",
+      "severity": "none",
+      "negative_finding": false,
+      "narrative": "Standard CTS.02.03.07 EP 7: met. A validated withdrawal-risk scale (CIWA-Ar) was administered, documenting the assessment of intoxication and withdrawal risk.",
+      "citations": [],
+      "linked_planted_gap": null
+    },
+    {
+      "ep_code": "CTS.02.01.07 EP 1",
+      "ep_domain": "History and physical within 24h of admission",
+      "status": "satisfied",
+      "severity": "none",
+      "negative_finding": false,
+      "narrative": "Standard CTS.02.01.07 EP 1: met. A biopsychosocial History and Physical was completed on 2026-05-04 (admission day), satisfying the within-24-hours requirement.",
+      "citations": [
+        {
+          "document_id": "3bbea558-14a2-42f3-abb1-b31e655f0d1d",
+          "char_start": 0,
+          "char_end": 120,
+          "snippet": "Client: Marcus Reyes\nDOB: 04/11/1991\nProvider: Adrian Dai\nAppointment: Individual appointment on May 4, 2026\n1:30 pm - 2"
+        }
+      ],
+      "linked_planted_gap": null
+    },
+    {
+      "ep_code": "CTS.03.01.03 EP 28",
+      "ep_domain": "Individualized treatment plan reflecting assessed needs",
+      "status": "gap",
+      "severity": "high",
+      "negative_finding": false,
+      "narrative": "Standard CTS.03.01.03 EP 28: not met. Documentation review revealed Documentation review identified a documented clinical service delivered (peer recovery support, 2026-05-09) that does not appear on the patient's treatment plan -- a treatment-plan / golden-thread misalignment.",
+      "citations": [
+        {
+          "document_id": "14bbb86c-5774-4aa4-9ccd-cccee6c1a4c5",
+          "char_start": 219,
+          "char_end": 240,
+          "snippet": "peer recovery support"
+        }
+      ],
+      "linked_planted_gap": "G2"
+    },
+    {
+      "ep_code": "CTS.03.01.09",
+      "ep_domain": "Measurement-based care",
+      "status": "gap",
+      "severity": "high",
+      "negative_finding": true,
+      "narrative": "Standard CTS.03.01.09: not met. Documentation review revealed PHQ-9 administered at intake (total 18, moderately severe). Documentation review did not identify a re-administration during the remainder of the 8-day inpatient admission.",
+      "citations": [],
+      "linked_planted_gap": "G1"
+    },
+    {
+      "ep_code": "CTS.04.02.33",
+      "ep_domain": "MOUD offered for opioid use disorder",
+      "status": "not_applicable",
+      "severity": "none",
+      "negative_finding": false,
+      "narrative": "Standard CTS.04.02.33: not applicable to this patient. No opioid use disorder diagnosis is documented; the MOUD requirement does not apply to this patient.",
+      "citations": [],
+      "linked_planted_gap": null
+    },
+    {
+      "ep_code": "CTS.04.02 (TOC)",
+      "ep_domain": "Care transition / discharge planning",
+      "status": "gap",
+      "severity": "high",
+      "negative_finding": true,
+      "narrative": "Standard CTS.04.02 (TOC): not met. Documentation review revealed Patient admitted 2026-05-04. Documentation review did not identify discharge or transition-of-care planning within the first 72 hours of admission (R3 Report Issue 25 requirement).",
+      "citations": [],
+      "linked_planted_gap": "G4"
+    },
+    {
+      "ep_code": "NPSG.15.01.01 EP 2",
+      "ep_domain": "Suicide risk screening with validated tool",
+      "status": "satisfied",
+      "severity": "none",
+      "negative_finding": false,
+      "narrative": "Standard NPSG.15.01.01 EP 2: met. The Columbia Suicide Severity Rating Scale (C-SSRS) -- a validated screening tool -- was administered at admission.",
+      "citations": [],
+      "linked_planted_gap": null
+    },
+    {
+      "ep_code": "NPSG.15.01.01 EP 3",
+      "ep_domain": "Suicide risk assessment + reassessment",
+      "status": "gap",
+      "severity": "high",
+      "negative_finding": true,
+      "narrative": "Standard NPSG.15.01.01 EP 3: not met. Documentation review revealed C-SSRS administered at intake (low-intensity passive ideation, negative for active SI/plan/intent). The 2026-05-12 progress note plans a C-SSRS re-administration prior to transfer, but documentation review did not identify a completed reassessment.",
+      "citations": [],
+      "linked_planted_gap": "G3"
+    },
+    {
+      "ep_code": "NPSG.15.01.01 EP 4",
+      "ep_domain": "Documented risk level + mitigation plan",
+      "status": "satisfied",
+      "severity": "none",
+      "negative_finding": false,
+      "narrative": "Standard NPSG.15.01.01 EP 4: met. An overall suicide-risk level is documented via C-SSRS and progress notes carry mitigation-plan language.",
+      "citations": [],
+      "linked_planted_gap": null
+    },
+    {
+      "ep_code": "RC.01.01.01 EP 7",
+      "ep_domain": "Entries authenticated, dated, timed",
+      "status": "satisfied",
+      "severity": "none",
+      "negative_finding": false,
+      "narrative": "Standard RC.01.01.01 EP 7: met. All 4 clinical documents carry a documented author and authored-on timestamp.",
+      "citations": [],
+      "linked_planted_gap": null
+    },
+    {
+      "ep_code": "RC.01.02.01 EP 3",
+      "ep_domain": "Co-signatures for delegated work",
+      "status": "gap",
+      "severity": "moderate",
+      "negative_finding": false,
+      "narrative": "Standard RC.01.02.01 EP 3: not met. Documentation review revealed A progress note dated 2026-05-09 was authored and signed solely by a peer recovery support specialist (non-clinical role) with no qualified clinician co-signature documented.",
+      "citations": [],
+      "linked_planted_gap": "G5"
+    },
+    {
+      "ep_code": "RC.01.03.01",
+      "ep_domain": "Timeliness of record completion",
+      "status": "satisfied",
+      "severity": "none",
+      "negative_finding": false,
+      "narrative": "Standard RC.01.03.01: met. All documents were authored within the active episode of care; no late or missing filings detected.",
+      "citations": [],
+      "linked_planted_gap": null
+    }
+  ],
+  "rationale_status": "ok",
+  "rationale_warnings": [],
+  "links": {
+    "self": "/api/v1/tjc-audits/af7c3c19-938e-4bd0-bacc-3e99027341f2",
+    "fhir_bundle": "/fhir/DetectedIssue?subject=Patient/d72ea8f6-ba22-4f47-81b6-35ce2eae78d5&category=tjc-audit"
+  }
+}

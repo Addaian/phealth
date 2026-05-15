@@ -1,0 +1,159 @@
+{
+  "id": "40a10c92-b310-4d39-b7d7-a9d6aa2b2762",
+  "patient_id": "d72ea8f6-ba22-4f47-81b6-35ce2eae78d5",
+  "computed_at": "2026-05-15T19:16:57.003194",
+  "evidence_hash": "e7c6951754f58268",
+  "model_version": "claude-sonnet-4-6",
+  "cached": false,
+  "recommendation": {
+    "level": "3.7",
+    "level_display": "Medically Monitored Intensive Inpatient",
+    "modifiers": [],
+    "co_occurring_enhanced": false,
+    "biomedical_enhanced": false
+  },
+  "dimensions": [
+    {
+      "dimension": 1,
+      "name": "Intoxication, Withdrawal, Addiction Medications",
+      "subdimensions": [
+        {
+          "name": "Intoxication and Associated Risks",
+          "rating": "dim1_i:0",
+          "min_level": "1.0",
+          "rationale": "Documentation does not establish findings for this subdimension.",
+          "citations": []
+        },
+        {
+          "name": "Withdrawal and Associated Risks",
+          "rating": "dim1_w:any",
+          "min_level": "1.0",
+          "rationale": "Latest CIWA-Ar = 2 reflects stabilization on the current regimen; admission rating remains 3A given the concurrent benzo dependence and after-hours monitoring need.",
+          "citations": [
+            {
+              "document_id": "3bbea558-14a2-42f3-abb1-b31e655f0d1d",
+              "char_start": 508,
+              "char_end": 678,
+              "snippet": "-TR criteria for Alcohol Use Disorder, severe (\u22656 criteria endorsed: tolerance, withdrawal, hazardous\nuse, continued use despite social/occupational consequences, time sp"
+            }
+          ]
+        },
+        {
+          "name": "Addiction Medication Needs",
+          "rating": "dim1_am:C",
+          "min_level": "3.7",
+          "rationale": "Active chlordiazepoxide taper maps to anchor C (Min Level 3.7) for medication-needs.",
+          "citations": []
+        }
+      ],
+      "rationale": "Active benzodiazepine taper plus moderate alcohol withdrawal with concurrent sedative-hypnotic use disorder requires medically managed inpatient care.",
+      "confidence": "high"
+    },
+    {
+      "dimension": 2,
+      "name": "Biomedical Conditions",
+      "subdimensions": [
+        {
+          "name": "Physical Health Concerns",
+          "rating": "dim2_ph:0",
+          "min_level": "1.0",
+          "rationale": "Documentation does not establish findings for this subdimension.",
+          "citations": []
+        },
+        {
+          "name": "Pregnancy-related Concerns",
+          "rating": "dim2_pr:na",
+          "min_level": "0.5",
+          "rationale": "Documentation does not establish findings for this subdimension.",
+          "citations": []
+        }
+      ],
+      "rationale": "Documentation does not establish findings for this dimension.",
+      "confidence": "high"
+    },
+    {
+      "dimension": 3,
+      "name": "Psychiatric and Cognitive Conditions",
+      "subdimensions": [
+        {
+          "name": "Active Psychiatric Symptoms",
+          "rating": "dim3_aps:1B",
+          "min_level": "1.7",
+          "rationale": "PHQ-9 = 18 (moderately severe) + GAD-7 = 15 (severe) with passive ideation only -> non-COE 1B (Min 1.7).",
+          "citations": []
+        },
+        {
+          "name": "Persistent Disability",
+          "rating": "dim3_pd:0",
+          "min_level": "1.0",
+          "rationale": "Documentation does not establish findings for this subdimension.",
+          "citations": []
+        }
+      ],
+      "rationale": "Passive ideation without active SI / plan / intent on the C-SSRS qualifies for standard co-occurring-capable care.",
+      "confidence": "high"
+    },
+    {
+      "dimension": 4,
+      "name": "Substance Use-related Risks",
+      "subdimensions": [
+        {
+          "name": "Likelihood of Risky Substance Use",
+          "rating": "dim4_rsu:E",
+          "min_level": "3.5",
+          "rationale": "Documentation does not establish findings for this subdimension.",
+          "citations": []
+        },
+        {
+          "name": "Likelihood of Risky SUD-related Behaviors",
+          "rating": "dim4_rsb:E",
+          "min_level": "3.5",
+          "rationale": "Documentation does not establish findings for this subdimension.",
+          "citations": []
+        }
+      ],
+      "rationale": "Documentation does not establish findings for this dimension.",
+      "confidence": "high"
+    },
+    {
+      "dimension": 5,
+      "name": "Recovery Environment Interactions",
+      "subdimensions": [
+        {
+          "name": "Ability to Function Effectively",
+          "rating": "dim5_f:B",
+          "min_level": "2.1",
+          "rationale": "Documentation does not establish findings for this subdimension.",
+          "citations": []
+        },
+        {
+          "name": "Support in Current Environment",
+          "rating": "dim5_s:B",
+          "min_level": "2.1",
+          "rationale": "Documentation does not establish findings for this subdimension.",
+          "citations": []
+        },
+        {
+          "name": "Safety in Current Environment",
+          "rating": "dim5_sf:B",
+          "min_level": "2.1",
+          "rationale": "Documentation does not establish findings for this subdimension.",
+          "citations": []
+        }
+      ],
+      "rationale": "Documentation does not establish findings for this dimension.",
+      "confidence": "high"
+    }
+  ],
+  "rules_fired": [
+    "Any subdimension Min Level 3 \u2192 recommend Level 3.7"
+  ],
+  "rationale": "Marcus Reyes presents with a moderate alcohol withdrawal syndrome (CIWA-Ar = 12 on admission) compounded by concurrent benzodiazepine use disorder, requiring medically managed withdrawal monitoring and an active chlordiazepoxide taper. The deterministic rule engine resolves these findings to Level 3.7 (Medically Monitored Intensive Inpatient) per Chapter 10 rules. Co-occurring depressive and anxious symptoms (PHQ-9 = 18, GAD-7 = 15) with passive ideation only are appropriate for a standard co-occurring-capable program, so the recommendation is non-COE and non-BIO.",
+  "confidence": "high",
+  "rationale_status": "ok",
+  "rationale_warnings": [],
+  "links": {
+    "self": "/api/v1/asam-assessments/40a10c92-b310-4d39-b7d7-a9d6aa2b2762",
+    "fhir": "/fhir/ClinicalImpression/40a10c92-b310-4d39-b7d7-a9d6aa2b2762"
+  }
+}

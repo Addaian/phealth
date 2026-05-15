@@ -25,7 +25,6 @@ synthetic chart — the regex handles it entirely. It is the documented
 graceful-degradation path, not the supported path.
 """
 
-import json
 import re
 
 from app.core.config import get_settings
@@ -137,46 +136,96 @@ def _slug(title: str) -> str:
 
 
 def llm_fallback_sections(raw_text: str, doc_type: str) -> dict[str, dict]:
-    """Recover section spans via an LLM when the regex splitter finds nothing.
+    """Recover section spans via Claude when the regex splitter finds nothing.
 
     Used only on a regex miss; the orchestrator is responsible for the
-    ``MAX_LLM_CALLS_PER_INGEST`` budget. Requires ``OPENAI_API_KEY`` — raises if
-    it is unset, because the regex path is the supported path for the Phase 1
+    ``MAX_LLM_CALLS_PER_INGEST`` budget. Requires ``ANTHROPIC_API_KEY`` — raises
+    if it is unset, because the regex path is the supported path for the Phase 1
     synthetic chart and this fallback exists only for malformed real-world
     documents.
 
-    The LLM is asked for section *text* (not offsets — models are unreliable at
-    character arithmetic); each returned chunk is then located in ``raw_text``
-    with ``str.find`` to recover a true provenance span.
+    The model is asked for section *text* (not offsets — models are unreliable
+    at character arithmetic); each returned chunk is then located in
+    ``raw_text`` with ``str.find`` to recover a true provenance span.
+
+    Uses the same Claude model id as the Phase 3 narration layer
+    (``PHEALTH_LLM_MODEL``, default ``claude-sonnet-4-6``) so a single SDK
+    + key powers every LLM call in the project.
     """
     settings = get_settings()
-    if not settings.openai_api_key:
+    if not settings.anthropic_api_key:
         raise RuntimeError(
-            "section regex found no sections and OPENAI_API_KEY is unset — "
+            "section regex found no sections and ANTHROPIC_API_KEY is unset — "
             "the LLM section-detection fallback is unavailable. "
             f"Inspect the {doc_type!r} document's format."
         )
 
-    from openai import OpenAI
+    import anthropic
 
-    client = OpenAI(api_key=settings.openai_api_key)
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        response_format={"type": "json_object"},
+    client = anthropic.Anthropic(api_key=settings.anthropic_api_key)
+
+    # Tool-use is the deterministic JSON-output path on the Anthropic SDK: we
+    # define a single tool, force the model to call it, and read the structured
+    # arguments out of the response. This is more reliable than freeform JSON
+    # in a text block (which the older OpenAI ``response_format`` mode produced).
+    sections_tool = {
+        "name": "record_sections",
+        "description": "Record the sections found in the clinical document.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "sections": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "key": {"type": "string", "description": "snake_case section key"},
+                            "title": {"type": "string", "description": "human-readable title"},
+                            "text": {
+                                "type": "string",
+                                "description": "verbatim section text copied from the document",
+                            },
+                        },
+                        "required": ["key", "title", "text"],
+                    },
+                }
+            },
+            "required": ["sections"],
+        },
+    }
+
+    # ``# type: ignore[call-overload]`` — the SDK exposes strict ``TypedDict``
+    # parameter types (``MessageParam``, ``ToolParam``, ``ToolChoiceToolParam``)
+    # that plain dict literals do not satisfy by structural typing. The runtime
+    # accepts the dicts unchanged; importing those TypedDicts here just to
+    # cast would add noise to a graceful-degradation code path that never
+    # fires on the synthetic chart.
+    response = client.messages.create(  # type: ignore[call-overload]
+        model=settings.phealth_llm_model,
+        max_tokens=4096,
+        tools=[sections_tool],
+        tool_choice={"type": "tool", "name": "record_sections"},
         messages=[
             {
-                "role": "system",
+                "role": "user",
                 "content": (
-                    "You split a clinical document into its sections. Return a "
-                    'JSON object {"sections": [{"key": str, "title": str, '
-                    '"text": str}]} where each text is copied verbatim from the '
-                    "document. Do not paraphrase."
+                    "Split this clinical document into its sections. Copy each "
+                    "section's text verbatim from the document — do not "
+                    "paraphrase. Return your answer by calling the "
+                    "record_sections tool.\n\n"
+                    f"Document type: {doc_type}\n\n{raw_text}"
                 ),
-            },
-            {"role": "user", "content": f"Document type: {doc_type}\n\n{raw_text}"},
+            }
         ],
     )
-    payload = json.loads(response.choices[0].message.content or "{}")
+
+    # Extract the forced tool_use block. Claude may emit a leading text block;
+    # we walk content to find the tool_use.
+    payload: dict = {}
+    for block in response.content:
+        if getattr(block, "type", None) == "tool_use":
+            payload = dict(block.input)  # type: ignore[attr-defined]
+            break
 
     sections: dict[str, dict] = {}
     for entry in payload.get("sections", []):
