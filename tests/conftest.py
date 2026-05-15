@@ -18,10 +18,33 @@ from pathlib import Path
 import pytest
 import yaml
 from fastapi.testclient import TestClient
-from sqlalchemy import text
-from sqlmodel import Session
+from sqlalchemy import delete, text
+from sqlmodel import Session, select
 
+from app.core.security import require_api_key
+from app.db.models import (
+    AsamEvidence,
+    AuditEvent,
+    ClinicalDocument,
+    Encounter,
+    ExtractedObservation,
+    Patient,
+    TjcCoverage,
+)
+from app.db.session import get_session
+from app.ingest.simplepractice_zip import ingest_export
 from app.main import app
+
+# Child-to-parent order, so foreign-key constraints are satisfied on delete.
+_PIPELINE_TABLES = (
+    AsamEvidence,
+    ExtractedObservation,
+    TjcCoverage,
+    ClinicalDocument,
+    Encounter,
+    AuditEvent,
+    Patient,
+)
 
 # Repo root, derived from this file's location (tests/conftest.py).
 _REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -88,3 +111,35 @@ def db_session(db_engine):
         if transaction.is_active:
             transaction.rollback()
         connection.close()
+
+
+@pytest.fixture
+def ingested_patient(db_session, export_root) -> Patient:
+    """Clear the pipeline tables, ingest the synthetic export, and return the Patient.
+
+    Runs inside the rolled-back ``db_session``, so the developer's database is
+    left untouched. Use this in tests that need an ingested chart to query.
+    """
+    for model in _PIPELINE_TABLES:
+        db_session.execute(delete(model))
+    db_session.flush()
+    ingest_export(export_root, db_session)
+    db_session.flush()
+    return db_session.exec(select(Patient)).one()
+
+
+@pytest.fixture
+def api_client(client, db_session):
+    """A TestClient whose endpoints use the test's rolled-back ``db_session``
+    and skip the X-API-Key check.
+
+    Two dependency overrides: ``get_session`` points at the test transaction
+    (so the request sees uncommitted data), and ``require_api_key`` becomes a
+    no-op (Phase 2 §5.11 makes the key mandatory on every read; the dedicated
+    auth tests live in ``test_security.py``, so other test files use this
+    fixture and don't have to thread the header through every call).
+    """
+    app.dependency_overrides[get_session] = lambda: db_session
+    app.dependency_overrides[require_api_key] = lambda: None
+    yield client
+    app.dependency_overrides.clear()

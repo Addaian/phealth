@@ -1,0 +1,696 @@
+{
+    "meta": {
+        "generated_at": "2026-05-12T17:00:00-05:00",
+        "extraction_version": "phase2-v1.0.0",
+        "completeness_score": 1.0,
+        "etag": null,
+        "audit_id": null,
+        "compliance_check_id": null
+    },
+    "patient": {
+        "id": "d72ea8f6-ba22-4f47-81b6-35ce2eae78d5",
+        "identifiers": [
+            {
+                "system": "simplepractice",
+                "value": "106915126"
+            }
+        ],
+        "name": {
+            "given": [
+                "Marcus"
+            ],
+            "family": "Reyes"
+        },
+        "birth_date": "1991-04-11",
+        "gender": "unknown",
+        "address": null,
+        "phone": null,
+        "preferred_language": "en"
+    },
+    "intake": {
+        "document_id": "3bbea558-14a2-42f3-abb1-b31e655f0d1d",
+        "document_type": "biopsychosocial",
+        "encounter_date": "2026-05-04T13:30:00",
+        "author": {
+            "name": "Adrian Dai",
+            "npi": null
+        },
+        "loinc_type": {
+            "system": "http://loinc.org",
+            "code": "11488-4",
+            "display": "Consultation Note"
+        },
+        "full_text": "Client: Marcus Reyes\nDOB: 04/11/1991\nProvider: Adrian Dai\nAppointment: Individual appointment on May 4, 2026\n1:30 pm - 2:20 pm CT, 50 min\nBilling code: 90834 - Psychotherapy, 45 min\n[BPS] Intake Assessment\n1. Presenting Problem:\n\"I fell at home and my brother brought me to the ED. They said I was withdrawing.\"\n2. Signs and Symptoms (DSM-V-TR based) resulting in impairment(s):\n(Include current examples for treatment planning, e.g., social, occupational, affective, cognitive, physical)\nPatient meets DSM-5-TR criteria for Alcohol Use Disorder, severe (\u22656 criteria endorsed: tolerance, withdrawal, hazardous\nuse, continued use despite social/occupational consequences, time spent obtaining/using, unsuccessful cut-down\nattempts); Sedative-Hypnotic Use Disorder, severe (alprazolam); and Major Depressive Disorder, recurrent, moderate\n(anhedonia, depressed mood, sleep disturbance, fatigue, appetite change, low self-worth, poor concentration,\npsychomotor change \u2014 PHQ-9 = 18, moderately severe). Current alcohol withdrawal syndrome with tremor, sweats,\nanxiety, insomnia (CIWA-Ar = 12). Resulting impairment spans: occupational (job loss 6 wks ago for intoxication at work),\nsocial (isolation from former sober peers), affective (severe anxiety GAD-7 = 15, depression PHQ-9 = 18), physical\n(witnessed fall, uncontrolled HTN, alcohol-related hepatic injury), and cognitive (poor concentration, impaired\ninsight/judgment on MSE).\n3. History of Presenting Problem\n(Events, precipitating factors, or incidents leading to need for services):\n34yo male with 4-year history of heavy alcohol use and 18-month history of daily alprazolam (originally prescribed for\nanxiety, now obtained illicitly), presenting 36 hours after last drink with tremor, sweats, sleep <2h, and a witnessed fall at\nhome. Referred from ED for medically monitored withdrawal management after CIWA-Ar of 12 on arrival. Lost employment\n6 weeks prior due to intoxication at work; DUI charge pending. Ambivalent about treatment (\"I'm here because my brother\nsaid so\").\nFrequency/duration/severity/cycling of symptoms:\nAlcohol: 4 years of escalating daily use, currently ~14 standard drinks/day. Alprazolam: 18 months of daily use, escalated\nfrom a legitimate 0.5 mg PRN prescription to illicit 1 mg daily. Cannabis: recreational, 2\u20133x weekly. Acute alcohol withdrawal\ncurrently moderate (CIWA-Ar = 12). Benzodiazepine withdrawal anticipated but not yet manifest. Depressive and anxious\nsymptoms have been continuously present x 4 years with worsening since job loss 6 weeks ago.\nWas there a clear time when Sx worsened?\nYes \u2014 substance use and depressive symptoms escalated sharply 6 weeks ago following job loss (terminated for\nintoxication at work). Acute withdrawal began approximately 36 hours prior to admission after a forced cut-down attempt\n(no alcohol available at home over the weekend).\nFamily mental health history:\nFather with alcohol use disorder; mother with depression\n4. Current Family and Significant Relationships\nStrengths/support:: Brother Daniel willing to engage; provided transportation to ED.\nStressors/problems:: Brother is an active substance user (alcohol, cannabis). Patient is housing-dependent on the brother.\nNo partner, no children. Parents live out of state; minimal contact.\nRecent changes:: Job loss 6 weeks ago; pending DUI charge. Brother delivered ultimatum about housing.\nChanges desired:: Stable sober housing; restored autonomy; reconnect with mother.\nComment on family circumstances:: Father with untreated alcohol use disorder. Mother with treated major depression.\nPatient is the younger of two siblings.\n5. Childhood/Adolescent History\n(Developmental milestones, past behavioral concerns, environment, abuse, school, social, mental\nhealth)\nNormative early development. Raised in two-parent household until parental separation at age 11. First alcohol use at age\n16 (family setting, moderate). First cannabis at age 17 (peer setting). High school graduate; completed 18 credits at\ncommunity college. No documented abuse or neglect. 2019 MVA at age 28 with mild TBI \u2014 brief LOC, evaluated and\ndischarged from ED. No documented cognitive sequelae, but patient reports lingering difficulty with sustained\nconcentration since.\n6. Social Relationships\nStrengths/support:: Brother Daniel (limited \u2014 actively using). Former AA sponsor from 2023 cycle, lost contact.\nStressors/problems:: Social isolation post-job-loss. Drift from former sober peer group. No current peer-recovery network.\nRecent changes:: Has not contacted former sponsor in 12+ months. Sober friends drifted as drinking escalated in 2024.\nChanges desired:: Reconnect with former sponsor; build new sober peer network through structured group.\n7. Cultural/Ethnic\nStrengths/support:: Identifies as Hispanic/Latino. Strong cultural value placed on family ties (familismo).\nStressors/problems:: Cultural shame around mental health and substance use. Internalized 'be a man, handle it yourself'\nnarrative.\nBeliefs/practices to incorporate into therapy:: Family-systems framing welcomed. Spanish-language psychoeducation\nmaterials acceptable. Open to culturally-aware peer matching.\n8. Spiritual/Religious\nStrengths/support:: Raised Catholic. Faith was a source of comfort in childhood; mother and grandmother were practicing.\nStressors/problems:: Currently disconnected from practice. Reports guilt and shame around substance use as a barrier to\nreturning to church.\nBeliefs/practices to incorporate into therapy:: Open to facility chaplaincy if available. Open to AA/NA frameworks that\nincorporate higher-power language without requiring it.\nRecent changes:: Has not attended Mass in 4+ years. Grandmother (primary spiritual influence) died in 2022.\nChanges desired:: Wants to 'find some peace' but not actively pursuing a specific practice at this time.\n9. Legal\nHistory:: No prior arrests or convictions.\nStatus/impact/stressors:: Pending DUI charge (2026-04-12). Court date TBD; assigned public defender. May lose driver's\nlicense. Stressor weighing heavily on treatment ambivalence and willingness to engage.\n10. Education\nStrengths:: High school graduate. Completed 18 credits of community college coursework.\nWeaknesses:: Did not complete associate's degree. Reports difficulty with sustained concentration since 2019 mTBI,\nexacerbated by current substance use.\n11. Employment/Vocational\nStrengths/support:: 5-year tenure in warehouse logistics (2020\u20132026). Considered reliable when sober.\nStressors/problems:: Unemployed x 6 weeks. Terminated for intoxication at work (workplace breathalyzer policy violation).\nIncome loss is a major stressor. No unemployment income \u2014 termination was 'for cause.' Identity disruption: \"I'm not used\nto not working.\"\n12. Military\nCurrent impact:: No military service history.\n13. Leisure/Recreational\nStrengths/support:: Previously enjoyed watching basketball and walking in the neighborhood.\nRecent changes:: Has not engaged in leisure activities x 6 months \u2014 substance use has crowded everything else out.\nChanges desired:: Wants to 'get back into walking' as a wellness practice during/after treatment.\n14. Physical Health\nSummary of health:: Active: uncontrolled essential hypertension, suspected alcoholic hepatitis (not biopsy-confirmed),\nremote mild TBI (2019). No current primary care relationship. Last PCP visit 2024 for naltrexone prescription.\nPhysical factors affecting mental condition:: Severe sleep deprivation (<2 h/night for several days pre-admission).\nWithdrawal physiology (autonomic arousal, tremor) directly affecting cognition, mood, and concentration. Hepatic\ndysfunction may affect medication metabolism \u2014 clinical relevance for benzo taper and any future SSRI/SNRI selection.\nVitals (BP, HR, RR, temp, SpO2):: BP 158/96; HR 104; RR 18; T 99.1\u00b0F; SpO2 97%.\nCurrent medications (name, dose, frequency, prescriber):: None at admission. Was prescribed lisinopril 10 mg PO daily by\nPCP in 2024 for HTN; non-adherent x 18 months. To be re-initiated on admission day 4 per inpatient medical orders.\nAllergies:: No known drug allergies (NKDA).\nRecent labs (date, panel, results):: Hepatic panel 2026-05-04: AST 142 U/L (ref 10\u201340), ALT 98 U/L (ref 7\u201356), GGT 312 U/L (ref\n9\u201348), total bilirubin 1.4 mg/dL (ref 0.1\u20131.2) \u2014 consistent with alcohol-related hepatic injury. UDS 2026-05-04: POSITIVE for\nethanol, benzodiazepines, cannabinoids; NEGATIVE for opioids, cocaine, amphetamines.\n15. Chemical Use History\nSummary of use:: Polysubstance: heavy daily alcohol (4 years), daily illicit alprazolam (18 months), recreational cannabis\n(years). Denies opioid, stimulant, and hallucinogen use; UDS corroborates. Active alcohol withdrawal at intake (CIWA-Ar =\n12); benzodiazepine withdrawal anticipated.\nPatient\u2019s perception of problem:: Minimizes severity: \"I drink a lot but it's not that bad.\" Attributes ED visit to \"just a fall, not\nthe drinking.\" Acknowledges alprazolam use is \"getting out of hand\" but does not connect it to the withdrawal-anticipation\nfinding. Ambivalent about treatment: \"I'm here because my brother said so.\"\nPer-substance breakdown (alcohol, sedative-hypnotics, cannabis, opioids, stimulants, other) \u2014 for each:\nfirst/last use, route, frequency, amounts, withdrawal hx, prior tx:: \u2022 Alcohol: first use age 16; pattern ~14 standard\ndrinks/day x 4 years (vodka, beer); last use 2026-05-03; route oral; withdrawal history \u2014 Multiple episodes; one prior ED\nvisit for seizure precaution; prior treatment \u2014 2023 outpatient, 2024 naltrexone trial.\n\u2022 Alprazolam (Xanax): first use age 32; pattern 1 mg PO daily x 18 months (originally Rx, now illicit); last use 2026-05-03;\nroute oral; withdrawal history \u2014 Anticipated; not yet manifest at intake; prior treatment \u2014 None.\n\u2022 Cannabis: first use age 17; pattern 2-3 joints per week, recreational; last use 2026-04-28; route inhaled; withdrawal history\n\u2014 None reported; prior treatment \u2014 None.\n\u2022 Opioids: DENIES current or past opioid use. COWS recorded as N/A; documented to demonstrate negative-finding\nhandling\nAUDIT-C (date, items, total, interpretation):: AUDIT-C administered 2026-05-04: frequency 4, typical quantity 4, heavy\nepisodic 3 \u2014 total 11 (positive, high risk).\nDAST-10 (date, items, total, interpretation):: DAST-10 administered 2026-05-04: total 7 (substantial level, indicates intensive\nassessment and treatment indicated).\n16. Counseling/Prior Treatment History\nSummary of prior treatment:: 2023 \u2014 Outpatient individual counseling, 6 weeks at community mental health center. Self-\ndiscontinued. 2024 \u2014 PCP-prescribed naltrexone 50 mg PO daily x 3 months; non-adherent and discontinued. No prior\nresidential or inpatient SUD treatment.\nBenefits of previous treatment:: Brief reduction in drinking (~30% by self-report) during the 2023 counseling cycle.\nSetbacks of previous treatment:: Self-discontinued before completing planned course in 2023. Naltrexone non-adherence\nwith no follow-up. No prior MAT, no prior recovery group attendance.\n17. Past Psychiatric History\nPrior psychiatric diagnoses (DSM-5-TR / ICD-10):: \u2022 Major Depressive Disorder, recurrent, moderate (ICD-10 F33.1; DSM-5-TR\n296.32; onset 2019)\n\u2022 Generalized Anxiety Disorder (ICD-10 F41.1; DSM-5-TR 300.02; onset 2020)\nPsychiatric hospitalizations (year, facility, reason, duration):: \u2022 2021 \u2014 Memorial Behavioral Health \u2014 Suicidal ideation,\nvoluntary 72-hour hold\nPrior psychiatric medications (drug, dose, dates, prescriber, response):: \u2022 Sertraline 100mg \u2014 2020-2022 \u2014 Self-\ndiscontinued\n\u2022 Alprazolam 0.5mg PRN \u2014 2023 \u2014 Escalated to daily then illicit\nSelf-harm history:: One episode of superficial cutting age 22; no attempts; no recent ideation with plan\nPrior suicide attempts (lifetime):: None.\n18. Mental Status Exam\nAppearance:: Disheveled, appropriate for age, malodorous of alcohol on arrival\nBehavior / psychomotor:: Cooperative, mild psychomotor restlessness\nSpeech:: Normal rate, mildly pressured\nMood (client-reported):: Depressed and anxious\nAffect (clinician-observed):: Constricted, congruent with mood\nThought process:: Linear and goal-directed\nThought content:: Passive death wish; no active SI/HI; no delusions\nPerception:: No hallucinations\nCognition / orientation:: Alert and oriented x3; MoCA deferred due to withdrawal\nInsight:: Limited \u2014 minimizes severity of substance use\nJudgment:: Impaired \u2014 recent fall, continued use despite consequences\nStandardized screening \u2014 PHQ-9 (date, items, total):: PHQ-9 administered 2026-05-04: anhedonia 3, depressed mood 3,\nsleep 3, fatigue 2, appetite 2, self-worth 2, concentration 2, psychomotor 1, suicidal ideation 0 \u2014 total 18 (moderately\nsevere).\nStandardized screening \u2014 GAD-7 (date, items, total):: GAD-7 administered 2026-05-04: nervousness 3, uncontrollable worry\n3, excessive worry 2, trouble relaxing 2, restlessness 2, irritability 2, fear 1 \u2014 total 15 (severe).\n19. Risk Assessment\nSuicide risk \u2014 C-SSRS (date, items, interpretation):: C-SSRS administered 2026-05-04: Q1 no, Q2 YES (\"I sometimes wish I\nweren't here\"), Q3 no, Q4 no, Q5 no, Q6 no lifetime suicidal behavior. Risk: low-intensity passive ideation; no active\nSI/plan/intent.\nHomicidal ideation:: Denies. No ideation, plan, intent, or lifetime history.\nWithdrawal risk \u2014 CIWA-Ar (date, items, total):: CIWA-Ar administered 2026-05-04 14:30: nausea/vomiting 2, tremor 3,\nsweats 2, anxiety 2, agitation 1, tactile 0, auditory 0, visual 0, headache 1, orientation 1 \u2014 total 12 (moderate).\nWithdrawal risk \u2014 COWS (date, items, total, or N/A):: COWS: not administered. Patient denies any opioid use; UDS negative\nfor opioids. Documented for completeness.\nViolence / aggression risk:: Low. No history of interpersonal violence; no current threats or ideation.\nOverall risk level:: Moderate \u2014 driven by withdrawal severity (CIWA-Ar = 12), passive suicidal ideation (C-SSRS Q2-positive),\nand unstable recovery environment.\nSafety plan / precautions:: Inpatient monitoring with CIWA-Ar q4h; nursing line of sight if CIWA \u2265 15. Fall precautions in\nplace. Suicide precautions: standard observation given passive ideation without plan/intent. Re-administer C-SSRS prior to\nany level-of-care change per NPSG.15.01.01.\n20. Diagnosis\nPrimary diagnosis (DSM-5-TR / ICD-10):: Alcohol Use Disorder, severe, with withdrawal (F10.232; DSM-5-TR 303.90).\nSecondary diagnosis (DSM-5-TR / ICD-10):: Sedative, Hypnotic, or Anxiolytic Use Disorder, severe (F13.20; DSM-5-TR 304.10).\nTertiary diagnosis (DSM-5-TR / ICD-10):: Major Depressive Disorder, recurrent episode, moderate (F33.1; DSM-5-TR 296.32).\nDifferential / rule-outs:: Generalized Anxiety Disorder (F41.1) is a co-occurring consideration, but anxiety symptoms may be\nsubstantially driven by current withdrawal physiology \u2014 reassess 2 weeks post-stabilization. Recommended level of care\non admission: ASAM 3.7 \u2014 Medically Monitored Intensive Inpatient, driven by Dim 1 (active polysubstance withdrawal) and\nDim 5 (unsafe recovery environment).\n21. Treatment Plan\nGoal 1 (domain, goal, target date, measure):: Domain: Substance use. Goal: Achieve and maintain 30 days of abstinence\nfrom alcohol and benzodiazepines. Target date: 2026-06-03. Measure: Daily breathalyzer, weekly UDS.\nGoal 2 (domain, goal, target date, measure):: Domain: Mental health. Goal: Reduce PHQ-9 score from 18 to <10 by 60 days.\nTarget date: 2026-07-03. Measure: Bi-weekly PHQ-9.\nGoal 3 (domain, goal, target date, measure):: Domain: Recovery environment. Goal: Identify and engage one sober support\nperson and one alternate housing option. Target date: 2026-05-25. Measure: Social-work documentation.\nInterventions (list with frequency):: Cognitive Behavioral Therapy (CBT) \u2014 3x/week individual\n\u2022 Motivational Interviewing (MI) \u2014 woven across sessions\n\u2022 Librium taper, gabapentin adjunct, thiamine\n\u2022 Psychiatric medication evaluation for MDD/GAD (in week 2)\n\u2022 Case-management for housing and DUI court navigation\nExpected outcomes:: \u2022 Stable medical withdrawal within 7 days\n\u2022 PHQ-9 < 10 by week 8\n\u2022 Step-down to PHP/IOP by week 2 if Dims 1 and 2 resolve\nDischarge / step-down criteria:: Step down to PHP (ASAM 2.5) when: (a) CIWA-Ar < 5 for 48 hours, (b) BP controlled on\nlisinopril, (c) sober housing option identified, (d) C-SSRS re-administered and stable. Target step-down date: 2026-05-15.",
+        "sections": {
+            "childhood_adolescent_history": {
+                "title": "Childhood/Adolescent History",
+                "text": "(Developmental milestones, past behavioral concerns, environment, abuse, school, social, mental\nhealth)\nNormative early development. Raised in two-parent household until parental separation at age 11. First alcohol use at age\n16 (family setting, moderate). First cannabis at age 17 (peer setting). High school graduate; completed 18 credits at\ncommunity college. No documented abuse or neglect. 2019 MVA at age 28 with mild TBI \u2014 brief LOC, evaluated and\ndischarged from ED. No documented cognitive sequelae, but patient reports lingering difficulty with sustained\nconcentration since.",
+                "char_span": [
+                    3646,
+                    4231
+                ],
+                "status": "found",
+                "provenance": {
+                    "document_id": "3bbea558-14a2-42f3-abb1-b31e655f0d1d",
+                    "char_start": 3646,
+                    "char_end": 4231,
+                    "snippet": "(Developmental milestones, past behavioral concerns, environment, abuse, school, social, mental\nhealth)\nNormative early development. Raised in two-parent household until parental separation at age 11. First alcohol use at age\n16 (family setting, moderate). First cannabis at age 17 (peer setting). High school graduate; completed 18 credits at\ncommunity college. No documented abuse or neglect. 2019 MVA at age 28 with mild TBI \u2014 brief LOC, evaluated and\ndischarged from ED. No documented cognitive sequelae, but patient reports lingering difficulty with sustained\nconcentration since."
+                }
+            },
+            "mental_status_exam": {
+                "title": "Mental Status Exam",
+                "text": "Appearance:: Disheveled, appropriate for age, malodorous of alcohol on arrival\nBehavior / psychomotor:: Cooperative, mild psychomotor restlessness\nSpeech:: Normal rate, mildly pressured\nMood (client-reported):: Depressed and anxious\nAffect (clinician-observed):: Constricted, congruent with mood\nThought process:: Linear and goal-directed\nThought content:: Passive death wish; no active SI/HI; no delusions\nPerception:: No hallucinations\nCognition / orientation:: Alert and oriented x3; MoCA deferred due to withdrawal\nInsight:: Limited \u2014 minimizes severity of substance use\nJudgment:: Impaired \u2014 recent fall, continued use despite consequences\nStandardized screening \u2014 PHQ-9 (date, items, total):: PHQ-9 administered 2026-05-04: anhedonia 3, depressed mood 3,\nsleep 3, fatigue 2, appetite 2, self-worth 2, concentration 2, psychomotor 1, suicidal ideation 0 \u2014 total 18 (moderately\nsevere).\nStandardized screening \u2014 GAD-7 (date, items, total):: GAD-7 administered 2026-05-04: nervousness 3, uncontrollable worry\n3, excessive worry 2, trouble relaxing 2, restlessness 2, irritability 2, fear 1 \u2014 total 15 (severe).",
+                "char_span": [
+                    11698,
+                    12811
+                ],
+                "status": "found",
+                "provenance": {
+                    "document_id": "3bbea558-14a2-42f3-abb1-b31e655f0d1d",
+                    "char_start": 11698,
+                    "char_end": 12811,
+                    "snippet": "Appearance:: Disheveled, appropriate for age, malodorous of alcohol on arrival\nBehavior / psychomotor:: Cooperative, mild psychomotor restlessness\nSpeech:: Normal rate, mildly pressured\nMood (client-reported):: Depressed and anxious\nAffect (clinician-observed):: Constricted, congruent with mood\nThought process:: Linear and goal-directed\nThought content:: Passive death wish; no active SI/HI; no delusions\nPerception:: No hallucinations\nCognition / orientation:: Alert and oriented x3; MoCA deferred due to withdrawal\nInsight:: Limited \u2014 minimizes severity of substance use\nJudgment:: Impaired \u2014 recent fall, continued use despite consequences\nStandardized screening \u2014 PHQ-9 (date, items, total):: PHQ-9 administered 2026-05-04: anhedonia 3, depressed mood 3,\nsleep 3, fatigue 2, appetite 2, self-worth 2, concentration 2, psychomotor 1, suicidal ideation 0 \u2014 total 18 (moderately\nsevere).\nStandardized screening \u2014 GAD-7 (date, items, total):: GAD-7 administered 2026-05-04: nervousness 3, uncontrollable worry\n3, excessive worry 2, trouble relaxing 2, restlessness 2, irritability 2, fear 1 \u2014 total 15 (severe)."
+                }
+            },
+            "leisure_recreational": {
+                "title": "Leisure/Recreational",
+                "text": "Strengths/support:: Previously enjoyed watching basketball and walking in the neighborhood.\nRecent changes:: Has not engaged in leisure activities x 6 months \u2014 substance use has crowded everything else out.\nChanges desired:: Wants to 'get back into walking' as a wellness practice during/after treatment.",
+                "char_span": [
+                    6807,
+                    7111
+                ],
+                "status": "found",
+                "provenance": {
+                    "document_id": "3bbea558-14a2-42f3-abb1-b31e655f0d1d",
+                    "char_start": 6807,
+                    "char_end": 7111,
+                    "snippet": "Strengths/support:: Previously enjoyed watching basketball and walking in the neighborhood.\nRecent changes:: Has not engaged in leisure activities x 6 months \u2014 substance use has crowded everything else out.\nChanges desired:: Wants to 'get back into walking' as a wellness practice during/after treatment."
+                }
+            },
+            "history_of_presenting_problem": {
+                "title": "History of Presenting Problem",
+                "text": "(Events, precipitating factors, or incidents leading to need for services):\n34yo male with 4-year history of heavy alcohol use and 18-month history of daily alprazolam (originally prescribed for\nanxiety, now obtained illicitly), presenting 36 hours after last drink with tremor, sweats, sleep <2h, and a witnessed fall at\nhome. Referred from ED for medically monitored withdrawal management after CIWA-Ar of 12 on arrival. Lost employment\n6 weeks prior due to intoxication at work; DUI charge pending. Ambivalent about treatment (\"I'm here because my brother\nsaid so\").\nFrequency/duration/severity/cycling of symptoms:\nAlcohol: 4 years of escalating daily use, currently ~14 standard drinks/day. Alprazolam: 18 months of daily use, escalated\nfrom a legitimate 0.5 mg PRN prescription to illicit 1 mg daily. Cannabis: recreational, 2\u20133x weekly. Acute alcohol withdrawal\ncurrently moderate (CIWA-Ar = 12). Benzodiazepine withdrawal anticipated but not yet manifest. Depressive and anxious\nsymptoms have been continuously present x 4 years with worsening since job loss 6 weeks ago.\nWas there a clear time when Sx worsened?\nYes \u2014 substance use and depressive symptoms escalated sharply 6 weeks ago following job loss (terminated for\nintoxication at work). Acute withdrawal began approximately 36 hours prior to admission after a forced cut-down attempt\n(no alcohol available at home over the weekend).\nFamily mental health history:\nFather with alcohol use disorder; mother with depression",
+                "char_span": [
+                    1463,
+                    2948
+                ],
+                "status": "found",
+                "provenance": {
+                    "document_id": "3bbea558-14a2-42f3-abb1-b31e655f0d1d",
+                    "char_start": 1463,
+                    "char_end": 2948,
+                    "snippet": "(Events, precipitating factors, or incidents leading to need for services):\n34yo male with 4-year history of heavy alcohol use and 18-month history of daily alprazolam (originally prescribed for\nanxiety, now obtained illicitly), presenting 36 hours after last drink with tremor, sweats, sleep <2h, and a witnessed fall at\nhome. Referred from ED for medically monitored withdrawal management after CIWA-Ar of 12 on arrival. Lost employment\n6 weeks prior due to intoxication at work; DUI charge pending. Ambivalent about treatment (\"I'm here because my brother\nsaid so\").\nFrequency/duration/severity/cycling of symptoms:\nAlcohol: 4 years of escalating daily use, currently ~14 standard drinks/day. Alprazolam: 18 months of daily use, escalated\nfrom a legitimate 0.5 mg PRN prescription to illicit 1 mg daily. Cannabis: recreational, 2\u20133x weekly. Acute alcohol withdrawal\ncurrently moderate (CIWA-Ar = 12). Benzodiazepine withdrawal anticipated but not yet manifest. Depressive and anxious\nsymptoms have been continuously present x 4 years with worsening since job loss 6 weeks ago.\nWas there a clear time when Sx worsened?\nYes \u2014 substance use and depressive symptoms escalated sharply 6 weeks ago following job loss (terminated for\nintoxication at work). Acute withdrawal began approximately 36 hours prior to admission after a forced cut-down attempt\n(no alcohol available at home over the weekend).\nFamily mental health history:\nFather with alcohol use disorder; mother with depression"
+                }
+            },
+            "counseling_prior_treatment_history": {
+                "title": "Counseling/Prior Treatment History",
+                "text": "Summary of prior treatment:: 2023 \u2014 Outpatient individual counseling, 6 weeks at community mental health center. Self-\ndiscontinued. 2024 \u2014 PCP-prescribed naltrexone 50 mg PO daily x 3 months; non-adherent and discontinued. No prior\nresidential or inpatient SUD treatment.\nBenefits of previous treatment:: Brief reduction in drinking (~30% by self-report) during the 2023 counseling cycle.\nSetbacks of previous treatment:: Self-discontinued before completing planned course in 2023. Naltrexone non-adherence\nwith no follow-up. No prior MAT, no prior recovery group attendance.",
+                "char_span": [
+                    10368,
+                    10944
+                ],
+                "status": "found",
+                "provenance": {
+                    "document_id": "3bbea558-14a2-42f3-abb1-b31e655f0d1d",
+                    "char_start": 10368,
+                    "char_end": 10944,
+                    "snippet": "Summary of prior treatment:: 2023 \u2014 Outpatient individual counseling, 6 weeks at community mental health center. Self-\ndiscontinued. 2024 \u2014 PCP-prescribed naltrexone 50 mg PO daily x 3 months; non-adherent and discontinued. No prior\nresidential or inpatient SUD treatment.\nBenefits of previous treatment:: Brief reduction in drinking (~30% by self-report) during the 2023 counseling cycle.\nSetbacks of previous treatment:: Self-discontinued before completing planned course in 2023. Naltrexone non-adherence\nwith no follow-up. No prior MAT, no prior recovery group attendance."
+                }
+            },
+            "military": {
+                "title": "Military",
+                "text": "Current impact:: No military service history.",
+                "char_span": [
+                    6736,
+                    6781
+                ],
+                "status": "found",
+                "provenance": {
+                    "document_id": "3bbea558-14a2-42f3-abb1-b31e655f0d1d",
+                    "char_start": 6736,
+                    "char_end": 6781,
+                    "snippet": "Current impact:: No military service history."
+                }
+            },
+            "chemical_use_history": {
+                "title": "Chemical Use History",
+                "text": "Summary of use:: Polysubstance: heavy daily alcohol (4 years), daily illicit alprazolam (18 months), recreational cannabis\n(years). Denies opioid, stimulant, and hallucinogen use; UDS corroborates. Active alcohol withdrawal at intake (CIWA-Ar =\n12); benzodiazepine withdrawal anticipated.\nPatient\u2019s perception of problem:: Minimizes severity: \"I drink a lot but it's not that bad.\" Attributes ED visit to \"just a fall, not\nthe drinking.\" Acknowledges alprazolam use is \"getting out of hand\" but does not connect it to the withdrawal-anticipation\nfinding. Ambivalent about treatment: \"I'm here because my brother said so.\"\nPer-substance breakdown (alcohol, sedative-hypnotics, cannabis, opioids, stimulants, other) \u2014 for each:\nfirst/last use, route, frequency, amounts, withdrawal hx, prior tx:: \u2022 Alcohol: first use age 16; pattern ~14 standard\ndrinks/day x 4 years (vodka, beer); last use 2026-05-03; route oral; withdrawal history \u2014 Multiple episodes; one prior ED\nvisit for seizure precaution; prior treatment \u2014 2023 outpatient, 2024 naltrexone trial.\n\u2022 Alprazolam (Xanax): first use age 32; pattern 1 mg PO daily x 18 months (originally Rx, now illicit); last use 2026-05-03;\nroute oral; withdrawal history \u2014 Anticipated; not yet manifest at intake; prior treatment \u2014 None.\n\u2022 Cannabis: first use age 17; pattern 2-3 joints per week, recreational; last use 2026-04-28; route inhaled; withdrawal history\n\u2014 None reported; prior treatment \u2014 None.\n\u2022 Opioids: DENIES current or past opioid use. COWS recorded as N/A; documented to demonstrate negative-finding\nhandling\nAUDIT-C (date, items, total, interpretation):: AUDIT-C administered 2026-05-04: frequency 4, typical quantity 4, heavy\nepisodic 3 \u2014 total 11 (positive, high risk).\nDAST-10 (date, items, total, interpretation):: DAST-10 administered 2026-05-04: total 7 (substantial level, indicates intensive\nassessment and treatment indicated).",
+                "char_span": [
+                    8433,
+                    10328
+                ],
+                "status": "found",
+                "provenance": {
+                    "document_id": "3bbea558-14a2-42f3-abb1-b31e655f0d1d",
+                    "char_start": 8433,
+                    "char_end": 10328,
+                    "snippet": "Summary of use:: Polysubstance: heavy daily alcohol (4 years), daily illicit alprazolam (18 months), recreational cannabis\n(years). Denies opioid, stimulant, and hallucinogen use; UDS corroborates. Active alcohol withdrawal at intake (CIWA-Ar =\n12); benzodiazepine withdrawal anticipated.\nPatient\u2019s perception of problem:: Minimizes severity: \"I drink a lot but it's not that bad.\" Attributes ED visit to \"just a fall, not\nthe drinking.\" Acknowledges alprazolam use is \"getting out of hand\" but does not connect it to the withdrawal-anticipation\nfinding. Ambivalent about treatment: \"I'm here because my brother said so.\"\nPer-substance breakdown (alcohol, sedative-hypnotics, cannabis, opioids, stimulants, other) \u2014 for each:\nfirst/last use, route, frequency, amounts, withdrawal hx, prior tx:: \u2022 Alcohol: first use age 16; pattern ~14 standard\ndrinks/day x 4 years (vodka, beer); last use 2026-05-03; route oral; withdrawal history \u2014 Multiple episodes; one prior ED\nvisit for seizure precaution; prior treatment \u2014 2023 outpatient, 2024 naltrexone trial.\n\u2022 Alprazolam (Xanax): first use age 32; pattern 1 mg PO daily x 18 months (originally Rx, now illicit); last use 2026-05-03;\nroute oral; withdrawal history \u2014 Anticipated; not yet manifest at intake; prior treatment \u2014 None.\n\u2022 Cannabis: first use age 17; pattern 2-3 joints per week, recreational; last use 2026-04-28; route inhaled; withdrawal history\n\u2014 None reported; prior treatment \u2014 None.\n\u2022 Opioids: DENIES current or past opioid use. COWS recorded as N/A; documented to demonstrate negative-finding\nhandling\nAUDIT-C (date, items, total, interpretation):: AUDIT-C administered 2026-05-04: frequency 4, typical quantity 4, heavy\nepisodic 3 \u2014 total 11 (positive, high risk).\nDAST-10 (date, items, total, interpretation):: DAST-10 administered 2026-05-04: total 7 (substantial level, indicates intensive\nassessment and treatment indicated)."
+                }
+            },
+            "cultural_ethnic": {
+                "title": "Cultural/Ethnic",
+                "text": "Strengths/support:: Identifies as Hispanic/Latino. Strong cultural value placed on family ties (familismo).\nStressors/problems:: Cultural shame around mental health and substance use. Internalized 'be a man, handle it yourself'\nnarrative.\nBeliefs/practices to incorporate into therapy:: Family-systems framing welcomed. Spanish-language psychoeducation\nmaterials acceptable. Open to culturally-aware peer matching.",
+                "char_span": [
+                    4732,
+                    5146
+                ],
+                "status": "found",
+                "provenance": {
+                    "document_id": "3bbea558-14a2-42f3-abb1-b31e655f0d1d",
+                    "char_start": 4732,
+                    "char_end": 5146,
+                    "snippet": "Strengths/support:: Identifies as Hispanic/Latino. Strong cultural value placed on family ties (familismo).\nStressors/problems:: Cultural shame around mental health and substance use. Internalized 'be a man, handle it yourself'\nnarrative.\nBeliefs/practices to incorporate into therapy:: Family-systems framing welcomed. Spanish-language psychoeducation\nmaterials acceptable. Open to culturally-aware peer matching."
+                }
+            },
+            "signs_and_symptoms_dsm_v_tr_based_resulting_in_impairment_s": {
+                "title": "Signs and Symptoms (DSM-V-TR based) resulting in impairment(s)",
+                "text": "(Include current examples for treatment planning, e.g., social, occupational, affective, cognitive, physical)\nPatient meets DSM-5-TR criteria for Alcohol Use Disorder, severe (\u22656 criteria endorsed: tolerance, withdrawal, hazardous\nuse, continued use despite social/occupational consequences, time spent obtaining/using, unsuccessful cut-down\nattempts); Sedative-Hypnotic Use Disorder, severe (alprazolam); and Major Depressive Disorder, recurrent, moderate\n(anhedonia, depressed mood, sleep disturbance, fatigue, appetite change, low self-worth, poor concentration,\npsychomotor change \u2014 PHQ-9 = 18, moderately severe). Current alcohol withdrawal syndrome with tremor, sweats,\nanxiety, insomnia (CIWA-Ar = 12). Resulting impairment spans: occupational (job loss 6 wks ago for intoxication at work),\nsocial (isolation from former sober peers), affective (severe anxiety GAD-7 = 15, depression PHQ-9 = 18), physical\n(witnessed fall, uncontrolled HTN, alcohol-related hepatic injury), and cognitive (poor concentration, impaired\ninsight/judgment on MSE).",
+                "char_span": [
+                    379,
+                    1429
+                ],
+                "status": "found",
+                "provenance": {
+                    "document_id": "3bbea558-14a2-42f3-abb1-b31e655f0d1d",
+                    "char_start": 379,
+                    "char_end": 1429,
+                    "snippet": "(Include current examples for treatment planning, e.g., social, occupational, affective, cognitive, physical)\nPatient meets DSM-5-TR criteria for Alcohol Use Disorder, severe (\u22656 criteria endorsed: tolerance, withdrawal, hazardous\nuse, continued use despite social/occupational consequences, time spent obtaining/using, unsuccessful cut-down\nattempts); Sedative-Hypnotic Use Disorder, severe (alprazolam); and Major Depressive Disorder, recurrent, moderate\n(anhedonia, depressed mood, sleep disturbance, fatigue, appetite change, low self-worth, poor concentration,\npsychomotor change \u2014 PHQ-9 = 18, moderately severe). Current alcohol withdrawal syndrome with tremor, sweats,\nanxiety, insomnia (CIWA-Ar = 12). Resulting impairment spans: occupational (job loss 6 wks ago for intoxication at work),\nsocial (isolation from former sober peers), affective (severe anxiety GAD-7 = 15, depression PHQ-9 = 18), physical\n(witnessed fall, uncontrolled HTN, alcohol-related hepatic injury), and cognitive (poor concentration, impaired\ninsight/judgment on MSE)."
+                }
+            },
+            "presenting_problem": {
+                "title": "Presenting Problem",
+                "text": "\"I fell at home and my brother brought me to the ED. They said I was withdrawing.\"",
+                "char_span": [
+                    229,
+                    311
+                ],
+                "status": "found",
+                "provenance": {
+                    "document_id": "3bbea558-14a2-42f3-abb1-b31e655f0d1d",
+                    "char_start": 229,
+                    "char_end": 311,
+                    "snippet": "\"I fell at home and my brother brought me to the ED. They said I was withdrawing.\""
+                }
+            },
+            "spiritual_religious": {
+                "title": "Spiritual/Religious",
+                "text": "Strengths/support:: Raised Catholic. Faith was a source of comfort in childhood; mother and grandmother were practicing.\nStressors/problems:: Currently disconnected from practice. Reports guilt and shame around substance use as a barrier to\nreturning to church.\nBeliefs/practices to incorporate into therapy:: Open to facility chaplaincy if available. Open to AA/NA frameworks that\nincorporate higher-power language without requiring it.\nRecent changes:: Has not attended Mass in 4+ years. Grandmother (primary spiritual influence) died in 2022.\nChanges desired:: Wants to 'find some peace' but not actively pursuing a specific practice at this time.",
+                "char_span": [
+                    5170,
+                    5820
+                ],
+                "status": "found",
+                "provenance": {
+                    "document_id": "3bbea558-14a2-42f3-abb1-b31e655f0d1d",
+                    "char_start": 5170,
+                    "char_end": 5820,
+                    "snippet": "Strengths/support:: Raised Catholic. Faith was a source of comfort in childhood; mother and grandmother were practicing.\nStressors/problems:: Currently disconnected from practice. Reports guilt and shame around substance use as a barrier to\nreturning to church.\nBeliefs/practices to incorporate into therapy:: Open to facility chaplaincy if available. Open to AA/NA frameworks that\nincorporate higher-power language without requiring it.\nRecent changes:: Has not attended Mass in 4+ years. Grandmother (primary spiritual influence) died in 2022.\nChanges desired:: Wants to 'find some peace' but not actively pursuing a specific practice at this time."
+                }
+            },
+            "social_relationships": {
+                "title": "Social Relationships",
+                "text": "Strengths/support:: Brother Daniel (limited \u2014 actively using). Former AA sponsor from 2023 cycle, lost contact.\nStressors/problems:: Social isolation post-job-loss. Drift from former sober peer group. No current peer-recovery network.\nRecent changes:: Has not contacted former sponsor in 12+ months. Sober friends drifted as drinking escalated in 2024.\nChanges desired:: Reconnect with former sponsor; build new sober peer network through structured group.",
+                "char_span": [
+                    4256,
+                    4712
+                ],
+                "status": "found",
+                "provenance": {
+                    "document_id": "3bbea558-14a2-42f3-abb1-b31e655f0d1d",
+                    "char_start": 4256,
+                    "char_end": 4712,
+                    "snippet": "Strengths/support:: Brother Daniel (limited \u2014 actively using). Former AA sponsor from 2023 cycle, lost contact.\nStressors/problems:: Social isolation post-job-loss. Drift from former sober peer group. No current peer-recovery network.\nRecent changes:: Has not contacted former sponsor in 12+ months. Sober friends drifted as drinking escalated in 2024.\nChanges desired:: Reconnect with former sponsor; build new sober peer network through structured group."
+                }
+            },
+            "past_psychiatric_history": {
+                "title": "Past Psychiatric History",
+                "text": "Prior psychiatric diagnoses (DSM-5-TR / ICD-10):: \u2022 Major Depressive Disorder, recurrent, moderate (ICD-10 F33.1; DSM-5-TR\n296.32; onset 2019)\n\u2022 Generalized Anxiety Disorder (ICD-10 F41.1; DSM-5-TR 300.02; onset 2020)\nPsychiatric hospitalizations (year, facility, reason, duration):: \u2022 2021 \u2014 Memorial Behavioral Health \u2014 Suicidal ideation,\nvoluntary 72-hour hold\nPrior psychiatric medications (drug, dose, dates, prescriber, response):: \u2022 Sertraline 100mg \u2014 2020-2022 \u2014 Self-\ndiscontinued\n\u2022 Alprazolam 0.5mg PRN \u2014 2023 \u2014 Escalated to daily then illicit\nSelf-harm history:: One episode of superficial cutting age 22; no attempts; no recent ideation with plan\nPrior suicide attempts (lifetime):: None.",
+                "char_span": [
+                    10974,
+                    11674
+                ],
+                "status": "found",
+                "provenance": {
+                    "document_id": "3bbea558-14a2-42f3-abb1-b31e655f0d1d",
+                    "char_start": 10974,
+                    "char_end": 11674,
+                    "snippet": "Prior psychiatric diagnoses (DSM-5-TR / ICD-10):: \u2022 Major Depressive Disorder, recurrent, moderate (ICD-10 F33.1; DSM-5-TR\n296.32; onset 2019)\n\u2022 Generalized Anxiety Disorder (ICD-10 F41.1; DSM-5-TR 300.02; onset 2020)\nPsychiatric hospitalizations (year, facility, reason, duration):: \u2022 2021 \u2014 Memorial Behavioral Health \u2014 Suicidal ideation,\nvoluntary 72-hour hold\nPrior psychiatric medications (drug, dose, dates, prescriber, response):: \u2022 Sertraline 100mg \u2014 2020-2022 \u2014 Self-\ndiscontinued\n\u2022 Alprazolam 0.5mg PRN \u2014 2023 \u2014 Escalated to daily then illicit\nSelf-harm history:: One episode of superficial cutting age 22; no attempts; no recent ideation with plan\nPrior suicide attempts (lifetime):: None."
+                }
+            },
+            "current_family_and_significant_relationships": {
+                "title": "Current Family and Significant Relationships",
+                "text": "Strengths/support:: Brother Daniel willing to engage; provided transportation to ED.\nStressors/problems:: Brother is an active substance user (alcohol, cannabis). Patient is housing-dependent on the brother.\nNo partner, no children. Parents live out of state; minimal contact.\nRecent changes:: Job loss 6 weeks ago; pending DUI charge. Brother delivered ultimatum about housing.\nChanges desired:: Stable sober housing; restored autonomy; reconnect with mother.\nComment on family circumstances:: Father with untreated alcohol use disorder. Mother with treated major depression.\nPatient is the younger of two siblings.",
+                "char_span": [
+                    2997,
+                    3613
+                ],
+                "status": "found",
+                "provenance": {
+                    "document_id": "3bbea558-14a2-42f3-abb1-b31e655f0d1d",
+                    "char_start": 2997,
+                    "char_end": 3613,
+                    "snippet": "Strengths/support:: Brother Daniel willing to engage; provided transportation to ED.\nStressors/problems:: Brother is an active substance user (alcohol, cannabis). Patient is housing-dependent on the brother.\nNo partner, no children. Parents live out of state; minimal contact.\nRecent changes:: Job loss 6 weeks ago; pending DUI charge. Brother delivered ultimatum about housing.\nChanges desired:: Stable sober housing; restored autonomy; reconnect with mother.\nComment on family circumstances:: Father with untreated alcohol use disorder. Mother with treated major depression.\nPatient is the younger of two siblings."
+                }
+            },
+            "diagnosis": {
+                "title": "Diagnosis",
+                "text": "Primary diagnosis (DSM-5-TR / ICD-10):: Alcohol Use Disorder, severe, with withdrawal (F10.232; DSM-5-TR 303.90).\nSecondary diagnosis (DSM-5-TR / ICD-10):: Sedative, Hypnotic, or Anxiolytic Use Disorder, severe (F13.20; DSM-5-TR 304.10).\nTertiary diagnosis (DSM-5-TR / ICD-10):: Major Depressive Disorder, recurrent episode, moderate (F33.1; DSM-5-TR 296.32).\nDifferential / rule-outs:: Generalized Anxiety Disorder (F41.1) is a co-occurring consideration, but anxiety symptoms may be\nsubstantially driven by current withdrawal physiology \u2014 reassess 2 weeks post-stabilization. Recommended level of care\non admission: ASAM 3.7 \u2014 Medically Monitored Intensive Inpatient, driven by Dim 1 (active polysubstance withdrawal) and\nDim 5 (unsafe recovery environment).",
+                "char_span": [
+                    14131,
+                    14891
+                ],
+                "status": "found",
+                "provenance": {
+                    "document_id": "3bbea558-14a2-42f3-abb1-b31e655f0d1d",
+                    "char_start": 14131,
+                    "char_end": 14891,
+                    "snippet": "Primary diagnosis (DSM-5-TR / ICD-10):: Alcohol Use Disorder, severe, with withdrawal (F10.232; DSM-5-TR 303.90).\nSecondary diagnosis (DSM-5-TR / ICD-10):: Sedative, Hypnotic, or Anxiolytic Use Disorder, severe (F13.20; DSM-5-TR 304.10).\nTertiary diagnosis (DSM-5-TR / ICD-10):: Major Depressive Disorder, recurrent episode, moderate (F33.1; DSM-5-TR 296.32).\nDifferential / rule-outs:: Generalized Anxiety Disorder (F41.1) is a co-occurring consideration, but anxiety symptoms may be\nsubstantially driven by current withdrawal physiology \u2014 reassess 2 weeks post-stabilization. Recommended level of care\non admission: ASAM 3.7 \u2014 Medically Monitored Intensive Inpatient, driven by Dim 1 (active polysubstance withdrawal) and\nDim 5 (unsafe recovery environment)."
+                }
+            },
+            "treatment_plan": {
+                "title": "Treatment Plan",
+                "text": "Goal 1 (domain, goal, target date, measure):: Domain: Substance use. Goal: Achieve and maintain 30 days of abstinence\nfrom alcohol and benzodiazepines. Target date: 2026-06-03. Measure: Daily breathalyzer, weekly UDS.\nGoal 2 (domain, goal, target date, measure):: Domain: Mental health. Goal: Reduce PHQ-9 score from 18 to <10 by 60 days.\nTarget date: 2026-07-03. Measure: Bi-weekly PHQ-9.\nGoal 3 (domain, goal, target date, measure):: Domain: Recovery environment. Goal: Identify and engage one sober support\nperson and one alternate housing option. Target date: 2026-05-25. Measure: Social-work documentation.\nInterventions (list with frequency):: Cognitive Behavioral Therapy (CBT) \u2014 3x/week individual\n\u2022 Motivational Interviewing (MI) \u2014 woven across sessions\n\u2022 Librium taper, gabapentin adjunct, thiamine\n\u2022 Psychiatric medication evaluation for MDD/GAD (in week 2)\n\u2022 Case-management for housing and DUI court navigation\nExpected outcomes:: \u2022 Stable medical withdrawal within 7 days\n\u2022 PHQ-9 < 10 by week 8\n\u2022 Step-down to PHP/IOP by week 2 if Dims 1 and 2 resolve\nDischarge / step-down criteria:: Step down to PHP (ASAM 2.5) when: (a) CIWA-Ar < 5 for 48 hours, (b) BP controlled on\nlisinopril, (c) sober housing option identified, (d) C-SSRS re-administered and stable. Target step-down date: 2026-05-15.",
+                "char_span": [
+                    14911,
+                    16217
+                ],
+                "status": "found",
+                "provenance": {
+                    "document_id": "3bbea558-14a2-42f3-abb1-b31e655f0d1d",
+                    "char_start": 14911,
+                    "char_end": 16217,
+                    "snippet": "Goal 1 (domain, goal, target date, measure):: Domain: Substance use. Goal: Achieve and maintain 30 days of abstinence\nfrom alcohol and benzodiazepines. Target date: 2026-06-03. Measure: Daily breathalyzer, weekly UDS.\nGoal 2 (domain, goal, target date, measure):: Domain: Mental health. Goal: Reduce PHQ-9 score from 18 to <10 by 60 days.\nTarget date: 2026-07-03. Measure: Bi-weekly PHQ-9.\nGoal 3 (domain, goal, target date, measure):: Domain: Recovery environment. Goal: Identify and engage one sober support\nperson and one alternate housing option. Target date: 2026-05-25. Measure: Social-work documentation.\nInterventions (list with frequency):: Cognitive Behavioral Therapy (CBT) \u2014 3x/week individual\n\u2022 Motivational Interviewing (MI) \u2014 woven across sessions\n\u2022 Librium taper, gabapentin adjunct, thiamine\n\u2022 Psychiatric medication evaluation for MDD/GAD (in week 2)\n\u2022 Case-management for housing and DUI court navigation\nExpected outcomes:: \u2022 Stable medical withdrawal within 7 days\n\u2022 PHQ-9 < 10 by week 8\n\u2022 Step-down to PHP/IOP by week 2 if Dims 1 and 2 resolve\nDischarge / step-down criteria:: Step down to PHP (ASAM 2.5) when: (a) CIWA-Ar < 5 for 48 hours, (b) BP controlled on\nlisinopril, (c) sober housing option identified, (d) C-SSRS re-administered and stable. Target step-down date: 2026-05-15."
+                }
+            },
+            "legal": {
+                "title": "Legal",
+                "text": "History:: No prior arrests or convictions.\nStatus/impact/stressors:: Pending DUI charge (2026-04-12). Court date TBD; assigned public defender. May lose driver's\nlicense. Stressor weighing heavily on treatment ambivalence and willingness to engage.",
+                "char_span": [
+                    5830,
+                    6078
+                ],
+                "status": "found",
+                "provenance": {
+                    "document_id": "3bbea558-14a2-42f3-abb1-b31e655f0d1d",
+                    "char_start": 5830,
+                    "char_end": 6078,
+                    "snippet": "History:: No prior arrests or convictions.\nStatus/impact/stressors:: Pending DUI charge (2026-04-12). Court date TBD; assigned public defender. May lose driver's\nlicense. Stressor weighing heavily on treatment ambivalence and willingness to engage."
+                }
+            },
+            "risk_assessment": {
+                "title": "Risk Assessment",
+                "text": "Suicide risk \u2014 C-SSRS (date, items, interpretation):: C-SSRS administered 2026-05-04: Q1 no, Q2 YES (\"I sometimes wish I\nweren't here\"), Q3 no, Q4 no, Q5 no, Q6 no lifetime suicidal behavior. Risk: low-intensity passive ideation; no active\nSI/plan/intent.\nHomicidal ideation:: Denies. No ideation, plan, intent, or lifetime history.\nWithdrawal risk \u2014 CIWA-Ar (date, items, total):: CIWA-Ar administered 2026-05-04 14:30: nausea/vomiting 2, tremor 3,\nsweats 2, anxiety 2, agitation 1, tactile 0, auditory 0, visual 0, headache 1, orientation 1 \u2014 total 12 (moderate).\nWithdrawal risk \u2014 COWS (date, items, total, or N/A):: COWS: not administered. Patient denies any opioid use; UDS negative\nfor opioids. Documented for completeness.\nViolence / aggression risk:: Low. No history of interpersonal violence; no current threats or ideation.\nOverall risk level:: Moderate \u2014 driven by withdrawal severity (CIWA-Ar = 12), passive suicidal ideation (C-SSRS Q2-positive),\nand unstable recovery environment.\nSafety plan / precautions:: Inpatient monitoring with CIWA-Ar q4h; nursing line of sight if CIWA \u2265 15. Fall precautions in\nplace. Suicide precautions: standard observation given passive ideation without plan/intent. Re-administer C-SSRS prior to\nany level-of-care change per NPSG.15.01.01.",
+                "char_span": [
+                    12832,
+                    14116
+                ],
+                "status": "found",
+                "provenance": {
+                    "document_id": "3bbea558-14a2-42f3-abb1-b31e655f0d1d",
+                    "char_start": 12832,
+                    "char_end": 14116,
+                    "snippet": "Suicide risk \u2014 C-SSRS (date, items, interpretation):: C-SSRS administered 2026-05-04: Q1 no, Q2 YES (\"I sometimes wish I\nweren't here\"), Q3 no, Q4 no, Q5 no, Q6 no lifetime suicidal behavior. Risk: low-intensity passive ideation; no active\nSI/plan/intent.\nHomicidal ideation:: Denies. No ideation, plan, intent, or lifetime history.\nWithdrawal risk \u2014 CIWA-Ar (date, items, total):: CIWA-Ar administered 2026-05-04 14:30: nausea/vomiting 2, tremor 3,\nsweats 2, anxiety 2, agitation 1, tactile 0, auditory 0, visual 0, headache 1, orientation 1 \u2014 total 12 (moderate).\nWithdrawal risk \u2014 COWS (date, items, total, or N/A):: COWS: not administered. Patient denies any opioid use; UDS negative\nfor opioids. Documented for completeness.\nViolence / aggression risk:: Low. No history of interpersonal violence; no current threats or ideation.\nOverall risk level:: Moderate \u2014 driven by withdrawal severity (CIWA-Ar = 12), passive suicidal ideation (C-SSRS Q2-positive),\nand unstable recovery environment.\nSafety plan / precautions:: Inpatient monitoring with CIWA-Ar q4h; nursing line of sight if CIWA \u2265 15. Fall precautions in\nplace. Suicide precautions: standard observation given passive ideation without plan/intent. Re-administer C-SSRS prior to\nany level-of-care change per NPSG.15.01.01."
+                }
+            },
+            "employment_vocational": {
+                "title": "Employment/Vocational",
+                "text": "Strengths/support:: 5-year tenure in warehouse logistics (2020\u20132026). Considered reliable when sober.\nStressors/problems:: Unemployed x 6 weeks. Terminated for intoxication at work (workplace breathalyzer policy violation).\nIncome loss is a major stressor. No unemployment income \u2014 termination was 'for cause.' Identity disruption: \"I'm not used\nto not working.\"",
+                "char_span": [
+                    6360,
+                    6722
+                ],
+                "status": "found",
+                "provenance": {
+                    "document_id": "3bbea558-14a2-42f3-abb1-b31e655f0d1d",
+                    "char_start": 6360,
+                    "char_end": 6722,
+                    "snippet": "Strengths/support:: 5-year tenure in warehouse logistics (2020\u20132026). Considered reliable when sober.\nStressors/problems:: Unemployed x 6 weeks. Terminated for intoxication at work (workplace breathalyzer policy violation).\nIncome loss is a major stressor. No unemployment income \u2014 termination was 'for cause.' Identity disruption: \"I'm not used\nto not working.\""
+                }
+            },
+            "education": {
+                "title": "Education",
+                "text": "Strengths:: High school graduate. Completed 18 credits of community college coursework.\nWeaknesses:: Did not complete associate's degree. Reports difficulty with sustained concentration since 2019 mTBI,\nexacerbated by current substance use.",
+                "char_span": [
+                    6093,
+                    6333
+                ],
+                "status": "found",
+                "provenance": {
+                    "document_id": "3bbea558-14a2-42f3-abb1-b31e655f0d1d",
+                    "char_start": 6093,
+                    "char_end": 6333,
+                    "snippet": "Strengths:: High school graduate. Completed 18 credits of community college coursework.\nWeaknesses:: Did not complete associate's degree. Reports difficulty with sustained concentration since 2019 mTBI,\nexacerbated by current substance use."
+                }
+            },
+            "physical_health": {
+                "title": "Physical Health",
+                "text": "Summary of health:: Active: uncontrolled essential hypertension, suspected alcoholic hepatitis (not biopsy-confirmed),\nremote mild TBI (2019). No current primary care relationship. Last PCP visit 2024 for naltrexone prescription.\nPhysical factors affecting mental condition:: Severe sleep deprivation (<2 h/night for several days pre-admission).\nWithdrawal physiology (autonomic arousal, tremor) directly affecting cognition, mood, and concentration. Hepatic\ndysfunction may affect medication metabolism \u2014 clinical relevance for benzo taper and any future SSRI/SNRI selection.\nVitals (BP, HR, RR, temp, SpO2):: BP 158/96; HR 104; RR 18; T 99.1\u00b0F; SpO2 97%.\nCurrent medications (name, dose, frequency, prescriber):: None at admission. Was prescribed lisinopril 10 mg PO daily by\nPCP in 2024 for HTN; non-adherent x 18 months. To be re-initiated on admission day 4 per inpatient medical orders.\nAllergies:: No known drug allergies (NKDA).\nRecent labs (date, panel, results):: Hepatic panel 2026-05-04: AST 142 U/L (ref 10\u201340), ALT 98 U/L (ref 7\u201356), GGT 312 U/L (ref\n9\u201348), total bilirubin 1.4 mg/dL (ref 0.1\u20131.2) \u2014 consistent with alcohol-related hepatic injury. UDS 2026-05-04: POSITIVE for\nethanol, benzodiazepines, cannabinoids; NEGATIVE for opioids, cocaine, amphetamines.",
+                "char_span": [
+                    7132,
+                    8407
+                ],
+                "status": "found",
+                "provenance": {
+                    "document_id": "3bbea558-14a2-42f3-abb1-b31e655f0d1d",
+                    "char_start": 7132,
+                    "char_end": 8407,
+                    "snippet": "Summary of health:: Active: uncontrolled essential hypertension, suspected alcoholic hepatitis (not biopsy-confirmed),\nremote mild TBI (2019). No current primary care relationship. Last PCP visit 2024 for naltrexone prescription.\nPhysical factors affecting mental condition:: Severe sleep deprivation (<2 h/night for several days pre-admission).\nWithdrawal physiology (autonomic arousal, tremor) directly affecting cognition, mood, and concentration. Hepatic\ndysfunction may affect medication metabolism \u2014 clinical relevance for benzo taper and any future SSRI/SNRI selection.\nVitals (BP, HR, RR, temp, SpO2):: BP 158/96; HR 104; RR 18; T 99.1\u00b0F; SpO2 97%.\nCurrent medications (name, dose, frequency, prescriber):: None at admission. Was prescribed lisinopril 10 mg PO daily by\nPCP in 2024 for HTN; non-adherent x 18 months. To be re-initiated on admission day 4 per inpatient medical orders.\nAllergies:: No known drug allergies (NKDA).\nRecent labs (date, panel, results):: Hepatic panel 2026-05-04: AST 142 U/L (ref 10\u201340), ALT 98 U/L (ref 7\u201356), GGT 312 U/L (ref\n9\u201348), total bilirubin 1.4 mg/dL (ref 0.1\u20131.2) \u2014 consistent with alcohol-related hepatic injury. UDS 2026-05-04: POSITIVE for\nethanol, benzodiazepines, cannabinoids; NEGATIVE for opioids, cocaine, amphetamines."
+                }
+            }
+        },
+        "scales": [
+            {
+                "instrument": "AUDIT-C total score",
+                "score": 11.0,
+                "severity": null,
+                "status": "found",
+                "items": null,
+                "provenance": {
+                    "document_id": "3bbea558-14a2-42f3-abb1-b31e655f0d1d",
+                    "char_start": 10047,
+                    "char_end": 10162,
+                    "snippet": "AUDIT-C administered 2026-05-04: frequency 4, typical quantity 4, heavy\nepisodic 3 \u2014 total 11 (positive, high risk)"
+                }
+            },
+            {
+                "instrument": "DAST-10 total score",
+                "score": 7.0,
+                "severity": null,
+                "status": "found",
+                "items": null,
+                "provenance": {
+                    "document_id": "3bbea558-14a2-42f3-abb1-b31e655f0d1d",
+                    "char_start": 10211,
+                    "char_end": 10327,
+                    "snippet": "DAST-10 administered 2026-05-04: total 7 (substantial level, indicates intensive\nassessment and treatment indicated)"
+                }
+            },
+            {
+                "instrument": "PHQ-9 total score",
+                "score": 18.0,
+                "severity": null,
+                "status": "found",
+                "items": null,
+                "provenance": {
+                    "document_id": "3bbea558-14a2-42f3-abb1-b31e655f0d1d",
+                    "char_start": 12397,
+                    "char_end": 12587,
+                    "snippet": "PHQ-9 administered 2026-05-04: anhedonia 3, depressed mood 3,\nsleep 3, fatigue 2, appetite 2, self-worth 2, concentration 2, psychomotor 1, suicidal ideation 0 \u2014 total 18 (moderately\nsevere)"
+                }
+            },
+            {
+                "instrument": "GAD-7 total score",
+                "score": 15.0,
+                "severity": null,
+                "status": "found",
+                "items": null,
+                "provenance": {
+                    "document_id": "3bbea558-14a2-42f3-abb1-b31e655f0d1d",
+                    "char_start": 12643,
+                    "char_end": 12810,
+                    "snippet": "GAD-7 administered 2026-05-04: nervousness 3, uncontrollable worry\n3, excessive worry 2, trouble relaxing 2, restlessness 2, irritability 2, fear 1 \u2014 total 15 (severe)"
+                }
+            },
+            {
+                "instrument": "C-SSRS (Columbia Suicide Severity Rating Scale)",
+                "score": null,
+                "severity": null,
+                "status": "found",
+                "items": null,
+                "provenance": {
+                    "document_id": "3bbea558-14a2-42f3-abb1-b31e655f0d1d",
+                    "char_start": 12886,
+                    "char_end": 13087,
+                    "snippet": "C-SSRS administered 2026-05-04: Q1 no, Q2 YES (\"I sometimes wish I\nweren't here\"), Q3 no, Q4 no, Q5 no, Q6 no lifetime suicidal behavior. Risk: low-intensity passive ideation; no active\nSI/plan/intent."
+                }
+            },
+            {
+                "instrument": "CIWA-Ar total score",
+                "score": 12.0,
+                "severity": null,
+                "status": "found",
+                "items": null,
+                "provenance": {
+                    "document_id": "3bbea558-14a2-42f3-abb1-b31e655f0d1d",
+                    "char_start": 13214,
+                    "char_end": 13396,
+                    "snippet": "CIWA-Ar administered 2026-05-04 14:30: nausea/vomiting 2, tremor 3,\nsweats 2, anxiety 2, agitation 1, tactile 0, auditory 0, visual 0, headache 1, orientation 1 \u2014 total 12 (moderate)"
+                }
+            },
+            {
+                "instrument": "COWS (Clinical Opiate Withdrawal Scale)",
+                "score": null,
+                "severity": null,
+                "status": "found",
+                "items": null,
+                "provenance": {
+                    "document_id": "3bbea558-14a2-42f3-abb1-b31e655f0d1d",
+                    "char_start": 13452,
+                    "char_end": 13561,
+                    "snippet": "COWS: not administered. Patient denies any opioid use; UDS negative\nfor opioids. Documented for completeness."
+                }
+            }
+        ]
+    },
+    "timeline": [
+        {
+            "document_id": "9a8f374e-599e-4896-8075-40282efd540d",
+            "date": "2026-05-06T11:00:00",
+            "type": "progress_note",
+            "format": "SOAP",
+            "loinc_type": {
+                "system": "http://loinc.org",
+                "code": "11506-3",
+                "display": "Progress Note"
+            },
+            "author": {
+                "name": "Dr. Aisha Patel, MD",
+                "npi": null
+            },
+            "sections": {
+                "plan": "Continue chlordiazepoxide taper, add gabapentin 300mg TID for benzo withdrawal prophylaxis. Continue daily CIWA\nmonitoring. MOUD evaluation deferred \u2014 no opioid use. Re-evaluate level of care in 5 days.",
+                "objective": "BP 142/88, HR 92. CIWA-Ar = 8 (nausea 1, tremor 2, sweats 1, anxiety 2, agitation 1, headache 1) \u2014 down from 12 at intake.\nMSE: alert, cooperative, affect constricted, no acute distress. UDS pending.",
+                "assessment": "Alcohol withdrawal, moderate, improving on chlordiazepoxide taper. Benzodiazepine withdrawal anticipated but not yet\nmanifest. MDD and GAD untreated; defer pharmacologic initiation until withdrawal resolves.",
+                "subjective": "\"Tremor better, sleep still rough. Want to leave AMA but my brother won't take me back.\" Reports anxiety improving with\nlibrium. Denies SI/HI."
+            },
+            "full_text": "Client: Marcus Reyes\nDOB: 04/11/1991\nProvider: Adrian Dai\nAppointment: Individual appointment on May 6, 2026\n11:00 am - 11:50 am CT, 50 min\nBilling code: 90834 - Psychotherapy, 45 min\n[SOAP] Progress Note\nSubjective\n\"Tremor better, sleep still rough. Want to leave AMA but my brother won't take me back.\" Reports anxiety improving with\nlibrium. Denies SI/HI.\nObjective\nBP 142/88, HR 92. CIWA-Ar = 8 (nausea 1, tremor 2, sweats 1, anxiety 2, agitation 1, headache 1) \u2014 down from 12 at intake.\nMSE: alert, cooperative, affect constricted, no acute distress. UDS pending.\nAssessment\nAlcohol withdrawal, moderate, improving on chlordiazepoxide taper. Benzodiazepine withdrawal anticipated but not yet\nmanifest. MDD and GAD untreated; defer pharmacologic initiation until withdrawal resolves.\nPlan\nContinue chlordiazepoxide taper, add gabapentin 300mg TID for benzo withdrawal prophylaxis. Continue daily CIWA\nmonitoring. MOUD evaluation deferred \u2014 no opioid use. Re-evaluate level of care in 5 days."
+        },
+        {
+            "document_id": "14bbb86c-5774-4aa4-9ccd-cccee6c1a4c5",
+            "date": "2026-05-09T10:00:00",
+            "type": "progress_note",
+            "format": "DAP",
+            "loinc_type": {
+                "system": "http://loinc.org",
+                "code": "11506-3",
+                "display": "Progress Note"
+            },
+            "author": {
+                "name": "Jordan Kim",
+                "npi": null
+            },
+            "sections": {
+                "data": "90-minute peer recovery support group. Marcus attended for full duration, contributed once regarding job loss and the\nimpact on his sense of identity. Affect engaged during others' shares; observable reduction in psychomotor restlessness\ncompared to admission week. No safety concerns.",
+                "plan": "Continue daily peer-support groups. Schedule family-coordination call with brother for boundary-setting and post-\ndischarge planning.",
+                "assessment": "Engagement improving. Continues to express ambivalence about long-term recovery but is participating in milieu. Peer\nconnection appears protective."
+            },
+            "full_text": "Client: Marcus Reyes\nDOB: 04/11/1991\nProvider: Adrian Dai\nAppointment: Individual appointment on May 9, 2026\n10:00 am - 10:50 am CT, 50 min\nBilling code: 90834 - Psychotherapy, 45 min\n[DAP] Progress Note\nData\n90-minute peer recovery support group. Marcus attended for full duration, contributed once regarding job loss and the\nimpact on his sense of identity. Affect engaged during others' shares; observable reduction in psychomotor restlessness\ncompared to admission week. No safety concerns.\nAssessment\nEngagement improving. Continues to express ambivalence about long-term recovery but is participating in milieu. Peer\nconnection appears protective.\nPlan\nContinue daily peer-support groups. Schedule family-coordination call with brother for boundary-setting and post-\ndischarge planning."
+        },
+        {
+            "document_id": "022da9ad-a7c6-4198-88c2-b37a8ffe18e2",
+            "date": "2026-05-12T17:00:00",
+            "type": "progress_note",
+            "format": "DSAP",
+            "loinc_type": {
+                "system": "http://loinc.org",
+                "code": "11506-3",
+                "display": "Progress Note"
+            },
+            "author": {
+                "name": "Maria Gonzales",
+                "npi": null
+            },
+            "sections": {
+                "data": "UDS negative across panel. CIWA-Ar = 2 (no withdrawal x 48h). BP 128/82 on lisinopril 10mg restarted day 4. LFTs trending\ndown (AST 92, ALT 71). Attended 4/4 daily groups this week.",
+                "plan": "Coordinate transfer to PHP starting 2026-05-15. Social-work to secure sober-housing referral. Re-administer C-SSRS prior to\ntransfer per NPSG.15.01.01. Continue gabapentin; psychiatry follow-up scheduled day 14 for MDD/GAD pharmacologic\neval.",
+                "assessment": "Ready clinically for step-down per Dim 1 (resolved withdrawal) and Dim 2 (improving). Dim 3 (PHQ-9 not repeated this\nadmission \u2014 see note), Dim 5 remains the limiting factor (unsafe home environment). Recommending 3.7 \u2192 2.5 (Partial\nHospitalization with IOP step) rather than full community discharge.",
+                "subjective": "\"I think I'm ready to step down to PHP. My brother is still using though, so I'm worried about going home.\" Denies SI/HI\ntoday."
+            },
+            "full_text": "Client: Marcus Reyes\nDOB: 04/11/1991\nProvider: Adrian Dai\nAppointment: Individual appointment on May 12, 2026\n5:00 pm - 5:50 pm CT, 50 min\nBilling code: 90834 - Psychotherapy, 45 min\n[DSAP] Progress Note\nData\nUDS negative across panel. CIWA-Ar = 2 (no withdrawal x 48h). BP 128/82 on lisinopril 10mg restarted day 4. LFTs trending\ndown (AST 92, ALT 71). Attended 4/4 daily groups this week.\nSubjective\n\"I think I'm ready to step down to PHP. My brother is still using though, so I'm worried about going home.\" Denies SI/HI\ntoday.\nAssessment\nReady clinically for step-down per Dim 1 (resolved withdrawal) and Dim 2 (improving). Dim 3 (PHQ-9 not repeated this\nadmission \u2014 see note), Dim 5 remains the limiting factor (unsafe home environment). Recommending 3.7 \u2192 2.5 (Partial\nHospitalization with IOP step) rather than full community discharge.\nPlan\nCoordinate transfer to PHP starting 2026-05-15. Social-work to secure sober-housing referral. Re-administer C-SSRS prior to\ntransfer per NPSG.15.01.01. Continue gabapentin; psychiatry follow-up scheduled day 14 for MDD/GAD pharmacologic\neval."
+        }
+    ],
+    "observations": [
+        {
+            "id": "3e9b8db3-4ff2-40e7-b8f3-8a732b7ad257",
+            "code": {
+                "system": "http://loinc.org",
+                "code": "75624-7",
+                "display": "AUDIT-C total score"
+            },
+            "value_quantity": 11.0,
+            "value_string": "positive, high risk",
+            "effective_date": "2026-05-04",
+            "provenance": {
+                "document_id": "3bbea558-14a2-42f3-abb1-b31e655f0d1d",
+                "char_start": 10047,
+                "char_end": 10162,
+                "snippet": "AUDIT-C administered 2026-05-04: frequency 4, typical quantity 4, heavy\nepisodic 3 \u2014 total 11 (positive, high risk)"
+            }
+        },
+        {
+            "id": "bc86fe13-c149-4132-a405-7c42fa2596fd",
+            "code": {
+                "system": "http://loinc.org",
+                "code": "82666-9",
+                "display": "DAST-10 total score"
+            },
+            "value_quantity": 7.0,
+            "value_string": "substantial level, indicates intensive assessment and treatment indicated",
+            "effective_date": "2026-05-04",
+            "provenance": {
+                "document_id": "3bbea558-14a2-42f3-abb1-b31e655f0d1d",
+                "char_start": 10211,
+                "char_end": 10327,
+                "snippet": "DAST-10 administered 2026-05-04: total 7 (substantial level, indicates intensive\nassessment and treatment indicated)"
+            }
+        },
+        {
+            "id": "463ce2c5-83fc-460a-a38b-539a2063eec8",
+            "code": {
+                "system": "http://loinc.org",
+                "code": "44261-6",
+                "display": "PHQ-9 total score"
+            },
+            "value_quantity": 18.0,
+            "value_string": "moderately severe",
+            "effective_date": "2026-05-04",
+            "provenance": {
+                "document_id": "3bbea558-14a2-42f3-abb1-b31e655f0d1d",
+                "char_start": 12397,
+                "char_end": 12587,
+                "snippet": "PHQ-9 administered 2026-05-04: anhedonia 3, depressed mood 3,\nsleep 3, fatigue 2, appetite 2, self-worth 2, concentration 2, psychomotor 1, suicidal ideation 0 \u2014 total 18 (moderately\nsevere)"
+            }
+        },
+        {
+            "id": "592e165b-7c53-4369-b0a4-d7b5d6dc3372",
+            "code": {
+                "system": "http://loinc.org",
+                "code": "70274-6",
+                "display": "GAD-7 total score"
+            },
+            "value_quantity": 15.0,
+            "value_string": "severe",
+            "effective_date": "2026-05-04",
+            "provenance": {
+                "document_id": "3bbea558-14a2-42f3-abb1-b31e655f0d1d",
+                "char_start": 12643,
+                "char_end": 12810,
+                "snippet": "GAD-7 administered 2026-05-04: nervousness 3, uncontrollable worry\n3, excessive worry 2, trouble relaxing 2, restlessness 2, irritability 2, fear 1 \u2014 total 15 (severe)"
+            }
+        },
+        {
+            "id": "e51bbe84-be13-4d38-8edc-1da6a78ab131",
+            "code": {
+                "system": "http://loinc.org",
+                "code": "93373-7",
+                "display": "C-SSRS (Columbia Suicide Severity Rating Scale)"
+            },
+            "value_quantity": null,
+            "value_string": "low-intensity passive ideation; no active SI/plan/intent.",
+            "effective_date": "2026-05-04",
+            "provenance": {
+                "document_id": "3bbea558-14a2-42f3-abb1-b31e655f0d1d",
+                "char_start": 12886,
+                "char_end": 13087,
+                "snippet": "C-SSRS administered 2026-05-04: Q1 no, Q2 YES (\"I sometimes wish I\nweren't here\"), Q3 no, Q4 no, Q5 no, Q6 no lifetime suicidal behavior. Risk: low-intensity passive ideation; no active\nSI/plan/intent."
+            }
+        },
+        {
+            "id": "d87a4cf2-7866-4ac3-94d9-44fb01abb134",
+            "code": {
+                "system": "http://loinc.org",
+                "code": "72109-3",
+                "display": "CIWA-Ar total score"
+            },
+            "value_quantity": 12.0,
+            "value_string": "moderate",
+            "effective_date": "2026-05-04",
+            "provenance": {
+                "document_id": "3bbea558-14a2-42f3-abb1-b31e655f0d1d",
+                "char_start": 13214,
+                "char_end": 13396,
+                "snippet": "CIWA-Ar administered 2026-05-04 14:30: nausea/vomiting 2, tremor 3,\nsweats 2, anxiety 2, agitation 1, tactile 0, auditory 0, visual 0, headache 1, orientation 1 \u2014 total 12 (moderate)"
+            }
+        },
+        {
+            "id": "33f94e9c-61d8-484a-af21-a6c9c53641b9",
+            "code": {
+                "system": "http://loinc.org",
+                "code": "92103-9",
+                "display": "COWS (Clinical Opiate Withdrawal Scale)"
+            },
+            "value_quantity": null,
+            "value_string": "not administered",
+            "effective_date": "2026-05-04",
+            "provenance": {
+                "document_id": "3bbea558-14a2-42f3-abb1-b31e655f0d1d",
+                "char_start": 13452,
+                "char_end": 13561,
+                "snippet": "COWS: not administered. Patient denies any opioid use; UDS negative\nfor opioids. Documented for completeness."
+            }
+        },
+        {
+            "id": "c9dc9fff-7319-4bad-94c2-caf2ff595ff8",
+            "code": {
+                "system": "http://loinc.org",
+                "code": "72109-3",
+                "display": "CIWA-Ar total score"
+            },
+            "value_quantity": 8.0,
+            "value_string": "nausea 1, tremor 2, sweats 1, anxiety 2, agitation 1, headache 1",
+            "effective_date": "2026-05-06",
+            "provenance": {
+                "document_id": "9a8f374e-599e-4896-8075-40282efd540d",
+                "char_start": 387,
+                "char_end": 465,
+                "snippet": "CIWA-Ar = 8 (nausea 1, tremor 2, sweats 1, anxiety 2, agitation 1, headache 1)"
+            }
+        },
+        {
+            "id": "72b2b469-6782-4aba-b7a6-e5c35b1228e9",
+            "code": {
+                "system": "http://loinc.org",
+                "code": "72109-3",
+                "display": "CIWA-Ar total score"
+            },
+            "value_quantity": 2.0,
+            "value_string": "no withdrawal x 48h",
+            "effective_date": "2026-05-12",
+            "provenance": {
+                "document_id": "022da9ad-a7c6-4198-88c2-b37a8ffe18e2",
+                "char_start": 236,
+                "char_end": 269,
+                "snippet": "CIWA-Ar = 2 (no withdrawal x 48h)"
+            }
+        }
+    ],
+    "asam_summary": {
+        "dim_1": 24,
+        "dim_2": 14,
+        "dim_3": 18,
+        "dim_4": 11,
+        "dim_5": 9,
+        "dim_6": 7
+    },
+    "tjc_coverage": {
+        "covered_eps": 3,
+        "total_eps": 8,
+        "gap_eps": [
+            "CTS.03.01.03",
+            "CTS.03.01.09",
+            "NPSG.15.01.01",
+            "R3-25",
+            "RC.01.02.01"
+        ]
+    }
+}

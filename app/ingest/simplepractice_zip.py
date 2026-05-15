@@ -48,6 +48,7 @@ import uuid
 from datetime import datetime
 from pathlib import Path
 
+from fhir.resources.R4B.resource import Resource
 from sqlmodel import Session, select
 
 from app.db.models import (
@@ -58,6 +59,12 @@ from app.db.models import (
     ExtractedObservation,
     Patient,
     TjcCoverage,
+)
+from app.fhir.mappers import (
+    to_fhir_clinical_impression,
+    to_fhir_document_reference,
+    to_fhir_encounter,
+    to_fhir_patient,
 )
 from app.ingest.asam_evidence_index import build_asam_evidence
 from app.ingest.embeddings import embed_text
@@ -180,7 +187,7 @@ def _get_or_create_patient(session: Session, card: ContactCard, actor: str) -> P
     )
     session.add(patient)
     session.flush()
-    patient.fhir_json = _fhir_patient(patient)
+    patient.fhir_json = _fhir_json(to_fhir_patient(patient))
     _audit(session, actor, "ingest", "Patient", patient.id, {"external_id": card.external_id})
     return patient
 
@@ -276,7 +283,7 @@ def _persist_document(
     )
     session.add(encounter)
     session.flush()
-    encounter.fhir_json = _fhir_encounter(encounter)
+    encounter.fhir_json = _fhir_json(to_fhir_encounter(encounter))
 
     document = ClinicalDocument(
         patient_id=patient.id,
@@ -294,7 +301,10 @@ def _persist_document(
     )
     session.add(document)
     session.flush()
-    document.fhir_document_reference = _fhir_document_reference(document)
+    document.fhir_document_reference = _fhir_json(to_fhir_document_reference(document))
+    # Progress notes carry a ClinicalImpression; the BPS intake does not.
+    if doc_type != "bps_intake":
+        document.fhir_clinical_impression = _fhir_json(to_fhir_clinical_impression(document))
 
     for observation in (*scale_observations, *entity_observations):
         session.add(ExtractedObservation(document_id=document.id, **observation))
@@ -378,43 +388,14 @@ def _audit(
     )
 
 
-# --- Minimal FHIR R4 JSON builders (M7 replaces with fhir.resources-validated) ---
-def _fhir_patient(patient: Patient) -> dict:
-    return {
-        "resourceType": "Patient",
-        "id": str(patient.id),
-        "identifier": [
-            {"system": "https://simplepractice.com/client-id", "value": patient.external_id}
-        ],
-        "name": [{"family": patient.family_name, "given": [patient.given_name]}],
-        "gender": patient.gender,
-        "birthDate": patient.birth_date.isoformat(),
-    }
+def _fhir_json(resource: Resource) -> dict:
+    """Dump a fhir.resources model to a JSON-safe dict for a ``fhir_*`` column.
 
-
-def _fhir_encounter(encounter: Encounter) -> dict:
-    return {
-        "resourceType": "Encounter",
-        "id": str(encounter.id),
-        "status": "finished",
-        "class": {"code": encounter.class_code},
-        "type": [{"text": encounter.type_code}],
-        "subject": {"reference": f"Patient/{encounter.patient_id}"},
-        "period": {"start": encounter.period_start.isoformat()},
-    }
-
-
-def _fhir_document_reference(document: ClinicalDocument) -> dict:
-    return {
-        "resourceType": "DocumentReference",
-        "id": str(document.id),
-        "status": "current",
-        "type": {"text": document.document_type},
-        "subject": {"reference": f"Patient/{document.patient_id}"},
-        "date": document.authored_on.isoformat(),
-        "author": [{"display": document.author_name}],
-        "context": {"encounter": [{"reference": f"Encounter/{document.encounter_id}"}]},
-    }
+    ``by_alias`` is required so the Encounter ``class`` field serializes under
+    its FHIR name (it is ``class_fhir`` in Python -- ``class`` is a keyword);
+    ``mode="json"`` renders dates/datetimes as ISO strings.
+    """
+    return resource.model_dump(mode="json", by_alias=True, exclude_none=True)
 
 
 def _main() -> None:

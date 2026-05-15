@@ -1,0 +1,1198 @@
+{
+    "resourceType": "Bundle",
+    "type": "searchset",
+    "total": 30,
+    "entry": [
+        {
+            "fullUrl": "Patient/d72ea8f6-ba22-4f47-81b6-35ce2eae78d5",
+            "resource": {
+                "resourceType": "Patient",
+                "id": "d72ea8f6-ba22-4f47-81b6-35ce2eae78d5",
+                "identifier": [
+                    {
+                        "system": "https://simplepractice.com/client-id",
+                        "value": "106915126"
+                    }
+                ],
+                "name": [
+                    {
+                        "family": "Reyes",
+                        "given": [
+                            "Marcus"
+                        ]
+                    }
+                ],
+                "gender": "unknown",
+                "birthDate": "1991-04-11"
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "fullUrl": "Encounter/5b2909d5-dcda-4567-a1f8-76552f242b3a",
+            "resource": {
+                "resourceType": "Encounter",
+                "id": "5b2909d5-dcda-4567-a1f8-76552f242b3a",
+                "status": "finished",
+                "class": {
+                    "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+                    "code": "IMP"
+                },
+                "type": [
+                    {
+                        "text": "intake"
+                    }
+                ],
+                "subject": {
+                    "reference": "Patient/d72ea8f6-ba22-4f47-81b6-35ce2eae78d5"
+                },
+                "period": {
+                    "start": "2026-05-04T13:30:00-05:00"
+                }
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "fullUrl": "Encounter/58a7e5eb-0179-4149-a3d2-dc6354ca6cc8",
+            "resource": {
+                "resourceType": "Encounter",
+                "id": "58a7e5eb-0179-4149-a3d2-dc6354ca6cc8",
+                "status": "finished",
+                "class": {
+                    "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+                    "code": "IMP"
+                },
+                "type": [
+                    {
+                        "text": "progress"
+                    }
+                ],
+                "subject": {
+                    "reference": "Patient/d72ea8f6-ba22-4f47-81b6-35ce2eae78d5"
+                },
+                "period": {
+                    "start": "2026-05-06T11:00:00-05:00"
+                }
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "fullUrl": "Encounter/fc52c14e-994d-4f01-99cc-860ddfa9b001",
+            "resource": {
+                "resourceType": "Encounter",
+                "id": "fc52c14e-994d-4f01-99cc-860ddfa9b001",
+                "status": "finished",
+                "class": {
+                    "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+                    "code": "IMP"
+                },
+                "type": [
+                    {
+                        "text": "progress"
+                    }
+                ],
+                "subject": {
+                    "reference": "Patient/d72ea8f6-ba22-4f47-81b6-35ce2eae78d5"
+                },
+                "period": {
+                    "start": "2026-05-09T10:00:00-05:00"
+                }
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "fullUrl": "Encounter/0ec0438b-7f49-4553-9ed2-56afcd97d78e",
+            "resource": {
+                "resourceType": "Encounter",
+                "id": "0ec0438b-7f49-4553-9ed2-56afcd97d78e",
+                "status": "finished",
+                "class": {
+                    "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+                    "code": "IMP"
+                },
+                "type": [
+                    {
+                        "text": "loc-reassessment"
+                    }
+                ],
+                "subject": {
+                    "reference": "Patient/d72ea8f6-ba22-4f47-81b6-35ce2eae78d5"
+                },
+                "period": {
+                    "start": "2026-05-12T17:00:00-05:00"
+                }
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "fullUrl": "DocumentReference/3bbea558-14a2-42f3-abb1-b31e655f0d1d",
+            "resource": {
+                "resourceType": "DocumentReference",
+                "id": "3bbea558-14a2-42f3-abb1-b31e655f0d1d",
+                "status": "current",
+                "type": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org",
+                            "code": "11488-4",
+                            "display": "Consultation Note"
+                        }
+                    ],
+                    "text": "bps_intake"
+                },
+                "subject": {
+                    "reference": "Patient/d72ea8f6-ba22-4f47-81b6-35ce2eae78d5"
+                },
+                "date": "2026-05-04T13:30:00-05:00",
+                "author": [
+                    {
+                        "display": "Adrian Dai"
+                    }
+                ],
+                "content": [
+                    {
+                        "attachment": {
+                            "contentType": "text/plain",
+                            "title": "bps_intake"
+                        }
+                    }
+                ],
+                "context": {
+                    "encounter": [
+                        {
+                            "reference": "Encounter/5b2909d5-dcda-4567-a1f8-76552f242b3a"
+                        }
+                    ]
+                }
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "fullUrl": "DocumentReference/9a8f374e-599e-4896-8075-40282efd540d",
+            "resource": {
+                "resourceType": "DocumentReference",
+                "id": "9a8f374e-599e-4896-8075-40282efd540d",
+                "status": "current",
+                "type": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org",
+                            "code": "11506-3",
+                            "display": "Progress Note"
+                        }
+                    ],
+                    "text": "soap"
+                },
+                "subject": {
+                    "reference": "Patient/d72ea8f6-ba22-4f47-81b6-35ce2eae78d5"
+                },
+                "date": "2026-05-06T11:00:00-05:00",
+                "author": [
+                    {
+                        "display": "Dr. Aisha Patel, MD"
+                    }
+                ],
+                "content": [
+                    {
+                        "attachment": {
+                            "contentType": "text/plain",
+                            "title": "soap"
+                        }
+                    }
+                ],
+                "context": {
+                    "encounter": [
+                        {
+                            "reference": "Encounter/58a7e5eb-0179-4149-a3d2-dc6354ca6cc8"
+                        }
+                    ]
+                }
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "fullUrl": "DocumentReference/14bbb86c-5774-4aa4-9ccd-cccee6c1a4c5",
+            "resource": {
+                "resourceType": "DocumentReference",
+                "id": "14bbb86c-5774-4aa4-9ccd-cccee6c1a4c5",
+                "status": "current",
+                "type": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org",
+                            "code": "11506-3",
+                            "display": "Progress Note"
+                        }
+                    ],
+                    "text": "dap"
+                },
+                "subject": {
+                    "reference": "Patient/d72ea8f6-ba22-4f47-81b6-35ce2eae78d5"
+                },
+                "date": "2026-05-09T10:00:00-05:00",
+                "author": [
+                    {
+                        "display": "Jordan Kim"
+                    }
+                ],
+                "content": [
+                    {
+                        "attachment": {
+                            "contentType": "text/plain",
+                            "title": "dap"
+                        }
+                    }
+                ],
+                "context": {
+                    "encounter": [
+                        {
+                            "reference": "Encounter/fc52c14e-994d-4f01-99cc-860ddfa9b001"
+                        }
+                    ]
+                }
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "fullUrl": "DocumentReference/022da9ad-a7c6-4198-88c2-b37a8ffe18e2",
+            "resource": {
+                "resourceType": "DocumentReference",
+                "id": "022da9ad-a7c6-4198-88c2-b37a8ffe18e2",
+                "status": "current",
+                "type": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org",
+                            "code": "11506-3",
+                            "display": "Progress Note"
+                        }
+                    ],
+                    "text": "dsap"
+                },
+                "subject": {
+                    "reference": "Patient/d72ea8f6-ba22-4f47-81b6-35ce2eae78d5"
+                },
+                "date": "2026-05-12T17:00:00-05:00",
+                "author": [
+                    {
+                        "display": "Maria Gonzales"
+                    }
+                ],
+                "content": [
+                    {
+                        "attachment": {
+                            "contentType": "text/plain",
+                            "title": "dsap"
+                        }
+                    }
+                ],
+                "context": {
+                    "encounter": [
+                        {
+                            "reference": "Encounter/0ec0438b-7f49-4553-9ed2-56afcd97d78e"
+                        }
+                    ]
+                }
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "fullUrl": "ClinicalImpression/9a8f374e-599e-4896-8075-40282efd540d",
+            "resource": {
+                "resourceType": "ClinicalImpression",
+                "id": "9a8f374e-599e-4896-8075-40282efd540d",
+                "status": "completed",
+                "subject": {
+                    "reference": "Patient/d72ea8f6-ba22-4f47-81b6-35ce2eae78d5"
+                },
+                "encounter": {
+                    "reference": "Encounter/58a7e5eb-0179-4149-a3d2-dc6354ca6cc8"
+                },
+                "date": "2026-05-06T11:00:00-05:00",
+                "summary": "Alcohol withdrawal, moderate, improving on chlordiazepoxide taper. Benzodiazepine withdrawal anticipated but not yet\nmanifest. MDD and GAD untreated; defer pharmacologic initiation until withdrawal resolves."
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "fullUrl": "ClinicalImpression/14bbb86c-5774-4aa4-9ccd-cccee6c1a4c5",
+            "resource": {
+                "resourceType": "ClinicalImpression",
+                "id": "14bbb86c-5774-4aa4-9ccd-cccee6c1a4c5",
+                "status": "completed",
+                "subject": {
+                    "reference": "Patient/d72ea8f6-ba22-4f47-81b6-35ce2eae78d5"
+                },
+                "encounter": {
+                    "reference": "Encounter/fc52c14e-994d-4f01-99cc-860ddfa9b001"
+                },
+                "date": "2026-05-09T10:00:00-05:00",
+                "summary": "Engagement improving. Continues to express ambivalence about long-term recovery but is participating in milieu. Peer\nconnection appears protective."
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "fullUrl": "ClinicalImpression/022da9ad-a7c6-4198-88c2-b37a8ffe18e2",
+            "resource": {
+                "resourceType": "ClinicalImpression",
+                "id": "022da9ad-a7c6-4198-88c2-b37a8ffe18e2",
+                "status": "completed",
+                "subject": {
+                    "reference": "Patient/d72ea8f6-ba22-4f47-81b6-35ce2eae78d5"
+                },
+                "encounter": {
+                    "reference": "Encounter/0ec0438b-7f49-4553-9ed2-56afcd97d78e"
+                },
+                "date": "2026-05-12T17:00:00-05:00",
+                "summary": "Ready clinically for step-down per Dim 1 (resolved withdrawal) and Dim 2 (improving). Dim 3 (PHQ-9 not repeated this\nadmission \u2014 see note), Dim 5 remains the limiting factor (unsafe home environment). Recommending 3.7 \u2192 2.5 (Partial\nHospitalization with IOP step) rather than full community discharge."
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "fullUrl": "Observation/3e9b8db3-4ff2-40e7-b8f3-8a732b7ad257",
+            "resource": {
+                "resourceType": "Observation",
+                "id": "3e9b8db3-4ff2-40e7-b8f3-8a732b7ad257",
+                "status": "final",
+                "code": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org",
+                            "code": "75624-7",
+                            "display": "AUDIT-C total score"
+                        }
+                    ]
+                },
+                "subject": {
+                    "reference": "Patient/d72ea8f6-ba22-4f47-81b6-35ce2eae78d5"
+                },
+                "encounter": {
+                    "reference": "Encounter/5b2909d5-dcda-4567-a1f8-76552f242b3a"
+                },
+                "valueQuantity": {
+                    "value": 11
+                }
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "fullUrl": "Observation/bc86fe13-c149-4132-a405-7c42fa2596fd",
+            "resource": {
+                "resourceType": "Observation",
+                "id": "bc86fe13-c149-4132-a405-7c42fa2596fd",
+                "status": "final",
+                "code": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org",
+                            "code": "82666-9",
+                            "display": "DAST-10 total score"
+                        }
+                    ]
+                },
+                "subject": {
+                    "reference": "Patient/d72ea8f6-ba22-4f47-81b6-35ce2eae78d5"
+                },
+                "encounter": {
+                    "reference": "Encounter/5b2909d5-dcda-4567-a1f8-76552f242b3a"
+                },
+                "valueQuantity": {
+                    "value": 7
+                }
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "fullUrl": "Observation/463ce2c5-83fc-460a-a38b-539a2063eec8",
+            "resource": {
+                "resourceType": "Observation",
+                "id": "463ce2c5-83fc-460a-a38b-539a2063eec8",
+                "status": "final",
+                "code": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org",
+                            "code": "44261-6",
+                            "display": "PHQ-9 total score"
+                        }
+                    ]
+                },
+                "subject": {
+                    "reference": "Patient/d72ea8f6-ba22-4f47-81b6-35ce2eae78d5"
+                },
+                "encounter": {
+                    "reference": "Encounter/5b2909d5-dcda-4567-a1f8-76552f242b3a"
+                },
+                "valueQuantity": {
+                    "value": 18
+                }
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "fullUrl": "Observation/592e165b-7c53-4369-b0a4-d7b5d6dc3372",
+            "resource": {
+                "resourceType": "Observation",
+                "id": "592e165b-7c53-4369-b0a4-d7b5d6dc3372",
+                "status": "final",
+                "code": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org",
+                            "code": "70274-6",
+                            "display": "GAD-7 total score"
+                        }
+                    ]
+                },
+                "subject": {
+                    "reference": "Patient/d72ea8f6-ba22-4f47-81b6-35ce2eae78d5"
+                },
+                "encounter": {
+                    "reference": "Encounter/5b2909d5-dcda-4567-a1f8-76552f242b3a"
+                },
+                "valueQuantity": {
+                    "value": 15
+                }
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "fullUrl": "Observation/e51bbe84-be13-4d38-8edc-1da6a78ab131",
+            "resource": {
+                "resourceType": "Observation",
+                "id": "e51bbe84-be13-4d38-8edc-1da6a78ab131",
+                "status": "final",
+                "code": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org",
+                            "code": "93373-7",
+                            "display": "C-SSRS (Columbia Suicide Severity Rating Scale)"
+                        }
+                    ]
+                },
+                "subject": {
+                    "reference": "Patient/d72ea8f6-ba22-4f47-81b6-35ce2eae78d5"
+                },
+                "encounter": {
+                    "reference": "Encounter/5b2909d5-dcda-4567-a1f8-76552f242b3a"
+                },
+                "valueString": "low-intensity passive ideation; no active SI/plan/intent."
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "fullUrl": "Observation/d87a4cf2-7866-4ac3-94d9-44fb01abb134",
+            "resource": {
+                "resourceType": "Observation",
+                "id": "d87a4cf2-7866-4ac3-94d9-44fb01abb134",
+                "status": "final",
+                "code": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org",
+                            "code": "72109-3",
+                            "display": "CIWA-Ar total score"
+                        }
+                    ]
+                },
+                "subject": {
+                    "reference": "Patient/d72ea8f6-ba22-4f47-81b6-35ce2eae78d5"
+                },
+                "encounter": {
+                    "reference": "Encounter/5b2909d5-dcda-4567-a1f8-76552f242b3a"
+                },
+                "valueQuantity": {
+                    "value": 12
+                }
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "fullUrl": "Observation/33f94e9c-61d8-484a-af21-a6c9c53641b9",
+            "resource": {
+                "resourceType": "Observation",
+                "id": "33f94e9c-61d8-484a-af21-a6c9c53641b9",
+                "status": "final",
+                "code": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org",
+                            "code": "92103-9",
+                            "display": "COWS (Clinical Opiate Withdrawal Scale)"
+                        }
+                    ]
+                },
+                "subject": {
+                    "reference": "Patient/d72ea8f6-ba22-4f47-81b6-35ce2eae78d5"
+                },
+                "encounter": {
+                    "reference": "Encounter/5b2909d5-dcda-4567-a1f8-76552f242b3a"
+                },
+                "valueString": "not administered"
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "fullUrl": "Observation/c9dc9fff-7319-4bad-94c2-caf2ff595ff8",
+            "resource": {
+                "resourceType": "Observation",
+                "id": "c9dc9fff-7319-4bad-94c2-caf2ff595ff8",
+                "status": "final",
+                "code": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org",
+                            "code": "72109-3",
+                            "display": "CIWA-Ar total score"
+                        }
+                    ]
+                },
+                "subject": {
+                    "reference": "Patient/d72ea8f6-ba22-4f47-81b6-35ce2eae78d5"
+                },
+                "encounter": {
+                    "reference": "Encounter/58a7e5eb-0179-4149-a3d2-dc6354ca6cc8"
+                },
+                "valueQuantity": {
+                    "value": 8
+                }
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "fullUrl": "Observation/72b2b469-6782-4aba-b7a6-e5c35b1228e9",
+            "resource": {
+                "resourceType": "Observation",
+                "id": "72b2b469-6782-4aba-b7a6-e5c35b1228e9",
+                "status": "final",
+                "code": {
+                    "coding": [
+                        {
+                            "system": "http://loinc.org",
+                            "code": "72109-3",
+                            "display": "CIWA-Ar total score"
+                        }
+                    ]
+                },
+                "subject": {
+                    "reference": "Patient/d72ea8f6-ba22-4f47-81b6-35ce2eae78d5"
+                },
+                "encounter": {
+                    "reference": "Encounter/0ec0438b-7f49-4553-9ed2-56afcd97d78e"
+                },
+                "valueQuantity": {
+                    "value": 2
+                }
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "fullUrl": "Provenance/prov-3e9b8db3-4ff2-40e7-b8f3-8a732b7ad257",
+            "resource": {
+                "resourceType": "Provenance",
+                "id": "prov-3e9b8db3-4ff2-40e7-b8f3-8a732b7ad257",
+                "target": [
+                    {
+                        "reference": "Observation/3e9b8db3-4ff2-40e7-b8f3-8a732b7ad257"
+                    }
+                ],
+                "recorded": "2026-05-04T13:30:00-05:00",
+                "activity": {
+                    "coding": [
+                        {
+                            "system": "http://terminology.hl7.org/CodeSystem/v3-DataOperation",
+                            "code": "DERIVE",
+                            "display": "derive"
+                        }
+                    ]
+                },
+                "agent": [
+                    {
+                        "type": {
+                            "coding": [
+                                {
+                                    "system": "http://terminology.hl7.org/CodeSystem/provenance-participant-type",
+                                    "code": "performer"
+                                }
+                            ]
+                        },
+                        "who": {
+                            "display": "perspectives-health-extractor"
+                        }
+                    }
+                ],
+                "entity": [
+                    {
+                        "extension": [
+                            {
+                                "extension": [
+                                    {
+                                        "url": "start",
+                                        "valueInteger": 10047
+                                    },
+                                    {
+                                        "url": "end",
+                                        "valueInteger": 10162
+                                    }
+                                ],
+                                "url": "http://perspectiveshealth.ai/fhir/StructureDefinition/text-position-selector"
+                            }
+                        ],
+                        "role": "source",
+                        "what": {
+                            "reference": "DocumentReference/3bbea558-14a2-42f3-abb1-b31e655f0d1d"
+                        }
+                    }
+                ]
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "fullUrl": "Provenance/prov-bc86fe13-c149-4132-a405-7c42fa2596fd",
+            "resource": {
+                "resourceType": "Provenance",
+                "id": "prov-bc86fe13-c149-4132-a405-7c42fa2596fd",
+                "target": [
+                    {
+                        "reference": "Observation/bc86fe13-c149-4132-a405-7c42fa2596fd"
+                    }
+                ],
+                "recorded": "2026-05-04T13:30:00-05:00",
+                "activity": {
+                    "coding": [
+                        {
+                            "system": "http://terminology.hl7.org/CodeSystem/v3-DataOperation",
+                            "code": "DERIVE",
+                            "display": "derive"
+                        }
+                    ]
+                },
+                "agent": [
+                    {
+                        "type": {
+                            "coding": [
+                                {
+                                    "system": "http://terminology.hl7.org/CodeSystem/provenance-participant-type",
+                                    "code": "performer"
+                                }
+                            ]
+                        },
+                        "who": {
+                            "display": "perspectives-health-extractor"
+                        }
+                    }
+                ],
+                "entity": [
+                    {
+                        "extension": [
+                            {
+                                "extension": [
+                                    {
+                                        "url": "start",
+                                        "valueInteger": 10211
+                                    },
+                                    {
+                                        "url": "end",
+                                        "valueInteger": 10327
+                                    }
+                                ],
+                                "url": "http://perspectiveshealth.ai/fhir/StructureDefinition/text-position-selector"
+                            }
+                        ],
+                        "role": "source",
+                        "what": {
+                            "reference": "DocumentReference/3bbea558-14a2-42f3-abb1-b31e655f0d1d"
+                        }
+                    }
+                ]
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "fullUrl": "Provenance/prov-463ce2c5-83fc-460a-a38b-539a2063eec8",
+            "resource": {
+                "resourceType": "Provenance",
+                "id": "prov-463ce2c5-83fc-460a-a38b-539a2063eec8",
+                "target": [
+                    {
+                        "reference": "Observation/463ce2c5-83fc-460a-a38b-539a2063eec8"
+                    }
+                ],
+                "recorded": "2026-05-04T13:30:00-05:00",
+                "activity": {
+                    "coding": [
+                        {
+                            "system": "http://terminology.hl7.org/CodeSystem/v3-DataOperation",
+                            "code": "DERIVE",
+                            "display": "derive"
+                        }
+                    ]
+                },
+                "agent": [
+                    {
+                        "type": {
+                            "coding": [
+                                {
+                                    "system": "http://terminology.hl7.org/CodeSystem/provenance-participant-type",
+                                    "code": "performer"
+                                }
+                            ]
+                        },
+                        "who": {
+                            "display": "perspectives-health-extractor"
+                        }
+                    }
+                ],
+                "entity": [
+                    {
+                        "extension": [
+                            {
+                                "extension": [
+                                    {
+                                        "url": "start",
+                                        "valueInteger": 12397
+                                    },
+                                    {
+                                        "url": "end",
+                                        "valueInteger": 12587
+                                    }
+                                ],
+                                "url": "http://perspectiveshealth.ai/fhir/StructureDefinition/text-position-selector"
+                            }
+                        ],
+                        "role": "source",
+                        "what": {
+                            "reference": "DocumentReference/3bbea558-14a2-42f3-abb1-b31e655f0d1d"
+                        }
+                    }
+                ]
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "fullUrl": "Provenance/prov-592e165b-7c53-4369-b0a4-d7b5d6dc3372",
+            "resource": {
+                "resourceType": "Provenance",
+                "id": "prov-592e165b-7c53-4369-b0a4-d7b5d6dc3372",
+                "target": [
+                    {
+                        "reference": "Observation/592e165b-7c53-4369-b0a4-d7b5d6dc3372"
+                    }
+                ],
+                "recorded": "2026-05-04T13:30:00-05:00",
+                "activity": {
+                    "coding": [
+                        {
+                            "system": "http://terminology.hl7.org/CodeSystem/v3-DataOperation",
+                            "code": "DERIVE",
+                            "display": "derive"
+                        }
+                    ]
+                },
+                "agent": [
+                    {
+                        "type": {
+                            "coding": [
+                                {
+                                    "system": "http://terminology.hl7.org/CodeSystem/provenance-participant-type",
+                                    "code": "performer"
+                                }
+                            ]
+                        },
+                        "who": {
+                            "display": "perspectives-health-extractor"
+                        }
+                    }
+                ],
+                "entity": [
+                    {
+                        "extension": [
+                            {
+                                "extension": [
+                                    {
+                                        "url": "start",
+                                        "valueInteger": 12643
+                                    },
+                                    {
+                                        "url": "end",
+                                        "valueInteger": 12810
+                                    }
+                                ],
+                                "url": "http://perspectiveshealth.ai/fhir/StructureDefinition/text-position-selector"
+                            }
+                        ],
+                        "role": "source",
+                        "what": {
+                            "reference": "DocumentReference/3bbea558-14a2-42f3-abb1-b31e655f0d1d"
+                        }
+                    }
+                ]
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "fullUrl": "Provenance/prov-e51bbe84-be13-4d38-8edc-1da6a78ab131",
+            "resource": {
+                "resourceType": "Provenance",
+                "id": "prov-e51bbe84-be13-4d38-8edc-1da6a78ab131",
+                "target": [
+                    {
+                        "reference": "Observation/e51bbe84-be13-4d38-8edc-1da6a78ab131"
+                    }
+                ],
+                "recorded": "2026-05-04T13:30:00-05:00",
+                "activity": {
+                    "coding": [
+                        {
+                            "system": "http://terminology.hl7.org/CodeSystem/v3-DataOperation",
+                            "code": "DERIVE",
+                            "display": "derive"
+                        }
+                    ]
+                },
+                "agent": [
+                    {
+                        "type": {
+                            "coding": [
+                                {
+                                    "system": "http://terminology.hl7.org/CodeSystem/provenance-participant-type",
+                                    "code": "performer"
+                                }
+                            ]
+                        },
+                        "who": {
+                            "display": "perspectives-health-extractor"
+                        }
+                    }
+                ],
+                "entity": [
+                    {
+                        "extension": [
+                            {
+                                "extension": [
+                                    {
+                                        "url": "start",
+                                        "valueInteger": 12886
+                                    },
+                                    {
+                                        "url": "end",
+                                        "valueInteger": 13087
+                                    }
+                                ],
+                                "url": "http://perspectiveshealth.ai/fhir/StructureDefinition/text-position-selector"
+                            }
+                        ],
+                        "role": "source",
+                        "what": {
+                            "reference": "DocumentReference/3bbea558-14a2-42f3-abb1-b31e655f0d1d"
+                        }
+                    }
+                ]
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "fullUrl": "Provenance/prov-d87a4cf2-7866-4ac3-94d9-44fb01abb134",
+            "resource": {
+                "resourceType": "Provenance",
+                "id": "prov-d87a4cf2-7866-4ac3-94d9-44fb01abb134",
+                "target": [
+                    {
+                        "reference": "Observation/d87a4cf2-7866-4ac3-94d9-44fb01abb134"
+                    }
+                ],
+                "recorded": "2026-05-04T13:30:00-05:00",
+                "activity": {
+                    "coding": [
+                        {
+                            "system": "http://terminology.hl7.org/CodeSystem/v3-DataOperation",
+                            "code": "DERIVE",
+                            "display": "derive"
+                        }
+                    ]
+                },
+                "agent": [
+                    {
+                        "type": {
+                            "coding": [
+                                {
+                                    "system": "http://terminology.hl7.org/CodeSystem/provenance-participant-type",
+                                    "code": "performer"
+                                }
+                            ]
+                        },
+                        "who": {
+                            "display": "perspectives-health-extractor"
+                        }
+                    }
+                ],
+                "entity": [
+                    {
+                        "extension": [
+                            {
+                                "extension": [
+                                    {
+                                        "url": "start",
+                                        "valueInteger": 13214
+                                    },
+                                    {
+                                        "url": "end",
+                                        "valueInteger": 13396
+                                    }
+                                ],
+                                "url": "http://perspectiveshealth.ai/fhir/StructureDefinition/text-position-selector"
+                            }
+                        ],
+                        "role": "source",
+                        "what": {
+                            "reference": "DocumentReference/3bbea558-14a2-42f3-abb1-b31e655f0d1d"
+                        }
+                    }
+                ]
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "fullUrl": "Provenance/prov-33f94e9c-61d8-484a-af21-a6c9c53641b9",
+            "resource": {
+                "resourceType": "Provenance",
+                "id": "prov-33f94e9c-61d8-484a-af21-a6c9c53641b9",
+                "target": [
+                    {
+                        "reference": "Observation/33f94e9c-61d8-484a-af21-a6c9c53641b9"
+                    }
+                ],
+                "recorded": "2026-05-04T13:30:00-05:00",
+                "activity": {
+                    "coding": [
+                        {
+                            "system": "http://terminology.hl7.org/CodeSystem/v3-DataOperation",
+                            "code": "DERIVE",
+                            "display": "derive"
+                        }
+                    ]
+                },
+                "agent": [
+                    {
+                        "type": {
+                            "coding": [
+                                {
+                                    "system": "http://terminology.hl7.org/CodeSystem/provenance-participant-type",
+                                    "code": "performer"
+                                }
+                            ]
+                        },
+                        "who": {
+                            "display": "perspectives-health-extractor"
+                        }
+                    }
+                ],
+                "entity": [
+                    {
+                        "extension": [
+                            {
+                                "extension": [
+                                    {
+                                        "url": "start",
+                                        "valueInteger": 13452
+                                    },
+                                    {
+                                        "url": "end",
+                                        "valueInteger": 13561
+                                    }
+                                ],
+                                "url": "http://perspectiveshealth.ai/fhir/StructureDefinition/text-position-selector"
+                            }
+                        ],
+                        "role": "source",
+                        "what": {
+                            "reference": "DocumentReference/3bbea558-14a2-42f3-abb1-b31e655f0d1d"
+                        }
+                    }
+                ]
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "fullUrl": "Provenance/prov-c9dc9fff-7319-4bad-94c2-caf2ff595ff8",
+            "resource": {
+                "resourceType": "Provenance",
+                "id": "prov-c9dc9fff-7319-4bad-94c2-caf2ff595ff8",
+                "target": [
+                    {
+                        "reference": "Observation/c9dc9fff-7319-4bad-94c2-caf2ff595ff8"
+                    }
+                ],
+                "recorded": "2026-05-06T11:00:00-05:00",
+                "activity": {
+                    "coding": [
+                        {
+                            "system": "http://terminology.hl7.org/CodeSystem/v3-DataOperation",
+                            "code": "DERIVE",
+                            "display": "derive"
+                        }
+                    ]
+                },
+                "agent": [
+                    {
+                        "type": {
+                            "coding": [
+                                {
+                                    "system": "http://terminology.hl7.org/CodeSystem/provenance-participant-type",
+                                    "code": "performer"
+                                }
+                            ]
+                        },
+                        "who": {
+                            "display": "perspectives-health-extractor"
+                        }
+                    }
+                ],
+                "entity": [
+                    {
+                        "extension": [
+                            {
+                                "extension": [
+                                    {
+                                        "url": "start",
+                                        "valueInteger": 387
+                                    },
+                                    {
+                                        "url": "end",
+                                        "valueInteger": 465
+                                    }
+                                ],
+                                "url": "http://perspectiveshealth.ai/fhir/StructureDefinition/text-position-selector"
+                            }
+                        ],
+                        "role": "source",
+                        "what": {
+                            "reference": "DocumentReference/9a8f374e-599e-4896-8075-40282efd540d"
+                        }
+                    }
+                ]
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "fullUrl": "Provenance/prov-72b2b469-6782-4aba-b7a6-e5c35b1228e9",
+            "resource": {
+                "resourceType": "Provenance",
+                "id": "prov-72b2b469-6782-4aba-b7a6-e5c35b1228e9",
+                "target": [
+                    {
+                        "reference": "Observation/72b2b469-6782-4aba-b7a6-e5c35b1228e9"
+                    }
+                ],
+                "recorded": "2026-05-12T17:00:00-05:00",
+                "activity": {
+                    "coding": [
+                        {
+                            "system": "http://terminology.hl7.org/CodeSystem/v3-DataOperation",
+                            "code": "DERIVE",
+                            "display": "derive"
+                        }
+                    ]
+                },
+                "agent": [
+                    {
+                        "type": {
+                            "coding": [
+                                {
+                                    "system": "http://terminology.hl7.org/CodeSystem/provenance-participant-type",
+                                    "code": "performer"
+                                }
+                            ]
+                        },
+                        "who": {
+                            "display": "perspectives-health-extractor"
+                        }
+                    }
+                ],
+                "entity": [
+                    {
+                        "extension": [
+                            {
+                                "extension": [
+                                    {
+                                        "url": "start",
+                                        "valueInteger": 236
+                                    },
+                                    {
+                                        "url": "end",
+                                        "valueInteger": 269
+                                    }
+                                ],
+                                "url": "http://perspectiveshealth.ai/fhir/StructureDefinition/text-position-selector"
+                            }
+                        ],
+                        "role": "source",
+                        "what": {
+                            "reference": "DocumentReference/022da9ad-a7c6-4198-88c2-b37a8ffe18e2"
+                        }
+                    }
+                ]
+            },
+            "search": {
+                "mode": "match"
+            }
+        }
+    ]
+}
